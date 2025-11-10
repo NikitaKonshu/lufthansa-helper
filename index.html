@@ -3,339 +3,286 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — embedded</title>
-  <meta name="color-scheme" content="dark light">
+  <title>LGV — Minimal</title>
+  <meta name="color-scheme" content="light dark">
   <style>
     :root{
-      --bg:#071826;
-      --card:#0d2b3a;
-      --accent:#ffd24d;
-      --muted:#9fb6d6;
-      --text:#eaf4ff;
-      --glass:rgba(255,255,255,0.03);
-      --radius:14px;
-      --gap:12px;
-      --shadow:0 12px 32px rgba(2,8,20,0.6);
-      --transition:170ms cubic-bezier(.2,.9,.3,1);
-      --max-width:980px;
+      --bg:#0b1220;
+      --card:#0f1724;
+      --muted:#96a0b4;
+      --accent:#9dd1ff;
+      --text:#e6eef8;
+      --soft:#0b1420;
+      --radius:12px;
+      --gap:14px;
+      --shadow: 0 6px 20px rgba(2,8,20,0.6);
+      --max-w:980px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg),#042536 95%);color:var(--text);
-      display:flex;align-items:flex-start;justify-content:center;padding:18px;
+      margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#071121);color:var(--text);
+      display:flex;align-items:center;justify-content:center;padding:20px;
     }
-    .wrap{width:100%;max-width:var(--max-width);margin-bottom:36px}
-    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:12px;background:linear-gradient(90deg,#083b54,#063048);box-shadow:var(--shadow)}
+
+    .wrap{width:100%;max-width:var(--max-w)}
+    /* header */
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(180deg,#083b63,#042a47);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900;font-size:18px}
-    .title{margin:0;font-size:18px;color:var(--accent);font-weight:900}
-    .subtitle{margin:0;font-size:13px;color:var(--muted)}
-    .card{margin-top:14px;background:linear-gradient(180deg,var(--card),#062c3f);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-    .left{flex:1;min-width:0}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{cursor:pointer;padding:10px 14px;border-radius:10px;border:0;font-weight:800;background:transparent;color:var(--text);transition:transform var(--transition)}
-    .btn-primary{background:var(--accent);color:#06202a}
-    .btn-ghost{border:1px solid rgba(255,255,255,0.06)}
-    .small{font-size:13px;color:var(--muted)}
-    .note{font-size:12px;color:var(--muted);margin-top:10px}
-    .grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:12px}
-    @media(max-width:960px){.grid{grid-template-columns:1fr}}
-    .panel{background:var(--glass);padding:12px;border-radius:10px}
-    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-    .option{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
-    .option:hover{transform:translateY(-4px)}
-    .option.selected{border-color:rgba(255,210,77,0.22);box-shadow:0 10px 30px rgba(1,6,12,0.45)}
-    .ico{width:40px;height:40px;border-radius:9px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
-    .result{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,0.14),rgba(0,0,0,0.08));display:none}
-    .r-row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
-    .r-label{color:var(--muted);font-size:13px}
-    .r-val{font-weight:900}
-    .r-icao{color:var(--accent);font-weight:900}
+    .badge{width:48px;height:48px;border-radius:10px;background:linear-gradient(180deg,#071e2b,#0a394b);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800}
+    h1{margin:0;font-size:18px;letter-spacing:0.2px}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+
+    /* container */
+    .card{
+      background:linear-gradient(180deg,var(--card),#091523);
+      border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;
+      display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start;
+    }
+    @media(max-width:860px){.card{grid-template-columns:1fr}}
+
+    /* left column */
+    .section{margin-bottom:12px}
+    .label{font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:600}
+    .options{display:flex;flex-wrap:wrap;gap:10px}
+    .chip{
+      background:transparent;border:1px solid rgba(255,255,255,0.04);padding:10px 12px;border-radius:10px;cursor:pointer;
+      display:flex;align-items:center;gap:10px;min-width:120px;transition:transform .15s ease;
+    }
+    .chip:hover{transform:translateY(-3px)}
+    .chip.selected{background:linear-gradient(90deg, rgba(157,209,255,0.08), rgba(157,209,255,0.04));border-color:rgba(157,209,255,0.22)}
+    .chip .mono{font-weight:800;color:var(--accent);min-width:36px;text-align:center;border-radius:6px;padding:6px 8px;background:rgba(255,255,255,0.01)}
+
+    /* actions */
+    .actions{display:flex;gap:10px;margin-top:14px}
+    .btn{padding:10px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+    .btn.primary{background:var(--accent);color:#062036}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--text)}
+
+    /* result */
+    .result{margin-top:14px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;display:none}
+    .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.02)}
+    .row:last-child{border-bottom:none}
+    .k{color:var(--muted);font-size:13px}
+    .v{font-weight:800}
+
+    /* right column */
+    aside{padding:12px;background:rgba(255,255,255,0.01);border-radius:10px}
+    .meta{font-size:13px;color:var(--muted)}
+    .meta strong{color:var(--text);font-weight:800}
+    .tiny{font-size:12px;color:var(--muted);margin-top:10px}
+
+    /* mobile tweaks */
     @media(max-width:480px){
-      .logo{width:48px;height:48px;font-size:16px}
-      .title{font-size:16px}
-      .option{padding:8px}
-      .ico{width:34px;height:34px}
-      .controls{gap:8px}
-      .btn{padding:8px 10px;font-size:14px}
+      header{flex-direction:column;align-items:flex-start;gap:8px}
+      .badge{width:44px;height:44px}
+      .card{padding:14px}
+      .chip{min-width:100px}
+      .actions{flex-direction:column;align-items:stretch}
+      .btn{width:100%}
     }
   </style>
 </head>
 <body>
-  <div class="wrap" id="app">
-    <header class="header" role="banner" aria-label="Lufthansa Group Virtual">
+  <div class="wrap" role="application" aria-label="LGV Minimal">
+    <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">LGV</div>
+        <div class="badge" aria-hidden="true">LG</div>
         <div>
-          <h1 class="title">Lufthansa Group Virtual</h1>
-          <p class="subtitle">Генератор рейсов — встроенные маршруты, мобильная адаптация</p>
+          <h1>Lufthansa Group Virtual</h1>
+          <p class="lead">Минималистичный генератор рейсов — встроенные данные, мгновенно</p>
         </div>
       </div>
-      <div>
-        <div class="small" style="text-align:right">Данные встроены в страницу; нет загрузки файлов</div>
-      </div>
+      <div class="meta">Встроено: Frankfurt EDDF + Munich EDDM</div>
     </header>
 
     <main class="card" role="main">
-      <div class="top">
-        <div class="left">
-          <h2 style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <p class="small" style="margin-top:6px">Выберите авиакомпанию и интервал длительности — результат появится ниже</p>
-
-          <div style="margin-top:12px">
-            <div style="font-size:13px;color:var(--muted);font-weight:800">Авиакомпания</div>
-            <div id="airlines" class="options" style="margin-top:8px"></div>
-          </div>
-
-          <div style="margin-top:12px">
-            <div style="font-size:13px;color:var(--muted);font-weight:800">Длительность</div>
-            <div id="durations" class="options" style="margin-top:8px"></div>
-          </div>
-
-          <div class="controls" aria-hidden="false" style="margin-top:12px">
-            <button id="gen" class="btn btn-primary" aria-label="Сгенерировать рейс">Сгенерировать</button>
-            <button id="demo" class="btn btn-ghost" aria-label="Демо: Lufthansa + 7-8ч">Демо</button>
-            <button id="reset" class="btn btn-ghost" aria-label="Сбросить выбор">Сброс</button>
-          </div>
-
-          <div id="result" class="result" role="status" aria-live="polite"></div>
-          <div class="note">Показываем реальное время из поля durationMinutes. Если для маршрута нет durationMinutes — время будет сгенерировано внутри выбранного интервала.</div>
+      <section>
+        <div class="section">
+          <div class="label">Авиакомпания</div>
+          <div id="air" class="options" aria-label="Список авиакомпаний"></div>
         </div>
 
-        <aside style="width:320px">
-          <div class="panel">
-            <h3 style="margin:0;color:var(--muted)">Инфо</h3>
-            <div style="margin-top:10px" class="small">Всего маршрутов: <strong id="count">—</strong></div>
-            <div style="margin-top:8px" class="small">Данные вшиты в страницу для мгновенного доступа.</div>
-            <div style="margin-top:12px">
-              <button id="inspect" class="btn btn-ghost">Показать 10 маршрутов в консоли</button>
-            </div>
-          </div>
-        </aside>
-      </div>
+        <div class="section">
+          <div class="label">Длительность</div>
+          <div id="dur" class="options" aria-label="Интервалы длительности"></div>
+        </div>
+
+        <div class="actions">
+          <button id="go" class="btn primary" aria-label="Генерировать рейс">Генерировать</button>
+          <button id="d" class="btn ghost" aria-label="Демо">Демо</button>
+          <button id="c" class="btn ghost" aria-label="Сброс">Сброс</button>
+        </div>
+
+        <div id="out" class="result" role="status" aria-live="polite"></div>
+      </section>
+
+      <aside>
+        <div class="meta">Маршрутов в наборе: <strong id="total">—</strong></div>
+        <div class="tiny">Показываем реальное значение durationMinutes, если оно доступно; иначе генерируем значение в выбранном интервале.</div>
+        <div style="margin-top:12px">
+          <button id="log" class="btn ghost" style="width:100%">Показать 8 маршрутов в консоли</button>
+        </div>
+      </aside>
     </main>
   </div>
 
 <script>
-/* ============================
-   Embedded ROUTES (EDDF + EDDM)
-   - durationMinutes numeric
-   ============================ */
+/* Minimal logic + embedded routes */
 const ROUTES = [
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":70,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Paris","toCountry":"France","toICAO":"LFPG","durationMinutes":85,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Munich","toCountry":"Germany","toICAO":"EDDM","durationMinutes":50,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Stockholm","toCountry":"Sweden","toICAO":"ESSA","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Reykjavik","toCountry":"Iceland","toICAO":"BIRK","durationMinutes":235,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Dubai","toCountry":"UAE","toICAO":"OMDB","durationMinutes":420,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":85,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":60,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Paris","toCountry":"France","toICAO":"LFPG","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":135,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Rome","toCountry":"Italy","toICAO":"LIRF","durationMinutes":120,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Vienna","toCountry":"Austria","toICAO":"LOWW","durationMinutes":80,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Vienna","toCountry":"Austria","toICAO":"LOWW","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":145,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":55,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Hamburg","toCountry":"Germany","toICAO":"EDDH","durationMinutes":45,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Hamburg","toCountry":"Germany","toICAO":"EDDH","durationMinutes":60,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":195,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":185,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Lisbon","toCountry":"Portugal","toICAO":"LPPT","durationMinutes":185,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":85,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Edinburgh","toCountry":"United Kingdom","toICAO":"EGPH","durationMinutes":145,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Edinburgh","toCountry":"United Kingdom","toICAO":"EGPH","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Tel Aviv","toCountry":"Israel","toICAO":"LLBG","durationMinutes":255,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Tel Aviv","toCountry":"Israel","toICAO":"LLBG","durationMinutes":260,"source":"embedded"}
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":70},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":75},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Paris","toCountry":"France","toICAO":"LFPG","durationMinutes":85},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Munich","toCountry":"Germany","toICAO":"EDDM","durationMinutes":50},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":85},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":60},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":135},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450}
 ];
-/* ============================
-   Airlines list (keeps previous UX)
-   ============================ */
+
 const AIRLINES = [
-  { name: "Lufthansa", hubs: ["EDDF","EDDM"] },
-  { name: "Austrian", hubs: ["LOWW"] },
-  { name: "Swiss", hubs: ["LSZH"] },
-  { name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"] },
-  { name: "Brussels Airlines", hubs: ["EBBR"] }
+  {name:"Lufthansa", hubs:["EDDF","EDDM"]},
+  {name:"Austrian", hubs:["LOWW"]},
+  {name:"Swiss", hubs:["LSZH"]}
 ];
 
 const DURATIONS = [
-  { label: "1-2ч", min: 60, max: 120 },
-  { label: "3-4ч", min: 180, max: 240 },
-  { label: "5-6ч", min: 300, max: 360 },
-  { label: "7-8ч", min: 420, max: 480 },
-  { label: "9-10ч", min: 540, max: 600 },
-  { label: "10+ч", min: 601, max: 1200 }
+  {label:"1–2 ч",min:60,max:120},
+  {label:"3–4 ч",min:180,max:240},
+  {label:"5–6 ч",min:300,max:360},
+  {label:"7–8 ч",min:420,max:480},
+  {label:"9–10 ч",min:540,max:600},
+  {label:"10+ ч",min:601,max:1200}
 ];
 
 /* Refs */
-const airlinesWrap = document.getElementById('airlines');
-const durationsWrap = document.getElementById('durations');
-const genBtn = document.getElementById('gen');
-const demoBtn = document.getElementById('demo');
-const resetBtn = document.getElementById('reset');
-const resultEl = document.getElementById('result');
-const countEl = document.getElementById('count');
-const inspectBtn = document.getElementById('inspect');
+const airEl = document.getElementById('air');
+const durEl = document.getElementById('dur');
+const goBtn = document.getElementById('go');
+const demoBtn = document.getElementById('d');
+const resetBtn = document.getElementById('c');
+const out = document.getElementById('out');
+const total = document.getElementById('total');
+const logBtn = document.getElementById('log');
 
-let chosenAir = null;
-let chosenDur = null;
+let selAir = null;
+let selDur = null;
 
-/* Helpers */
-function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-function pad(n){ return String(n).padStart(2,'0'); }
+/* Utils */
+function clamp(n,min,max){return Math.max(min,Math.min(max,n))}
+function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
-/* Ensure durations numeric (embedded already numeric but keep safety) */
-function ensureNumeric(routes){
-  routes.forEach(r=>{
-    if(r.durationMinutes === undefined || r.durationMinutes === null || r.durationMinutes === '') r.durationMinutes = NaN;
-    else r.durationMinutes = Number(r.durationMinutes);
-    if(!Number.isFinite(r.durationMinutes)) r.durationMinutes = NaN;
-  });
-  return routes;
-}
-ensureNumeric(ROUTES);
-
-/* Render controls */
-function renderAirlines(){
-  airlinesWrap.innerHTML = '';
+/* Render chips */
+function renderAir(){
+  airEl.innerHTML = '';
   AIRLINES.forEach((a,i)=>{
-    const el = document.createElement('div');
-    el.className = 'option';
-    el.tabIndex = 0;
-    el.innerHTML = `<div class="ico">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
-                    <div style="min-width:0"><div style="font-weight:800">${esc(a.name)}</div><div class="small" style="margin-top:4px;color:var(--muted)">Хабы: ${a.hubs.join(', ')}</div></div>`;
-    el.addEventListener('click', ()=> selectAir(i));
-    el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectAir(i); });
-    airlinesWrap.appendChild(el);
+    const el = document.createElement('button');
+    el.className = 'chip';
+    el.type = 'button';
+    el.innerHTML = `<span class="mono">${a.name.split(' ').map(x=>x[0]).slice(0,2).join('')}</span><div style="text-align:left"><div style="font-weight:700">${a.name}</div><div style="font-size:12px;color:var(--muted)">${a.hubs.join(', ')}</div></div>`;
+    el.onclick = ()=>{ selectAir(i); };
+    el.onkeydown = (e)=>{ if(e.key==='Enter') selectAir(i); };
+    airEl.appendChild(el);
   });
 }
-
-function renderDurations(){
-  durationsWrap.innerHTML = '';
+function renderDur(){
+  durEl.innerHTML = '';
   DURATIONS.forEach((d,i)=>{
-    const avg = Math.round(((d.min + d.max)/2)/60);
-    const el = document.createElement('div');
-    el.className = 'option';
-    el.tabIndex = 0;
-    el.innerHTML = `<div class="ico">⌛</div><div style="min-width:0"><div style="font-weight:800">${esc(d.label)}</div><div class="small" style="margin-top:4px;color:var(--muted)">~ ${avg} ч</div></div>`;
-    el.addEventListener('click', ()=> selectDur(i));
-    el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
-    durationsWrap.appendChild(el);
+    const el = document.createElement('button');
+    el.className = 'chip';
+    el.type = 'button';
+    el.innerHTML = `<span class="mono">⌛</span><div style="text-align:left"><div style="font-weight:700">${d.label}</div><div style="font-size:12px;color:var(--muted)">~ ${Math.round(((d.min+d.max)/2)/60)} ч</div></div>`;
+    el.onclick = ()=>{ selectDur(i); };
+    el.onkeydown = (e)=>{ if(e.key==='Enter') selectDur(i); };
+    durEl.appendChild(el);
   });
 }
 
-/* Selection */
+/* Selectors */
 function selectAir(i){
-  chosenAir = i;
-  Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-  hideResult();
+  selAir = i;
+  Array.from(airEl.children).forEach((c,idx)=> c.classList.toggle('selected', idx===i));
+  out.style.display='none';
 }
 function selectDur(i){
-  chosenDur = i;
-  Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-  hideResult();
+  selDur = i;
+  Array.from(durEl.children).forEach((c,idx)=> c.classList.toggle('selected', idx===i));
+  out.style.display='none';
 }
-function hideResult(){ resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
-/* Filtering: first by hubs, then by duration interval; fallback to nearest */
-function routesInDurationInterval(routes, durIdx){
-  if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
+/* Filtering logic */
+function filterByHubAndDuration(airIdx,durIdx){
+  const hubs = AIRLINES[airIdx].hubs.map(h=>h.toUpperCase());
+  let pool = ROUTES.filter(r => hubs.includes((r.fromICAO||'').toUpperCase()));
+  if(!Array.isArray(pool) || pool.length===0) return [];
+
+  if(typeof durIdx !== 'number') return pool;
+
   const interval = DURATIONS[durIdx];
-  if(!interval) return routes.slice();
+  const exact = pool.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
+  if(exact.length) return exact;
 
-  const matched = routes.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
-  if(matched.length>0) return matched;
-
+  // nearest by midpoint
   const midpoint = (interval.min + interval.max)/2;
-  const withNum = routes.filter(r => Number.isFinite(r.durationMinutes));
-  if(withNum.length===0) return [];
-  let bestDiff = Infinity;
-  withNum.forEach(r=>{ const d = Math.abs(r.durationMinutes - midpoint); if(d < bestDiff) bestDiff = d; });
-  const best = withNum.filter(r => Math.abs(r.durationMinutes - midpoint) <= bestDiff + 0.5);
-  return best.slice(0,200);
+  const withNum = pool.filter(r => Number.isFinite(r.durationMinutes));
+  if(!withNum.length) return pool;
+  let best = withNum.reduce((acc,r)=>{
+    const d = Math.abs(r.durationMinutes - midpoint);
+    if(acc.diff === undefined || d < acc.diff) return {diff:d,list:[r]};
+    if(Math.abs(d - acc.diff) < 1) acc.list.push(r);
+    return acc;
+  },{});
+  return best.list || withNum.slice(0,20);
 }
 
-/* Core generate (uses route.durationMinutes if numeric) */
-function generateFlight(){
-  if(chosenAir === null){ alert('Выберите авиакомпанию'); return; }
-  if(chosenDur === null){ alert('Выберите длительность'); return; }
+/* Generate */
+function prettyTime(mins){
+  const hh = Math.floor(mins/60); const mm = mins%60;
+  return hh.toString().padStart(2,'0') + ':' + mm.toString().padStart(2,'0');
+}
+function generate(){
+  if(selAir === null){ alert('Выберите авиакомпанию'); return; }
+  if(selDur === null){ alert('Выберите длительность'); return; }
 
-  const airline = AIRLINES[chosenAir];
+  const pool = filterByHubAndDuration(selAir, selDur);
+  if(!pool.length){ out.style.display='block'; out.innerHTML = `<div class="row"><div class="k">Ошибка</div><div class="v">Нет маршрутов для выбранных параметров</div></div>`; return; }
 
-  let pool = ROUTES.filter(r => airline.hubs.includes((r.fromICAO||'').toUpperCase()));
-  if(pool.length===0){
-    resultEl.style.display = 'block';
-    resultEl.innerHTML = `<div class="r-row"><div class="r-label">Ошибка</div><div class="r-val">Нет маршрутов из хабов ${esc(airline.name)}.</div></div>`;
-    return;
-  }
+  const route = pool[rnd(0, pool.length-1)];
+  let mins = Number.isFinite(route.durationMinutes) ? Math.round(route.durationMinutes) : rnd(DURATIONS[selDur].min, DURATIONS[selDur].max);
 
-  const filtered = routesInDurationInterval(pool, chosenDur);
-  if(filtered.length>0) pool = filtered;
-
-  const route = pool[randInt(0, pool.length-1)];
-
-  let minutes;
-  if(Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
-  else {
-    const interval = DURATIONS[chosenDur];
-    minutes = randInt(interval.min, interval.max);
-  }
-
-  const hh = Math.floor(minutes/60), mm = minutes % 60;
-  const time = pad(hh) + ':' + pad(mm);
-
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = `
-    <div class="r-row"><div class="r-label">Авиакомпания</div><div class="r-val">${esc(airline.name)}</div></div>
-    <div class="r-row"><div class="r-label">Отправление</div><div class="r-val">${esc(route.fromCity)} <span class="small r-icao">(${esc(route.fromICAO)})</span></div></div>
-    <div class="r-row"><div class="r-label">Прибытие</div><div class="r-val">${esc(route.toCity)} <span class="small r-icao">(${esc(route.toICAO)})</span></div></div>
-    <div class="r-row"><div class="r-label">Время в полёте</div><div class="r-val">${time}</div></div>
-    <div class="r-row"><div class="r-label">Источник времени</div><div class="r-val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Сгенерировано (интервал)'}</div></div>
+  out.style.display='block';
+  out.innerHTML = `
+    <div class="row"><div class="k">Авиакомпания</div><div class="v">${esc(AIRLINES[selAir].name)}</div></div>
+    <div class="row"><div class="k">Отправление</div><div class="v">${esc(route.fromCity)} <span style="color:var(--muted)">(${esc(route.fromICAO)})</span></div></div>
+    <div class="row"><div class="k">Прибытие</div><div class="v">${esc(route.toCity)} <span style="color:var(--muted)">(${esc(route.toICAO)})</span></div></div>
+    <div class="row"><div class="k">Время полёта</div><div class="v">${prettyTime(mins)}</div></div>
+    <div class="row"><div class="k">Источник</div><div class="v">${Number.isFinite(route.durationMinutes) ? 'durationMinutes (встроено)' : 'Сгенерировано'}</div></div>
   `;
-  resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-  console.log('Generated route', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'route.durationMinutes=', route.durationMinutes);
 }
 
-/* Utility buttons */
-function doDemo(){
-  selectAir(0); // Lufthansa
-  selectDur(3); // 7-8ч (index 3)
-  // optionally auto-generate immediately
-  generateFlight();
+/* Controls */
+function demo(){
+  selectAir(0); selectDur(3); generate();
 }
-function doReset(){
-  chosenAir = null; chosenDur = null;
-  Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected'));
-  Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected'));
-  hideResult();
+function clearAll(){
+  selAir = null; selDur = null;
+  Array.from(airEl.children).forEach(c=>c.classList.remove('selected'));
+  Array.from(durEl.children).forEach(c=>c.classList.remove('selected'));
+  out.style.display='none';
 }
-function inspectRoutes(){
-  console.log('ROUTES sample (first 10):', ROUTES.slice(0,10));
-  alert('10 маршрутов выведено в консоль (DevTools).');
-}
+function showLog(){ console.log('ROUTES sample:', ROUTES.slice(0,8)); alert('8 маршрутов выведены в консоль'); }
 
 /* Init */
 function init(){
-  renderAirlines();
-  renderDurations();
-  countEl.textContent = ROUTES.length;
-  genBtn.addEventListener('click', generateFlight);
-  demoBtn.addEventListener('click', doDemo);
-  resetBtn.addEventListener('click', doReset);
-  inspectBtn.addEventListener('click', inspectRoutes);
+  renderAir(); renderDur();
+  total.textContent = ROUTES.length;
+  goBtn.addEventListener('click', generate);
+  demoBtn.addEventListener('click', demo);
+  resetBtn.addEventListener('click', clearAll);
+  logBtn.addEventListener('click', showLog);
 }
 init();
 </script>
