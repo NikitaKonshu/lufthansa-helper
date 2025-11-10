@@ -159,7 +159,7 @@ const ROUTES = [
   {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":135,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":145,"source":"embedded"},
   {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded'},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Rome","toCountry":"Italy","toICAO":"LIRF","durationMinutes":120,"source":"embedded"},
   {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":185,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Lisbon","toCountry":"Portugal","toICAO":"LPPT","durationMinutes":185,"source":"embedded"},
@@ -221,7 +221,7 @@ const about = document.getElementById('about');
 
 let chosenAir = null;
 let chosenDur = null;
-let lastAssigned = null; // store last assigned aircraft for display
+let lastAssigned = null;
 
 /* UI data for airlines & durations */
 const AIRLINES = [
@@ -301,13 +301,12 @@ function fleetHousekeeping(){
 function findSuitableAircraft(route, nowTs=Date.now()){
   const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
   const candidates = FLEET.filter(ac=>{
-    // available now or idle
     if(ac.status === 'inFlight' && ac.availableAt > nowTs) return false;
     if((ac.locationICAO||'').toUpperCase() !== (route.fromICAO||'').toUpperCase()) return false;
-    if(distanceKm === null) return true; // unknown distance => optimistic
-    return ac.rangeKm * 0.95 >= distanceKm; // 5% safety margin
+    if(distanceKm === null) return true;
+    return ac.rangeKm * 0.95 >= distanceKm;
   });
-  candidates.sort((a,b)=> b.seats - a.seats); // prefer larger
+  candidates.sort((a,b)=> b.seats - a.seats);
   return { distanceKm, candidates };
 }
 
@@ -331,7 +330,7 @@ function assignAircraftToRoute(route){
   return { ok:true, aircraft: ac, distanceKm };
 }
 
-/* Render assign log (recent 8) */
+/* Render assign log (recent 12) */
 function renderAssignLog(){
   if(!assignLogEl) return;
   const items = FLEET_LOG.slice(-12).reverse();
@@ -347,11 +346,6 @@ function renderAssignLog(){
     return `${t} — ${it.event}`;
   }).map(s=>`<div style="margin-bottom:6px">${esc(s)}</div>`).join('');
 }
-
-/* Integrate into route generation:
-   - when route chosen, call assignAircraftToRoute(route)
-   - show aircraft info in result
-*/
 
 /* UI: render airlines/durations */
 function renderAirlines(){
@@ -394,7 +388,7 @@ function selectDur(i){
 }
 function hideResult(){ resultEl.style.display='none'; resultEl.innerHTML=''; lastAssigned = null; }
 
-/* filtering helper (as earlier) */
+/* filtering helper */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
@@ -424,10 +418,8 @@ function generateFlight(){
   const filteredByDur = routesInDurationInterval(pool, chosenDur);
   if(filteredByDur.length > 0) pool = filteredByDur;
   const route = pool[randInt(0, pool.length-1)];
-  // assign aircraft
   const assign = assignAircraftToRoute(route);
   lastAssigned = assign.ok ? assign.aircraft : null;
-  // determine minutes (prefer route.durationMinutes)
   let minutes;
   if (Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
   else {
@@ -455,7 +447,7 @@ function generateFlight(){
   console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'assigned=', assign.ok ? assign.aircraft.id : 'none');
 }
 
-/* Utility: expose quick demo and reset */
+/* Utility: demo and reset */
 function doDemo(){
   selectAir(0); selectDur(3); generateFlight();
 }
