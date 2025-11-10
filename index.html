@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — stylish</title>
+  <title>Lufthansa Group Virtual — fleet</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
-      --bg-1:#041528;       /* deep navy */
-      --bg-2:#082d46;       /* tealish navy */
+      --bg-1:#041528;
+      --bg-2:#082d46;
       --lufthansa-yellow:#ffd700;
       --muted:#9fb6d6;
       --text:#eaf4ff;
@@ -26,41 +26,26 @@
       margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2) 90%);color:var(--text);
       display:flex;align-items:flex-start;justify-content:center;padding:20px;
     }
-
     .wrap{width:100%;max-width:var(--max-width);margin-bottom:40px}
-
-    /* Header */
-    .hero{
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      background:linear-gradient(90deg,#03243a,#073a46);padding:18px;border-radius:12px;box-shadow:var(--shadow)
-    }
+    .hero{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,#03243a,#073a46);padding:18px;border-radius:12px;box-shadow:var(--shadow)}
     .brand{display:flex;gap:14px;align-items:center}
-    .logo{
-      width:68px;height:68px;border-radius:10px;background:linear-gradient(180deg,#063a59,#012938);
-      display:flex;align-items:center;justify-content:center;color:var(--lufthansa-yellow);font-weight:900;font-size:20px;
-      box-shadow:0 6px 18px rgba(2,8,20,0.45)
-    }
+    .logo{width:68px;height:68px;border-radius:10px;background:linear-gradient(180deg,#063a59,#012938);display:flex;align-items:center;justify-content:center;color:var(--lufthansa-yellow);font-weight:900;font-size:20px;box-shadow:0 6px 18px rgba(2,8,20,0.45)}
     .title{margin:0;font-size:20px;color:var(--lufthansa-yellow)}
     .subtitle{margin:0;font-size:13px;color:var(--muted)}
-
     .hero-actions{display:flex;gap:10px;align-items:center}
     .btn{cursor:pointer;padding:10px 14px;border-radius:10px;border:0;font-weight:800;background:transparent;color:var(--text);transition:transform var(--transition)}
     .btn-primary{background:var(--lufthansa-yellow);color:#04202a}
     .btn-ghost{border:1px solid rgba(255,255,255,0.06)}
-
-    /* Main card */
     .card{margin-top:16px;background:linear-gradient(180deg,var(--card),#043044);padding:16px;border-radius:12px;box-shadow:var(--shadow)}
     .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
     @media(max-width:980px){.grid{grid-template-columns:1fr}}
     .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));padding:12px;border-radius:10px}
     h3{margin:0;font-size:13px;color:var(--muted);font-weight:800}
-
     .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:10px}
     .opt{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
     .opt:hover{transform:translateY(-4px)}
     .opt.selected{border-color:rgba(255,215,0,0.22);box-shadow:0 12px 30px rgba(1,6,12,0.45)}
     .icon{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--lufthansa-yellow);font-weight:900}
-
     .controls{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
     .small{font-size:13px;color:var(--muted)}
     .result{margin-top:14px;padding:14px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,0.18),rgba(0,0,0,0.08));display:none}
@@ -68,16 +53,17 @@
     .label{color:var(--muted);font-size:13px}
     .val{font-weight:900}
     .icao{color:var(--lufthansa-yellow);font-weight:900}
-
-    /* Info panel */
     .info .small{margin-top:8px}
     .muted-block{color:var(--muted);font-size:13px}
-
-    /* Mobile */
+    /* fleet list */
+    .fleet-row{padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:10px}
+    .fleet-row .id{font-weight:900}
+    .fleet-status-idle{color:#8be88b;font-weight:700}
+    .fleet-status-flight{color:#ffcc66;font-weight:700}
+    .badge{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.12);font-weight:700}
     @media(max-width:520px){
       body{padding:12px}
       .logo{width:56px;height:56px}
-      .title{font-size:18px}
       .opt{padding:10px}
       .icon{width:36px;height:36px}
       .controls{gap:8px}
@@ -92,7 +78,7 @@
         <div class="logo" aria-hidden="true">LH</div>
         <div>
           <h1 class="title">Lufthansa Group Virtual</h1>
-          <div class="subtitle">Генератор рейсов — встроенные маршруты, улучшенная фильтрация и мобильная адаптация</div>
+          <div class="subtitle">Генератор рейсов — флот, назначения и ротация</div>
         </div>
       </div>
       <div class="hero-actions">
@@ -105,9 +91,9 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 id="main-title" style="margin:0;color:var(--lufthansa-yellow)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Выбери авиакомпанию и длительность — мы покажем ближайший подходящий маршрут</div>
+          <div class="small" style="margin-top:6px">Выбери авиакомпанию и длительность — назначим доступный самолёт из флота</div>
         </div>
-        <div class="muted-block">Данные встроены в страницу — доступны сразу</div>
+        <div class="muted-block">Данные встроены; флот демонстрационный</div>
       </div>
 
       <div class="grid" style="margin-top:14px">
@@ -126,18 +112,28 @@
             </div>
 
             <div id="result" class="result" role="status" aria-live="polite"></div>
-            <div class="small" style="margin-top:10px">Если маршрут имеет durationMinutes — мы показываем его; иначе генерируем значение внутри выбранного интервала.</div>
+            <div class="small" style="margin-top:10px">Показываем назначенный самолёт и его статус. Самолёт занят на длину рейса + turnaround.</div>
+          </div>
+
+          <div id="assignLogPanel" class="panel" style="margin-top:12px">
+            <h3>Журнал назначений</h3>
+            <div id="assignLog" class="small" style="margin-top:8px">Пока пусто</div>
+            <div style="margin-top:10px">
+              <button id="clearLog" class="btn btn-ghost">Очистить журнал</button>
+            </div>
           </div>
         </div>
 
         <aside class="panel info" aria-label="Информация">
-          <h3>Инфо</h3>
+          <h3>Флот</h3>
+          <div id="fleetList" style="margin-top:10px"></div>
+          <div style="margin-top:10px">
+            <button id="refreshFleet" class="btn btn-ghost">Обновить флот</button>
+            <button id="showFleetLog" class="btn btn-ghost">Показать лог в консоли</button>
+          </div>
+          <h3 style="margin-top:12px">Инфо</h3>
           <div class="small" style="margin-top:8px">Всего маршрутов: <strong id="routesCount">—</strong></div>
           <div class="small" style="margin-top:8px">Хабы: EDDF — Frankfurt, EDDM — Munich</div>
-          <div style="margin-top:12px">
-            <button id="inspect" class="btn btn-ghost">Показать 10 маршрутов в консоли</button>
-          </div>
-          <div class="small" style="margin-top:12px;color:var(--muted)">Рекомендуется проверять ключевые дальние рейсы (NYC, LAX, DXB) против официального расписания для точности.</div>
         </aside>
       </div>
     </section>
@@ -145,9 +141,7 @@
 
 <script>
 /* ============================
-   Embedded ROUTES (Frankfurt EDDF + Munich EDDM)
-   durationMinutes numeric where known
-   Source: embedded estimated
+   Embedded ROUTES (sample EDDF + EDDM)
    ============================ */
 const ROUTES = [
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120,"source":"embedded"},
@@ -157,59 +151,54 @@ const ROUTES = [
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Berlin","toCountry":"Germany","toICAO":"EDDB","durationMinutes":65,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Brussels","toCountry":"Belgium","toICAO":"EBBR","durationMinutes":75,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Bucharest","toCountry":"Romania","toICAO":"LROP","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Budapest","toCountry":"Hungary","toICAO":"LHBP","durationMinutes":115,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Dublin","toCountry":"Ireland","toICAO":"EIDW","durationMinutes":145,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Edinburgh","toCountry":"United Kingdom","toICAO":"EGPH","durationMinutes":145,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Geneva","toCountry":"Switzerland","toICAO":"LSGG","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Hamburg","toCountry":"Germany","toICAO":"EDDH","durationMinutes":45,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":195,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Lisbon","toCountry":"Portugal","toICAO":"LPPT","durationMinutes":185,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":145,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Munich","toCountry":"Germany","toICAO":"EDDM","durationMinutes":50,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Chicago","toCountry":"United States","toICAO":"KORD","durationMinutes":495,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Los Angeles","toCountry":"United States","toICAO":"KLAX","durationMinutes":720,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Toronto","toCountry":"Canada","toICAO":"CYYZ","durationMinutes":495,"source":"embedded"},
-  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Dubai","toCountry":"UAE","toICAO":"OMDB","durationMinutes":420,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":75,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Berlin","toCountry":"Germany","toICAO":"EDDB","durationMinutes":55,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Brussels","toCountry":"Belgium","toICAO":"EBBR","durationMinutes":80,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":85,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Dublin","toCountry":"Ireland","toICAO":"EIDW","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Frankfurt am Main","toCountry":"Germany","toICAO":"EDDF","durationMinutes":50,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Geneva","toCountry":"Switzerland","toICAO":"LSGG","durationMinutes":70,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":185,"source":"embedded"},
   {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":85,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":150,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Munich","toCountry":"Germany","toICAO":"EDDM","durationMinutes":0,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":60,"source":"embedded"},
   {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Chicago","toCountry":"United States","toICAO":"KORD","durationMinutes":500,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Dubai","toCountry":"UAE","toICAO":"OMDB","durationMinutes":420,"source":"embedded"},
-  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Tel Aviv","toCountry":"Israel","toICAO":"LLBG","durationMinutes":260,"source":"embedded"}
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Dubai","toCountry":"UAE","toICAO":"OMDB","durationMinutes":420,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":135,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":145,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":150,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded'},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Rome","toCountry":"Italy","toICAO":"LIRF","durationMinutes":120,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":185,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Lisbon","toCountry":"Portugal","toICAO":"LPPT","durationMinutes":185,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"}
 ];
+/* ensure durations numeric */
+ROUTES.forEach(r=>{ r.durationMinutes = Number.isFinite(Number(r.durationMinutes)) ? Number(r.durationMinutes) : NaN; });
 
 /* ============================
-   Airlines + durations (UI data)
+   AIRPORTS coordinates (small subset)
+   (lat, lon) — needed for distance checks
    ============================ */
-const AIRLINES = [
-  {name:"Lufthansa", hubs:["EDDF","EDDM"]},
-  {name:"Austrian", hubs:["LOWW"]},
-  {name:"Swiss", hubs:["LSZH"]},
-  {name:"Eurowings", hubs:["EDDF","EDDM","EDDH"]},
-  {name:"Brussels Airlines", hubs:["EBBR"]}
+const AIRPORTS = {
+  "EDDF": { lat:50.0379, lon:8.5622 },
+  "EDDM": { lat:48.3538, lon:11.7861 },
+  "EHAM": { lat:52.3105, lon:4.7683 },
+  "ENGM": { lat:59.6498, lon:10.9198 },
+  "KJFK": { lat:40.6413, lon:-73.7781 },
+  "KLAX": { lat:33.9416, lon:-118.4085 },
+  "OMDB": { lat:25.2532, lon:55.3657 },
+  "LEMD": { lat:40.4983, lon:-3.5676 },
+  "LIRF": { lat:41.8003, lon:12.2389 },
+  "LIMC": { lat:45.6301, lon:8.7231 },
+  "EKCH": { lat:55.6179, lon:12.6560 }
+};
+
+/* ============================
+   Fleet definition (demo pool)
+   - id, type, reg, rangeKm, seats, turnaround (min), status, locationICAO
+   ============================ */
+const FLEET = [
+  { id: 'LH-A320-01', type: 'A320', reg: 'D-AIXX', rangeKm: 6100, seats: 180, turnaround: 40, status: 'idle', locationICAO: 'EDDF', availableAt: 0 },
+  { id: 'LH-A321-02', type: 'A321', reg: 'D-AIYY', rangeKm: 6100, seats: 200, turnaround: 40, status: 'idle', locationICAO: 'EDDM', availableAt: 0 },
+  { id: 'LH-787-01', type: 'B787', reg: 'D-ABCD', rangeKm: 14140, seats: 270, turnaround: 75, status: 'idle', locationICAO: 'EDDF', availableAt: 0 },
+  { id: 'LH-A350-01', type: 'A350', reg: 'D-AEEE', rangeKm: 15000, seats: 300, turnaround: 90, status: 'idle', locationICAO: 'EDDM', availableAt: 0 }
 ];
 
-const DURATIONS = [
-  {label:"1-2ч",min:60,max:120},
-  {label:"3-4ч",min:180,max:240},
-  {label:"5-6ч",min:300,max:360},
-  {label:"7-8ч",min:420,max:480},
-  {label:"9-10ч",min:540,max:600},
-  {label:"10+ч",min:601,max:1200}
-];
+/* fleet log */
+const FLEET_LOG = [];
 
 /* ============================
    UI refs
@@ -222,28 +211,149 @@ const resetBtn = document.getElementById('reset');
 const resultEl = document.getElementById('result');
 const routesCount = document.getElementById('routesCount');
 const inspectBtn = document.getElementById('inspect');
+const fleetListEl = document.getElementById('fleetList');
+const refreshFleetBtn = document.getElementById('refreshFleet');
+const showFleetLogBtn = document.getElementById('showFleetLog');
+const assignLogEl = document.getElementById('assignLog');
+const clearLogBtn = document.getElementById('clearLog');
 const openDemo = document.getElementById('openDemo');
 const about = document.getElementById('about');
 
 let chosenAir = null;
 let chosenDur = null;
+let lastAssigned = null; // store last assigned aircraft for display
+
+/* UI data for airlines & durations */
+const AIRLINES = [
+  {name:"Lufthansa", hubs:["EDDF","EDDM"]},
+  {name:"Austrian", hubs:["LOWW"]},
+  {name:"Swiss", hubs:["LSZH"]},
+  {name:"Eurowings", hubs:["EDDF","EDDM","EDDH"]},
+  {name:"Brussels Airlines", hubs:["EBBR"]}
+];
+const DURATIONS = [
+  {label:"1-2ч",min:60,max:120},
+  {label:"3-4ч",min:180,max:240},
+  {label:"5-6ч",min:300,max:360},
+  {label:"7-8ч",min:420,max:480},
+  {label:"9-10ч",min:540,max:600},
+  {label:"10+ч",min:601,max:1200}
+];
 
 /* Helpers */
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function pad(n){ return String(n).padStart(2,'0'); }
 
-/* normalize duration values */
-function normalize(routes){
-  routes.forEach(r=>{
-    if(r.durationMinutes === undefined || r.durationMinutes === null || r.durationMinutes === '') r.durationMinutes = NaN;
-    else r.durationMinutes = Number(r.durationMinutes);
-    if(!Number.isFinite(r.durationMinutes)) r.durationMinutes = NaN;
+/* Distance: Haversine */
+function haversineKm(aLat,aLon,bLat,bLon){
+  const R=6371, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(bLat-aLat), dLon=toRad(bLon-aLon);
+  const lat1=toRad(aLat), lat2=toRad(bLat);
+  const sinDlat=Math.sin(dLat/2), sinDlon=Math.sin(dLon/2);
+  const c=2*Math.asin(Math.sqrt(sinDlat*sinDlat + Math.cos(lat1)*Math.cos(lat2)*sinDlon*sinDlon));
+  return R*c;
+}
+function getAirportCoords(icao){
+  return AIRPORTS[icao] || null;
+}
+function estimateDistanceKm(fromICAO, toICAO){
+  const a = getAirportCoords(fromICAO), b = getAirportCoords(toICAO);
+  if(!a || !b) return null;
+  return Math.round(haversineKm(a.lat,a.lon,b.lat,b.lon));
+}
+
+/* Fleet utilities */
+function renderFleetList(){
+  if(!fleetListEl) return;
+  fleetListEl.innerHTML = '';
+  FLEET.forEach(ac=>{
+    const div = document.createElement('div');
+    div.className = 'fleet-row';
+    const statusHtml = ac.status === 'idle'
+      ? `<span class="fleet-status-idle">idle</span>`
+      : `<span class="fleet-status-flight">inFlight</span>`;
+    const avail = ac.availableAt ? ` · availableAt: ${new Date(ac.availableAt).toLocaleTimeString()}` : '';
+    div.innerHTML = `<div class="id">${esc(ac.id)} <span class="badge">${esc(ac.type)}</span></div>
+      <div style="font-size:13px;color:var(--muted)">loc: ${esc(ac.locationICAO)} · range: ${ac.rangeKm} km · seats: ${ac.seats} · ${statusHtml}${avail}</div>`;
+    fleetListEl.appendChild(div);
   });
 }
-normalize(ROUTES);
 
-/* render controls */
+/* Fleet housekeeping to free aircraft that finished flights */
+function fleetHousekeeping(){
+  const now = Date.now();
+  let changed = false;
+  FLEET.forEach(ac=>{
+    if(ac.status === 'inFlight' && ac.availableAt && ac.availableAt <= now){
+      ac.status = 'idle';
+      if(ac.nextLocation){ ac.locationICAO = ac.nextLocation; ac.nextLocation = undefined; }
+      ac.availableAt = 0;
+      FLEET_LOG.push({ ts: now, event:'available', aircraft: ac.id, location: ac.locationICAO });
+      changed = true;
+    }
+  });
+  if(changed) renderFleetList();
+  renderAssignLog();
+}
+
+/* Find suitable aircraft for route */
+function findSuitableAircraft(route, nowTs=Date.now()){
+  const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
+  const candidates = FLEET.filter(ac=>{
+    // available now or idle
+    if(ac.status === 'inFlight' && ac.availableAt > nowTs) return false;
+    if((ac.locationICAO||'').toUpperCase() !== (route.fromICAO||'').toUpperCase()) return false;
+    if(distanceKm === null) return true; // unknown distance => optimistic
+    return ac.rangeKm * 0.95 >= distanceKm; // 5% safety margin
+  });
+  candidates.sort((a,b)=> b.seats - a.seats); // prefer larger
+  return { distanceKm, candidates };
+}
+
+/* Assign aircraft to route */
+function assignAircraftToRoute(route){
+  const now = Date.now();
+  const { distanceKm, candidates } = findSuitableAircraft(route, now);
+  if(candidates.length === 0){
+    FLEET_LOG.push({ ts: now, event:'assign_failed', route: `${route.fromICAO}->${route.toICAO}`, distanceKm });
+    renderAssignLog();
+    return { ok:false, reason:'no_suitable', distanceKm };
+  }
+  const ac = candidates[0];
+  const durationMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
+  ac.status = 'inFlight';
+  ac.availableAt = now + durationMs + ac.turnaround*60*1000;
+  ac.nextLocation = route.toICAO;
+  FLEET_LOG.push({ ts: now, event:'assign', aircraft: ac.id, route: `${route.fromICAO}->${route.toICAO}`, durationMin: route.durationMinutes, distanceKm });
+  renderFleetList();
+  renderAssignLog();
+  return { ok:true, aircraft: ac, distanceKm };
+}
+
+/* Render assign log (recent 8) */
+function renderAssignLog(){
+  if(!assignLogEl) return;
+  const items = FLEET_LOG.slice(-12).reverse();
+  if(items.length === 0){
+    assignLogEl.textContent = 'Пока пусто';
+    return;
+  }
+  assignLogEl.innerHTML = items.map(it=>{
+    const t = new Date(it.ts).toLocaleTimeString();
+    if(it.event === 'assign') return `${t} — assign ${it.aircraft} ${it.route} (${it.durationMin} min, ${it.distanceKm || 'n/a'} km)`;
+    if(it.event === 'available') return `${t} — available ${it.aircraft} @ ${it.location}`;
+    if(it.event === 'assign_failed') return `${t} — assign_failed ${it.route} (dist ${it.distanceKm || 'n/a'})`;
+    return `${t} — ${it.event}`;
+  }).map(s=>`<div style="margin-bottom:6px">${esc(s)}</div>`).join('');
+}
+
+/* Integrate into route generation:
+   - when route chosen, call assignAircraftToRoute(route)
+   - show aircraft info in result
+*/
+
+/* UI: render airlines/durations */
 function renderAirlines(){
   airlinesWrap.innerHTML = '';
   AIRLINES.forEach((a,i)=>{
@@ -282,73 +392,70 @@ function selectDur(i){
   Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
   hideResult();
 }
-function hideResult(){ resultEl.style.display='none'; resultEl.innerHTML=''; }
+function hideResult(){ resultEl.style.display='none'; resultEl.innerHTML=''; lastAssigned = null; }
 
-/* filtering and fallback */
+/* filtering helper (as earlier) */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
   if(!interval) return routes.slice();
-
   const matched = routes.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
   if(matched.length > 0) return matched;
-
-  // fallback nearest to midpoint
   const midpoint = (interval.min + interval.max) / 2;
   const withNum = routes.filter(r => Number.isFinite(r.durationMinutes));
   if(withNum.length === 0) return [];
   let bestDiff = Infinity;
-  withNum.forEach(r => {
-    const d = Math.abs(r.durationMinutes - midpoint);
-    if(d < bestDiff) bestDiff = d;
-  });
+  withNum.forEach(r => { const d = Math.abs(r.durationMinutes - midpoint); if(d < bestDiff) bestDiff = d; });
   const best = withNum.filter(r => Math.abs(r.durationMinutes - midpoint) <= bestDiff + 0.5);
   return best.slice(0,200);
 }
 
-/* core generation */
+/* core generateFlight with fleet integration */
 function generateFlight(){
   if (chosenAir === null) { alert('Выберите авиакомпанию'); return; }
   if (chosenDur === null) { alert('Выберите длительность'); return; }
-
   const airline = AIRLINES[chosenAir];
-
-  // routes from airline hubs
   let pool = ROUTES.filter(r => airline.hubs.includes((r.fromICAO||'').toUpperCase()));
   if(pool.length === 0){
     resultEl.style.display = 'block';
     resultEl.innerHTML = `<div class="row"><div class="label">Ошибка</div><div class="val">Нет маршрутов из хабов ${esc(airline.name)}.</div></div>`;
     return;
   }
-
-  const filtered = routesInDurationInterval(pool, chosenDur);
-  if(filtered.length > 0) pool = filtered;
-
+  const filteredByDur = routesInDurationInterval(pool, chosenDur);
+  if(filteredByDur.length > 0) pool = filteredByDur;
   const route = pool[randInt(0, pool.length-1)];
-
+  // assign aircraft
+  const assign = assignAircraftToRoute(route);
+  lastAssigned = assign.ok ? assign.aircraft : null;
+  // determine minutes (prefer route.durationMinutes)
   let minutes;
   if (Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
   else {
     const interval = DURATIONS[chosenDur];
     minutes = randInt(interval.min, interval.max);
   }
-
   const hh = Math.floor(minutes/60), mm = minutes % 60;
   const time = pad(hh) + ':' + pad(mm);
-
   resultEl.style.display = 'block';
+  let acHtml = '';
+  if(assign.ok){
+    acHtml = `<div class="row"><div class="label">Aircraft</div><div class="val">${esc(assign.aircraft.id)} · ${esc(assign.aircraft.type)} · seats ${assign.aircraft.seats}</div></div>`;
+  } else {
+    acHtml = `<div class="row"><div class="label">Aircraft</div><div class="val" style="color:#ffcc88">Нет подходящего самолёта (расстояние ${assign.distanceKm || 'n/a'} km)</div></div>`;
+  }
   resultEl.innerHTML = `
     <div class="row"><div class="label">Авиакомпания</div><div class="val">${esc(airline.name)}</div></div>
     <div class="row"><div class="label">Отправление</div><div class="val">${esc(route.fromCity)} <span class="icao">(${esc(route.fromICAO)})</span></div></div>
     <div class="row"><div class="label">Прибытие</div><div class="val">${esc(route.toCity)} <span class="icao">(${esc(route.toICAO)})</span></div></div>
     <div class="row"><div class="label">Время в полёте</div><div class="val">${time}</div></div>
+    ${acHtml}
     <div class="row"><div class="label">Источник</div><div class="val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Сгенерировано (интервал)'}</div></div>
   `;
   resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-  console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'route.durationMinutes=', route.durationMinutes);
+  console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'assigned=', assign.ok ? assign.aircraft.id : 'none');
 }
 
-/* utility buttons */
+/* Utility: expose quick demo and reset */
 function doDemo(){
   selectAir(0); selectDur(3); generateFlight();
 }
@@ -358,27 +465,30 @@ function doReset(){
   Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected'));
   hideResult();
 }
-function inspectRoutes(){
-  console.log('ROUTES sample (first 10):', ROUTES.slice(0,10));
-  alert('10 маршрутов выведено в консоль');
-}
-function openDemoPanel(){
-  // quick shortcut: open card focus demo
-  doDemo();
-}
 
-/* init */
+/* Fleet UI actions */
+function refreshFleet(){ renderFleetList(); renderAssignLog(); }
+function showFleetLogConsole(){ console.table(FLEET_LOG.slice(-50)); alert('Флот лог выведен в консоль (последние события).'); }
+function clearAssignLog(){ FLEET_LOG.length = 0; renderAssignLog(); }
+
+/* attach events & init */
 function init(){
   renderAirlines();
   renderDurations();
   routesCount.textContent = ROUTES.length;
+  renderFleetList();
+  renderAssignLog();
   genBtn.addEventListener('click', generateFlight);
   demoBtn.addEventListener('click', doDemo);
   resetBtn.addEventListener('click', doReset);
-  inspectBtn.addEventListener('click', inspectRoutes);
-  openDemo.addEventListener('click', openDemoPanel);
-  about.addEventListener('click', ()=> alert('Lufthansa Group Virtual — генератор демонстрационных рейсов. Данные оценочные.'));
+  refreshFleetBtn.addEventListener('click', refreshFleet);
+  showFleetLogBtn.addEventListener('click', showFleetLogConsole);
+  clearLogBtn.addEventListener('click', clearAssignLog);
+  openDemo.addEventListener('click', ()=>{ alert('Демо: назначение флота включено. Нажмите Демо в панели.'); doDemo(); });
+  about.addEventListener('click', ()=>{ alert('Lufthansa Group Virtual — демонстрационный генератор рейсов с назначением флота. Данные оценочные.'); });
 }
+/* periodic housekeeping */
+setInterval(fleetHousekeeping, 15 * 1000);
 init();
 </script>
 </body>
