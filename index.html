@@ -3,106 +3,130 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — загрузка локального файла</title>
+  <title>Lufthansa Group Virtual — improved</title>
   <style>
     :root{
-      --bg-1:#031428; --bg-2:#06283b; --accent:#ffd24d; --muted:#9fb6d6; --text:#eaf4ff;
-      --radius:12px; --shadow-lg:0 20px 50px rgba(2,8,20,0.6); --transition:180ms;
+      --bg-1:#041026; --bg-2:#07263f; --accent:#ffd24d; --muted:#9fb6d6; --text:#eaf4ff;
+      --card:#071b2b; --card-2:#082731; --radius:14px; --shadow:0 14px 40px rgba(2,8,20,0.6);
+      --glass:rgba(255,255,255,0.03); --gap:12px; --transition:180ms;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--text);display:flex;align-items:center;justify-content:center;padding:18px}
-    .wrap{width:100%;max-width:1024px}
-    .hero{display:flex;gap:14px;align-items:center;background:rgba(255,255,255,0.02);padding:16px;border-radius:12px;box-shadow:var(--shadow-lg)}
-    .logo{width:64px;height:64px;border-radius:10px;background:#0e3a66;display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
+    body{margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--text);display:flex;align-items:flex-start;justify-content:center;padding:20px}
+    .wrap{width:100%;max-width:1100px}
+    .hero{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,var(--card),var(--card-2));padding:16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(180deg,#083b63,#042a47);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
     .title{font-size:18px;color:var(--accent);margin:0}
-    .sub{color:var(--muted);font-size:13px;margin-top:6px}
-    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:0;font-weight:800}
-    .btn-primary{background:var(--accent);color:#06202a}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
-    .card{background:rgba(255,255,255,0.01);padding:14px;border-radius:12px;margin-top:14px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:760px){.grid{grid-template-columns:1fr}}
-    .panel{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01)}
-    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
-    .opt{display:flex;gap:8px;align-items:center;padding:8px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.02);transition:transform var(--transition)}
+    .subtitle{font-size:13px;color:var(--muted);margin-top:6px}
+    .hero-actions{display:flex;gap:8px;align-items:center}
+    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:0;font-weight:800;background:transparent;color:var(--text);transition:transform var(--transition)}
+    .btn-primary{background:var(--accent);color:#04202a}
+    .btn-ghost{border:1px solid rgba(255,255,255,0.06)}
+    .card{margin-top:14px;background:var(--glass);padding:14px;border-radius:12px}
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));padding:12px;border-radius:10px}
+    .panel h3{margin:0;font-size:13px;color:var(--muted);font-weight:800}
+    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px}
+    .opt{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
     .opt:hover{transform:translateY(-4px)}
-    .opt.selected{border-color:rgba(255,210,77,0.28);box-shadow:0 12px 30px rgba(2,8,20,0.45)}
-    .icon{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
+    .opt.selected{border-color:rgba(255,210,77,0.24);box-shadow:0 12px 40px rgba(1,6,15,0.45)}
+    .icon{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
     .meta .name{font-weight:800}
-    .meta .sub{color:var(--muted);font-size:12px}
-    .actions{display:flex;gap:10px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-    .result{margin-top:12px;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);display:none}
-    .row{display:flex;justify-content:space-between;margin:6px 0;gap:12px}
+    .meta .sub{font-size:12px;color:var(--muted)}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+    .result{margin-top:12px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.14);display:none}
+    .row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
     .label{color:var(--muted);font-size:13px}
-    .val{font-weight:800}
-    .file-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+    .val{font-weight:900}
+    .file-row{display:flex;gap:8px;align-items:center}
     input[type="file"]{display:none}
-    .file-preview{font-size:13px;color:var(--muted)}
     .small{font-size:12px;color:var(--muted)}
-    /* Mobile tweaks */
-    @media(max-width:480px){
-      body{padding:10px}
-      .logo{width:60px;height:60px}
+    .footer-note{margin-top:10px;color:var(--muted);font-size:12px}
+    @media(max-width:520px){
+      body{padding:12px}
+      .logo{width:56px;height:56px}
       .title{font-size:16px}
       .opt{padding:8px}
       .icon{width:30px;height:30px}
       .meta .name{font-size:13px}
-      .meta .sub{font-size:11px}
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="hero">
-      <div class="logo">LGV</div>
-      <div style="flex:1">
-        <h1 class="title">Lufthansa Group Virtual</h1>
-        <div class="sub">Загружай локальный routes.json или routes.csv; мобильно-оптимизировано</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <div style="display:flex;gap:8px">
-          <button id="open" class="btn btn-primary">Открыть</button>
-          <button id="demo" class="btn btn-ghost">Демо</button>
+    <div class="hero" id="hero">
+      <div class="brand">
+        <div class="logo">LGV</div>
+        <div>
+          <h1 class="title">Lufthansa Group Virtual</h1>
+          <div class="subtitle">Генератор рейсов — улучшенная фильтрация, загрузка файлов и мобильный интерфейс</div>
         </div>
-        <div class="small">Файл: <span id="ext-status">нет</span></div>
+      </div>
+      <div class="hero-actions">
+        <button id="openBtn" class="btn btn-primary">Открыть</button>
+        <button id="demoBtn" class="btn btn-ghost">Демо</button>
       </div>
     </div>
 
-    <div id="main" class="card" style="display:none">
+    <div class="card" id="mainCard" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div style="font-weight:900;color:var(--accent)">Генерация рейса</div>
-          <div style="color:var(--muted);font-size:13px;margin-top:6px">Выберите авиакомпанию и длительность</div>
+          <h2 style="margin:0;color:var(--accent)">Генерация рейса</h2>
+          <div class="small" style="margin-top:6px">Выберите авиакомпанию и интервал длительности. Поддерживаются routes.json и routes.csv (локальная загрузка).</div>
         </div>
-        <div class="file-row">
-          <label for="file-input" class="btn btn-ghost" id="load-local-btn">Загрузить файл</label>
-          <input id="file-input" type="file" accept=".json,.csv" />
+        <div style="text-align:right">
+          <div class="small">Файл: <span id="extStatus">нет</span></div>
+          <div style="margin-top:6px" class="file-row">
+            <label for="fileInput" class="btn btn-ghost" id="uploadLabel">Загрузить файл</label>
+            <input id="fileInput" type="file" accept=".json,.csv" />
+          </div>
         </div>
       </div>
 
       <div class="grid" style="margin-top:12px">
         <div class="panel">
-          <div style="font-size:13px;color:var(--muted);font-weight:800;margin-bottom:8px">Авиакомпания</div>
-          <div id="airlines" class="options"></div>
+          <h3>Параметры</h3>
+
+          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+            <div style="flex:1;">
+              <div style="font-size:13px;color:var(--muted);font-weight:800">Авиакомпания</div>
+              <div id="airlines" class="options" style="margin-top:10px"></div>
+            </div>
+            <div style="width:260px;">
+              <div style="font-size:13px;color:var(--muted);font-weight:800">Длительность</div>
+              <div id="durations" class="options" style="margin-top:10px"></div>
+            </div>
+          </div>
+
+          <div class="controls">
+            <button id="genBtn" class="btn btn-primary">Сгенерировать</button>
+            <button id="backBtn" class="btn btn-ghost">Назад</button>
+            <div class="small" id="hint" style="align-self:center;color:var(--muted)">CSV/JSON: fromCity,fromCountry,fromICAO,toCity,toCountry,toICAO,durationMinutes[,notes,source]</div>
+          </div>
+
+          <div id="result" class="result" role="status" aria-live="polite"></div>
+          <div class="footer-note">Если время в списке не совпадает с реальным — загрузите routes.csv/json с точными durationMinutes (FR24 или официальный источник)</div>
         </div>
+
         <div class="panel">
-          <div style="font-size:13px;color:var(--muted);font-weight:800;margin-bottom:8px">Длительность</div>
-          <div id="durations" class="options"></div>
+          <h3>Информация</h3>
+          <div style="margin-top:8px" class="small">Loaded routes: <span id="routesCount">—</span></div>
+          <div style="margin-top:8px" class="small">Статус файла: <span id="fileInfo">—</span></div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <button id="exportBtn" class="btn btn-ghost">Экспортировать routes → JSON</button>
+            <button id="validateBtn" class="btn btn-ghost">Проверить durationMinutes</button>
+          </div>
+          <div id="validateLog" style="margin-top:12px;color:var(--muted);font-size:13px"></div>
         </div>
       </div>
-
-      <div class="actions">
-        <button id="gen" class="btn btn-primary">Сгенерировать</button>
-        <button id="back" class="btn btn-ghost">Назад</button>
-      </div>
-
-      <div id="result" class="result" aria-live="polite"></div>
-      <div style="margin-top:8px" class="file-preview" id="file-info"></div>
     </div>
   </div>
 
 <script>
-/* -------- DATA (fallback) -------- */
+/* ======================
+   Fallback DATA (keeps previous changes)
+   ====================== */
 let AIRLINES = [
   {name:"Lufthansa", hubs:["EDDF","EDDM"]},
   {name:"Austrian", hubs:["LOWW"]},
@@ -111,10 +135,11 @@ let AIRLINES = [
   {name:"Brussels Airlines", hubs:["EBBR"]}
 ];
 
+// fallback routes; will be replaced on load/upload
 let ROUTES = [
-  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"New York",toCountry:"United States",toICAO:"KJFK",durationMinutes:450},
-  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"London",toCountry:"United Kingdom",toICAO:"EGLL",durationMinutes:75},
-  {fromCity:"Munich",fromCountry:"Germany",fromICAO:"EDDM",toCity:"Rome",toCountry:"Italy",toICAO:"LIRF",durationMinutes:120}
+  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"Oslo",toCountry:"Norway",toICAO:"ENGM",durationMinutes:120,source:"fallback"},
+  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"New York",toCountry:"United States",toICAO:"KJFK",durationMinutes:450,source:"fallback"},
+  {fromCity:"Munich",fromCountry:"Germany",fromICAO:"EDDM",toCity:"London",toCountry:"United Kingdom",toICAO:"EGLL",durationMinutes:85,source:"fallback"}
 ];
 
 const DURATIONS = [
@@ -126,49 +151,80 @@ const DURATIONS = [
   {label:"10+ч",min:601,max:1200}
 ];
 
-/* -------- UI refs -------- */
-const openBtn = document.getElementById('open');
-const demoBtn = document.getElementById('demo');
-const mainCard = document.getElementById('main');
-const extStatus = document.getElementById('ext-status');
+/* ======================
+   Refs
+   ====================== */
+const openBtn = document.getElementById('openBtn');
+const demoBtn = document.getElementById('demoBtn');
+const mainCard = document.getElementById('mainCard');
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
-const genBtn = document.getElementById('gen');
-const backBtn = document.getElementById('back');
-const resultBox = document.getElementById('result');
-const fileInput = document.getElementById('file-input');
-const fileInfo = document.getElementById('file-info');
-const loadLocalBtn = document.getElementById('load-local-btn');
+const genBtn = document.getElementById('genBtn');
+const backBtn = document.getElementById('backBtn');
+const resultEl = document.getElementById('result');
+const extStatus = document.getElementById('extStatus');
+const routesCount = document.getElementById('routesCount');
+const fileInput = document.getElementById('fileInput');
+const fileInfo = document.getElementById('fileInfo');
+const uploadLabel = document.getElementById('uploadLabel');
+const exportBtn = document.getElementById('exportBtn');
+const validateBtn = document.getElementById('validateBtn');
+const validateLog = document.getElementById('validateLog');
 
 let chosenAir = null;
 let chosenDur = null;
 
-/* -------- Helpers -------- */
-function esc(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+/* ======================
+   Helpers
+   ====================== */
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function pad(n){ return String(n).padStart(2,'0'); }
 
-/* -------- Normalize / Parse -------- */
+/* ======================
+   Normalization / Parsers
+   ====================== */
+function ensureNumericDurations(routes){
+  const bad = [];
+  routes.forEach(r=>{
+    if (r.durationMinutes === undefined || r.durationMinutes === null || r.durationMinutes === ''){
+      r.durationMinutes = NaN;
+      bad.push({route:r, reason:'missing'});
+      return;
+    }
+    const n = Number(r.durationMinutes);
+    if (!Number.isFinite(n)){
+      r.durationMinutes = NaN;
+      bad.push({route:r, reason:'non-numeric'});
+    } else {
+      r.durationMinutes = Math.round(n);
+    }
+  });
+  if (bad.length){
+    console.warn('Routes with missing/non-numeric durationMinutes (sample):', bad.slice(0,10));
+  }
+  return routes;
+}
+
 function normalizeRoutes(data){
   if(!Array.isArray(data)) return [];
-  return data.map(item=>{
-    const r = {
+  const out = data.map(item=>{
+    return {
       fromCity: item.fromCity || item.from || '',
       fromCountry: item.fromCountry || item.from_country || '',
       fromICAO: (item.fromICAO || item.from_icao || item.from || '').toUpperCase(),
       toCity: item.toCity || item.to || '',
       toCountry: item.toCountry || item.to_country || '',
-      toICAO: (item.toICAO || item.to_icao || item.to || '').toUpperCase()
+      toICAO: (item.toICAO || item.to_icao || item.to || '').toUpperCase(),
+      durationMinutes: item.durationMinutes !== undefined ? item.durationMinutes : (item.duration_minutes !== undefined ? item.duration_minutes : undefined),
+      notes: item.notes || item.note || '',
+      source: item.source || ''
     };
-    const dm = item.durationMinutes !== undefined ? Number(item.durationMinutes) : (item.duration_minutes !== undefined ? Number(item.duration_minutes) : NaN);
-    if (Number.isFinite(dm)) r.durationMinutes = Math.round(dm);
-    if (item.notes) r.notes = item.notes;
-    if (item.source) r.source = item.source;
-    return r;
   }).filter(r => r.fromICAO && r.toICAO);
+  return ensureNumericDurations(out);
 }
 
-/* Lightweight CSV parser (handles simple CSV with header) */
+/* Basic CSV parser (header required). Handles simple CSV without multiline quoted fields. */
 function parseCSV(text){
   const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
   if(lines.length===0) return [];
@@ -182,7 +238,94 @@ function parseCSV(text){
   });
 }
 
-/* -------- Render controls -------- */
+/* ======================
+   External autoload (root) and upload
+   ====================== */
+async function tryAutoLoadRoot(){
+  // try routes.json
+  try {
+    const r = await fetch('routes.json', {cache:'no-cache'});
+    if (r.ok){
+      const data = await r.json();
+      const normalized = normalizeRoutes(data);
+      if (normalized.length>0){
+        ROUTES = normalized;
+        extStatus.textContent = 'routes.json';
+        routesCount.textContent = ROUTES.length;
+        fileInfo.textContent = `Auto-loaded routes.json (${ROUTES.length})`;
+        console.log('Auto-loaded routes.json', ROUTES.length);
+        return;
+      }
+    }
+  } catch(e){ /* ignore */ }
+
+  // try routes.csv
+  try {
+    const r2 = await fetch('routes.csv', {cache:'no-cache'});
+    if (r2.ok){
+      const txt = await r2.text();
+      const parsed = parseCSV(txt);
+      const normalized = normalizeRoutes(parsed);
+      if (normalized.length>0){
+        ROUTES = normalized;
+        extStatus.textContent = 'routes.csv';
+        routesCount.textContent = ROUTES.length;
+        fileInfo.textContent = `Auto-loaded routes.csv (${ROUTES.length})`;
+        console.log('Auto-loaded routes.csv', ROUTES.length);
+        return;
+      }
+    }
+  } catch(e){ /* ignore */ }
+
+  // fallback
+  routesCount.textContent = ROUTES.length;
+  extStatus.textContent = 'нет';
+  fileInfo.textContent = 'Используется встроенный набор (fallback)';
+  console.log('No external file found, using fallback routes:', ROUTES.length);
+}
+
+fileInput.addEventListener('change', async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) return;
+  fileInfo.textContent = `Файл ${f.name} — загружается...`;
+  try {
+    const text = await f.text();
+    if (f.name.toLowerCase().endsWith('.json')){
+      const data = JSON.parse(text);
+      const normalized = normalizeRoutes(data);
+      if (normalized.length===0) throw new Error('no valid routes in JSON');
+      ROUTES = normalized;
+      extStatus.textContent = f.name;
+      routesCount.textContent = ROUTES.length;
+      fileInfo.textContent = `Загружено ${ROUTES.length} маршрутов (${f.name})`;
+      console.log('Loaded local JSON', ROUTES.length);
+    } else if (f.name.toLowerCase().endsWith('.csv')){
+      const parsed = parseCSV(text);
+      const normalized = normalizeRoutes(parsed);
+      if (normalized.length===0) throw new Error('no valid routes in CSV');
+      ROUTES = normalized;
+      extStatus.textContent = f.name;
+      routesCount.textContent = ROUTES.length;
+      fileInfo.textContent = `Загружено ${ROUTES.length} маршрутов (${f.name})`;
+      console.log('Loaded local CSV', ROUTES.length);
+    } else {
+      throw new Error('unsupported file type');
+    }
+    // reset UI
+    chosenAir = null; chosenDur = null;
+    renderAirlines(); renderDurations();
+    hideResult();
+  } catch(err){
+    console.error(err);
+    fileInfo.textContent = `Ошибка: ${err.message}`;
+  } finally {
+    fileInput.value = '';
+  }
+});
+
+/* ======================
+   Render UI
+   ====================== */
 function renderAirlines(){
   airlinesWrap.innerHTML = '';
   AIRLINES.forEach((a,i)=>{
@@ -196,21 +339,24 @@ function renderAirlines(){
     airlinesWrap.appendChild(el);
   });
 }
+
 function renderDurations(){
   durationsWrap.innerHTML = '';
   DURATIONS.forEach((d,i)=>{
-    const avg = Math.round(((d.min + d.max)/2)/60);
+    const avgH = Math.round(((d.min + d.max)/2)/60);
     const el = document.createElement('div');
     el.className = 'opt';
     el.tabIndex = 0;
-    el.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${esc(d.label)}</div><div class="sub">~ ${avg} ч</div></div>`;
+    el.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${esc(d.label)}</div><div class="sub">~ ${avgH} ч</div></div>`;
     el.addEventListener('click', ()=> selectDur(i));
     el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
     durationsWrap.appendChild(el);
   });
 }
 
-/* -------- Select handlers -------- */
+/* ======================
+   Selection handlers
+   ====================== */
 function selectAir(i){
   chosenAir = i;
   Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
@@ -221,152 +367,157 @@ function selectDur(i){
   Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
   hideResult();
 }
-function hideResult(){ resultBox.style.display='none'; resultBox.innerHTML=''; }
+function hideResult(){ resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
-/* -------- Generate flight logic -------- */
+/* ======================
+   Filtering helpers
+   ====================== */
+function routesInDurationInterval(routes, durIdx){
+  if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
+  const interval = DURATIONS[durIdx];
+  if(!interval) return routes.slice();
+
+  // filter only routes with numeric duration
+  const matched = routes.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
+  if(matched.length > 0) return matched;
+
+  // fallback: find nearest by absolute difference to interval midpoint
+  const midpoint = (interval.min + interval.max) / 2;
+  const withNum = routes.filter(r => Number.isFinite(r.durationMinutes));
+  if(withNum.length === 0) return [];
+  // compute minimal diff
+  let bestDiff = Infinity;
+  withNum.forEach(r => {
+    const d = Math.abs(r.durationMinutes - midpoint);
+    if(d < bestDiff) bestDiff = d;
+  });
+  // return subset with minimal diff (and some slack)
+  const best = withNum.filter(r => Math.abs(r.durationMinutes - midpoint) <= bestDiff + 0.5);
+  return best.slice(0, 200);
+}
+
+/* ======================
+   Core generation logic
+   ====================== */
 function generateFlight(){
-  if (chosenAir === null || chosenDur === null) { alert('Выберите авиакомпанию и длительность'); return; }
-  const airline = AIRLINES[chosenAir];
-  const dur = DURATIONS[chosenDur];
+  if (chosenAir === null) { alert('Выберите авиакомпанию'); return; }
+  if (chosenDur === null) { alert('Выберите длительность'); return; }
 
-  const filtered = ROUTES.filter(r => airline.hubs.includes((r.fromICAO||'').toUpperCase()));
-  if (filtered.length===0){
-    resultBox.style.display='block';
-    resultBox.innerHTML = `<div class="row"><div class="label">Ошибка</div><div class="val">Нет маршрутов из хабов ${esc(airline.name)}. Загрузите routes.json/csv или добавьте в DATA.</div></div>`;
+  const airline = AIRLINES[chosenAir];
+
+  // 1) routes from airline hubs
+  let pool = ROUTES.filter(r => airline.hubs.includes((r.fromICAO||'').toUpperCase()));
+  if(pool.length === 0){
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<div class="row"><div class="label">Ошибка</div><div class="val">Нет маршрутов из хабов ${esc(airline.name)}. Загрузите routes.json/csv или добавьте в DATA.</div></div>`;
     return;
   }
 
-  const route = filtered[randInt(0, filtered.length-1)];
-
-  // priority: chosen interval -> route.durationMinutes -> fallback
-  let minutes;
-  if (typeof chosenDur === 'number') {
-    minutes = randInt(dur.min, dur.max);
-  } else if (route.durationMinutes !== undefined && Number.isFinite(route.durationMinutes)) {
-    minutes = Math.round(route.durationMinutes);
-  } else {
-    minutes = randInt(60,240);
+  // 2) apply duration filter (if chosen)
+  if (typeof chosenDur === 'number'){
+    const filteredByDur = routesInDurationInterval(pool, chosenDur);
+    if(filteredByDur.length > 0){
+      pool = filteredByDur;
+      console.log('Filtered pool by duration: count =', pool.length);
+    } else {
+      console.warn('No numeric duration matches in hub pool; using original hub pool.');
+    }
   }
 
+  // 3) pick random route
+  const route = pool[randInt(0, pool.length-1)];
+
+  // 4) determine minutes to display: prefer route.durationMinutes when numeric
+  let minutes;
+  if (Number.isFinite(route.durationMinutes)) {
+    minutes = Math.round(route.durationMinutes);
+  } else {
+    // fallback to chosen interval or safe range
+    if (typeof chosenDur === 'number'){
+      const interval = DURATIONS[chosenDur];
+      minutes = randInt(interval.min, interval.max);
+    } else {
+      minutes = randInt(60,240);
+    }
+  }
+
+  // render result
   const hh = Math.floor(minutes/60), mm = minutes % 60;
   const time = pad(hh) + ':' + pad(mm);
 
-  resultBox.style.display='block';
-  resultBox.innerHTML = `
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
     <div class="row"><div class="label">Авиакомпания</div><div class="val">${esc(airline.name)}</div></div>
-    <div class="row"><div class="label">Отправление</div><div class="val">${esc(route.fromCity)}</div></div>
-    <div class="row"><div class="label">ICAO отправления</div><div class="val">${esc(route.fromICAO)}</div></div>
-    <div class="row"><div class="label">Прибытие</div><div class="val">${esc(route.toCity)}</div></div>
-    <div class="row"><div class="label">ICAO прибытия</div><div class="val">${esc(route.toICAO)}</div></div>
+    <div class="row"><div class="label">Отправление</div><div class="val">${esc(route.fromCity)} <span class="small">(${esc(route.fromICAO)})</span></div></div>
+    <div class="row"><div class="label">Прибытие</div><div class="val">${esc(route.toCity)} <span class="small">(${esc(route.toICAO)})</span></div></div>
     <div class="row"><div class="label">Время в полёте</div><div class="val">${time}</div></div>
-    <div class="row"><div class="label">Источник времени</div><div class="val">${typeof chosenDur === 'number' ? 'Выбранный интервал' : (route.durationMinutes ? 'durationMinutes в DATA' : 'случайный диапазон')}</div></div>
+    <div class="row"><div class="label">Источник времени</div><div class="val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Generated (interval)'}</div></div>
   `;
-  resultBox.scrollIntoView({behavior:'smooth', block:'nearest'});
+  resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+  console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'route.durationMinutes=', route.durationMinutes);
 }
 
-/* -------- File load (local) -------- */
-fileInput.addEventListener('change', async (e) => {
-  const f = e.target.files && e.target.files[0];
-  if (!f) return;
-  const name = f.name;
-  fileInfo.textContent = `Файл: ${name} — загружается...`;
-  try {
-    const text = await f.text();
-    if (name.toLowerCase().endsWith('.json')) {
-      const data = JSON.parse(text);
-      const normalized = normalizeRoutes(data);
-      if (normalized.length===0) throw new Error('no valid routes in JSON');
-      ROUTES = normalized;
-      extStatus.textContent = name;
-      fileInfo.textContent = `Файл: ${name} — ${ROUTES.length} маршрутов загружено`;
-      console.log('Loaded local JSON', ROUTES.length);
-    } else if (name.toLowerCase().endsWith('.csv')) {
-      const parsed = parseCSV(text);
-      const normalized = normalizeRoutes(parsed);
-      if (normalized.length===0) throw new Error('no valid routes in CSV');
-      ROUTES = normalized;
-      extStatus.textContent = name;
-      fileInfo.textContent = `Файл: ${name} — ${ROUTES.length} маршрутов загружено`;
-      console.log('Loaded local CSV', ROUTES.length);
-    } else {
-      throw new Error('unsupported file type');
-    }
-    hideResult();
-  } catch(err) {
-    console.error(err);
-    fileInfo.textContent = `Ошибка загрузки: ${err.message}`;
-  } finally {
-    // reset input to allow loading same file again
-    fileInput.value = '';
+/* ======================
+   Export + validation features
+   ====================== */
+function exportRoutes(){
+  const dataStr = JSON.stringify(ROUTES, null, 2);
+  const blob = new Blob([dataStr], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'routes_export.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function validateDurations(){
+  const missing = ROUTES.filter(r => !Number.isFinite(r.durationMinutes));
+  if(missing.length===0){
+    validateLog.textContent = 'Все маршруты имеют числовое durationMinutes.';
+  } else {
+    validateLog.textContent = `Найдено ${missing.length} маршрутов без корректного durationMinutes (пример в консоли).`;
+    console.warn('Missing durationMinutes sample:', missing.slice(0,10));
   }
-});
-
-/* -------- Try autoload from repo root (routes.json -> routes.csv) -------- */
-async function tryAutoLoad(){
-  try {
-    const r = await fetch('routes.json', {cache:'no-cache'});
-    if (r.ok) {
-      const data = await r.json();
-      const normalized = normalizeRoutes(data);
-      if (normalized.length>0) {
-        ROUTES = normalized;
-        extStatus.textContent = 'routes.json';
-        fileInfo.textContent = `${ROUTES.length} маршрутов подгружено (routes.json)`;
-        console.log('Auto-loaded routes.json', ROUTES.length);
-        return;
-      }
-    }
-  } catch(e){ /* ignore */ }
-
-  try {
-    const r2 = await fetch('routes.csv', {cache:'no-cache'});
-    if (r2.ok){
-      const text = await r2.text();
-      const parsed = parseCSV(text);
-      const normalized = normalizeRoutes(parsed);
-      if (normalized.length>0){
-        ROUTES = normalized;
-        extStatus.textContent = 'routes.csv';
-        fileInfo.textContent = `${ROUTES.length} маршрутов подгружено (routes.csv)`;
-        console.log('Auto-loaded routes.csv', ROUTES.length);
-        return;
-      }
-    }
-  } catch(e){ /* ignore */ }
-
-  extStatus.textContent = 'нет';
-  fileInfo.textContent = 'Используется встроенный набор маршрутов (fallback)';
 }
 
-/* -------- Navigation / Events -------- */
+/* ======================
+   Events & init
+   ====================== */
 openBtn.addEventListener('click', async () => {
   openBtn.disabled = true;
-  await tryAutoLoad();
+  await tryAutoLoadRoot();
   renderAirlines(); renderDurations();
-  document.querySelector('.hero').style.display = 'none';
+  document.getElementById('hero').style.display = 'none';
   mainCard.style.display = 'block';
   openBtn.disabled = false;
 });
 demoBtn.addEventListener('click', async () => {
-  await tryAutoLoad();
+  await tryAutoLoadRoot();
   renderAirlines(); renderDurations();
-  selectAir(0); selectDur(3);
-  document.querySelector('.hero').style.display = 'none';
+  selectAir(0);
+  selectDur(3);
+  document.getElementById('hero').style.display = 'none';
   mainCard.style.display = 'block';
 });
+genBtn.addEventListener('click', generateFlight);
 backBtn.addEventListener('click', ()=>{
   mainCard.style.display = 'none';
-  document.querySelector('.hero').style.display = 'flex';
+  document.getElementById('hero').style.display = 'flex';
   chosenAir = null; chosenDur = null; hideResult();
   Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected'));
   Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected'));
 });
-genBtn.addEventListener('click', generateFlight);
+exportBtn.addEventListener('click', exportRoutes);
+validateBtn.addEventListener('click', validateDurations);
 
-/* init */
+/* init: try autoload and render UI controls */
 (async function init(){
-  await tryAutoLoad();
-  renderAirlines(); renderDurations();
+  await tryAutoLoadRoot();
+  renderAirlines();
+  renderDurations();
 })();
 </script>
 </body>
