@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — refined layout</title>
+  <title>Lufthansa Group Virtual — collapsed groups + durations UI</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
@@ -40,7 +40,7 @@
     .val{font-weight:800}
     .icao{color:var(--accent);font-weight:800;font-size:12px}
 
-    /* ---------- Airlines: 3-column hub groups ---------- */
+    /* ---------- Airlines grid (3 columns) ---------- */
     .airline-groups{
       display:grid;
       grid-template-columns:repeat(3,1fr);
@@ -62,7 +62,23 @@
     .airline-badge{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);flex-shrink:0}
     .airline-meta{font-size:12px;color:var(--muted);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    /* ---------- Fleet in right panel ---------- */
+    /* ---------- Durations UI (styled cards) ---------- */
+    #durations{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    .opt{
+      background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));
+      border:1px solid rgba(255,255,255,0.03);
+      padding:10px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;cursor:pointer;min-width:120px;
+      transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+    .opt:hover{transform:translateY(-4px);border-color:rgba(255,215,0,0.12)}
+    .opt:focus{outline:none;box-shadow:0 0 0 4px rgba(255,215,0,0.06)}
+    .opt .label-main{font-weight:900}
+    .opt .label-sub{font-size:12px;color:var(--muted)}
+    .opt.selected{background:linear-gradient(180deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02));border-color:rgba(255,215,0,0.22);box-shadow:0 10px 28px rgba(255,215,0,0.06)}
+    .opt .icon{width:36px;height:36;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent)}
+
+    /* ---------- Fleet right panel ---------- */
     .fleet-panel{padding:12px;border-radius:10px;background:linear-gradient(180deg,#041f2a,#03222a);border:1px solid rgba(255,255,255,0.03)}
     .fleet-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
     .fleet-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.02)}
@@ -77,15 +93,12 @@
 
     .muted-note{font-size:12px;color:var(--muted)}
 
-    /* responsive adjustments */
     @media(max-width:520px){
-      :root{--panel-padding:10px}
-      .logo{width:48px;height:48px}
-      .airline-badge{width:30px;height:30px}
+      .airline-groups{grid-template-columns:1fr}
+      .opt{min-width:48%;flex:1}
       .plane-type{width:46px;height:38px;font-size:12px}
       .fleet-right{min-width:0;align-items:flex-start}
-      .fleet-row{padding:8px}
-      .airline-item{padding:8px}
+      .airline-badge{width:30px;height:30px}
     }
   </style>
 </head>
@@ -96,7 +109,7 @@
         <div class="logo" aria-hidden="true">LH</div>
         <div>
           <h1 class="title">Lufthansa Group Virtual</h1>
-          <div class="subtitle">Генератор рейсов — аккуратный и адаптивный UI</div>
+          <div class="subtitle">Генератор рейсов — компактный и аккуратный</div>
         </div>
       </div>
       <div class="hero-actions">
@@ -109,9 +122,9 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 id="main-title" style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Группы хабов: 3 колонки на широких экранах; коснись заголовка группы — свернёшь/развернёшь</div>
+          <div class="small" style="margin-top:6px">Группы хабов свернуты по умолчанию; выбери хаб и длительность</div>
         </div>
-        <div class="small">Данные демонстрационные</div>
+        <div class="small">Демо-данные</div>
       </div>
 
       <div class="grid" style="margin-top:12px">
@@ -122,7 +135,7 @@
             <div id="airlines" class="airline-groups" aria-label="Список авиакомпаний"></div>
 
             <h3 style="margin-top:12px">Длительность</h3>
-            <div id="durations" style="margin-top:8px"></div>
+            <div id="durations"></div>
 
             <div class="controls" style="margin-top:12px">
               <button id="gen" class="btn btn-primary">Сгенерировать</button>
@@ -136,7 +149,7 @@
           </div>
         </div>
 
-        <!-- right column: fleet + info -->
+        <!-- right column -->
         <aside>
           <div class="fleet-panel panel" style="margin-bottom:12px">
             <div style="display:flex;align-items:center;justify-content:space-between">
@@ -167,7 +180,7 @@
             <h3 style="margin-top:12px">Подсказки</h3>
             <div class="small" style="margin-top:8px">
               - Нажми на заголовок группы, чтобы свернуть/развернуть<br>
-              - На телефоне список автоматически упрощается
+              - На телефоне карточки длительности упрощаются
             </div>
           </div>
         </aside>
@@ -253,7 +266,7 @@ const AIRLINES = [
   { name: "SunExpress", hubs: ["EDDF","EDDM"] }
 ];
 
-/* ================ Helpers ================ */
+/* ================= HELPERS ================= */
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function pad(n){ return String(n).padStart(2,'0'); }
@@ -272,7 +285,7 @@ function estimateDistanceKm(fromICAO, toICAO){
   return Math.round(haversineKm(a.lat,a.lon,b.lat,b.lon));
 }
 
-/* ================ UI refs ================ */
+/* ================= UI refs ================= */
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
 const genBtn = document.getElementById('gen');
@@ -292,33 +305,32 @@ const about = document.getElementById('about');
 let chosenAir = null;
 let chosenDur = null;
 
-/* ================ Render durations ================ */
+/* ================= Durations ================= */
 const DURATIONS = [
-  {label:"1-2ч",min:60,max:120},
-  {label:"3-4ч",min:180,max:240},
-  {label:"5-6ч",min:300,max:360},
-  {label:"7-8ч",min:420,max:480},
-  {label:"9-10ч",min:540,max:600},
+  {label:"1–2ч",min:60,max:120},
+  {label:"3–4ч",min:180,max:240},
+  {label:"5–6ч",min:300,max:360},
+  {label:"7–8ч",min:420,max:480},
+  {label:"9–10ч",min:540,max:600},
   {label:"10+ч",min:601,max:1200}
 ];
 function renderDurations(){
   durationsWrap.innerHTML = '';
   DURATIONS.forEach((d,i)=>{
     const avg = Math.round(((d.min + d.max)/2)/60);
-    const el = document.createElement('div');
+    const el = document.createElement('button');
     el.className = 'opt';
+    el.type = 'button';
     el.tabIndex = 0;
-    el.style.display = 'flex';
-    el.style.alignItems = 'center';
-    el.style.gap = '10px';
-    el.innerHTML = `<div class="icon">⌛</div><div style="min-width:0"><div style="font-weight:900">${esc(d.label)}</div><div class="small" style="margin-top:6px;color:var(--muted)">~ ${avg} ч</div></div>`;
+    el.innerHTML = `<div class="icon">⌛</div>
+      <div><div class="label-main">${esc(d.label)}</div><div class="label-sub">~ ${avg} ч</div></div>`;
     el.addEventListener('click', ()=> selectDur(i));
     el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
     durationsWrap.appendChild(el);
   });
 }
 
-/* ================ Render airlines: 3-column groups ================ */
+/* ================= Airlines (collapsed by default) ================= */
 function renderAirlines(){
   const copy = AIRLINES.map((a,origIndex)=> Object.assign({__origIndex: origIndex}, a))
     .sort((a,b)=>{
@@ -370,7 +382,8 @@ function renderAirlines(){
 
     const list = document.createElement('div');
     list.className = 'airline-list';
-    list.style.height = 'auto';
+    // start collapsed: set height 0
+    list.style.height = '0px';
 
     const frag = document.createDocumentFragment();
     g.forEach(a=>{
@@ -396,21 +409,32 @@ function renderAirlines(){
     groupEl.appendChild(list);
     airlinesWrap.appendChild(groupEl);
 
-    // collapse/expand
-    let collapsed = false;
+    // collapse/expand state - start collapsed
+    let collapsed = true;
+    // ensure the chevron rotated left initially
+    head.querySelector('.chev').style.transform = 'rotate(-90deg)';
+
     head.addEventListener('click', ()=>{
       const chev = head.querySelector('.chev');
-      if(!collapsed){
+      if(collapsed){
+        // expand
+        // set explicit height to animate from 0 to scrollHeight
         const full = list.scrollHeight;
         list.style.height = full + 'px';
-        requestAnimationFrame(()=>{ list.style.height = '0px'; chev.style.transform = 'rotate(-90deg)'; });
-        collapsed = true;
-      } else {
-        list.style.height = '0px';
-        requestAnimationFrame(()=>{ list.style.height = list.scrollHeight + 'px'; head.querySelector('.chev').style.transform = 'rotate(0deg)'; });
+        chev.style.transform = 'rotate(0deg)';
         collapsed = false;
+      } else {
+        // collapse
+        const full = list.scrollHeight;
+        // ensure from full height
+        list.style.height = full + 'px';
+        requestAnimationFrame(()=> { list.style.height = '0px'; });
+        chev.style.transform = 'rotate(-90deg)';
+        collapsed = true;
       }
     });
+
+    // after expand animation, set height to auto for flexible content
     list.addEventListener('transitionend', (e)=>{
       if(e.propertyName !== 'height') return;
       if(!collapsed) list.style.height = 'auto';
@@ -418,7 +442,7 @@ function renderAirlines(){
   });
 }
 
-/* ================ Fleet render: right panel ================ */
+/* ================= Fleet render ================= */
 function renderFleetList(){
   if(!fleetListEl) return;
   fleetListEl.innerHTML = '';
@@ -467,7 +491,7 @@ function fleetHousekeeping(){
   renderAssignLog();
 }
 
-/* ================ Assignment logic (unchanged) ================ */
+/* assignment (unchanged) */
 function findSuitableAircraftSmart(route, nowTs=Date.now()){
   const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
   const safety = 0.95;
@@ -516,7 +540,7 @@ function renderAssignLog(){
   }).map(s=>`<div style="margin-bottom:6px">${esc(s)}</div>`).join('');
 }
 
-/* ================ Duration filter & generate ================ */
+/* durations & generate */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
@@ -547,7 +571,7 @@ function generateFlight(){
   const route = pool[randInt(0, pool.length-1)];
   const assign = assignAircraftToRouteSmart(route);
 
-  // time in flight display (hours:minutes) — restored and styled
+  // time in flight (HH:MM) restored and styled
   let minutes;
   if (Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
   else {
@@ -577,7 +601,7 @@ function generateFlight(){
   resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-/* ================ Selection helpers ================ */
+/* selection helpers */
 function selectAir(origIndex){
   chosenAir = origIndex;
   document.querySelectorAll('.airline-item').forEach(n=>{
@@ -593,12 +617,12 @@ function selectDur(i){
   resultEl.style.display = 'none';
 }
 
-/* ================ UI actions ================ */
+/* UI actions */
 function refreshFleet(){ renderFleetList(); renderAssignLog(); }
 function showFleetLogConsole(){ console.table(FLEET_LOG.slice(-50)); alert('Лог флота выведен в консоль.'); }
 function clearAssignLog(){ FLEET_LOG.length = 0; renderAssignLog(); }
 
-/* ================ Init ================ */
+/* init */
 function init(){
   renderAirlines();
   renderDurations();
@@ -611,7 +635,7 @@ function init(){
   refreshFleetBtn.addEventListener('click', refreshFleet);
   showFleetLogBtn.addEventListener('click', showFleetLogConsole);
   clearLogBtn && clearLogBtn.addEventListener('click', clearAssignLog);
-  openDemo.addEventListener('click', ()=>{ alert('Демо: выбирается первая авиакомпания + 7-8ч'); selectAir(0); selectDur(3); generateFlight(); });
+  openDemo.addEventListener('click', ()=>{ alert('Демо: первая авиакомпания + 7–8ч'); selectAir(0); selectDur(3); generateFlight(); });
   about.addEventListener('click', ()=>{ alert('Lufthansa Group Virtual — демонстрационный генератор рейсов.'); });
   setInterval(fleetHousekeeping, 15 * 1000);
 }
