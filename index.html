@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — fleet (range-aware)</title>
+  <title>Lufthansa Group Virtual — fleet (collapsible airlines)</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
@@ -14,10 +14,10 @@
       --text:#eaf4ff;
       --card:#072033;
       --glass:rgba(255,255,255,0.03);
-      --radius:14px;
+      --radius:12px;
       --shadow:0 14px 40px rgba(2,8,20,0.6);
       --gap:12px;
-      --transition:180ms;
+      --transition:200ms;
       --max-width:1100px;
     }
     *{box-sizing:border-box}
@@ -55,28 +55,30 @@
     .icao{color:var(--lufthansa-yellow);font-weight:900}
     .info .small{margin-top:8px}
     .muted-block{color:var(--muted);font-size:13px}
-    /* fleet list */
-    .fleet-row{padding:8px;border-radius:8px;background:rgba(255,255,255,0.01);margin-bottom:10px}
-    .fleet-row .id{font-weight:900}
-    .fleet-status-idle{color:#8be88b;font-weight:700}
-    .fleet-status-flight{color:#ffcc66;font-weight:700}
-    .badge{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.12);font-weight:700}
+
+    /* prettier airlines list + collapsible groups */
+    .airline-groups{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .airline-group{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg,rgba(255,255,255,0.005),transparent)}
+    .airline-group-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;user-select:none}
+    .airline-group-title{display:flex;align-items:center;gap:12px}
+    .airline-badge{width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--lufthansa-yellow);flex-shrink:0}
+    .airline-hub{font-size:12px;color:var(--muted)}
+    .toggle-icon{transition:transform var(--transition);color:var(--muted);font-weight:800}
+    .airline-list{overflow:hidden;transition:height var(--transition) cubic-bezier(.2,.9,.2,1);display:block}
+    .airline-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid rgba(255,255,255,0.01);cursor:pointer;background:transparent}
+    .airline-item:hover{background:rgba(255,255,255,0.01)}
+    .airline-item.selected{background:linear-gradient(90deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02))}
+    .airline-meta{font-size:13px;color:var(--muted);line-height:1.1}
+
+    .chev{transform-origin:center}
+    .chev.collapsed{transform:rotate(-90deg)}
+
+    /* small screen tweaks */
     @media(max-width:520px){
-      body{padding:12px}
       .logo{width:56px;height:56px}
-      .opt{padding:10px}
-      .icon{width:36px;height:36px}
-      .controls{gap:8px}
-      .btn{padding:8px 10px}
+      .airline-badge{width:36px;height:36px}
+      .airline-item{padding:8px 10px}
     }
-    /* prettier airlines list */
-.airline-group{margin-top:8px}
-.airline-group h4{margin:8px 0 6px;color:var(--lufthansa-yellow);font-size:13px;font-weight:800}
-.airline-list{display:flex;flex-direction:column;gap:8px}
-.airline-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg,rgba(255,255,255,0.006),transparent);cursor:pointer;transition:transform .14s}
-.airline-item:hover{transform:translateY(-4px)}
-.airline-badge{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--lufthansa-yellow)}
-.airline-meta{font-size:13px;color:var(--muted);line-height:1.1}
   </style>
 </head>
 <body>
@@ -86,7 +88,7 @@
         <div class="logo" aria-hidden="true">LH</div>
         <div>
           <h1 class="title">Lufthansa Group Virtual</h1>
-          <div class="subtitle">Генератор рейсов — флот с умным назначением</div>
+          <div class="subtitle">Генератор рейсов — аккуратный список авиакомпаний</div>
         </div>
       </div>
       <div class="hero-actions">
@@ -99,16 +101,16 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 id="main-title" style="margin:0;color:var(--lufthansa-yellow)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Выбери авиакомпанию и длительность — система подберёт подходящий самолёт по типу и дальности</div>
+          <div class="small" style="margin-top:6px">Нажми на группу чтобы свернуть/развернуть; кликом по авиакомпании выбирается хаб</div>
         </div>
-        <div class="muted-block">Данные встроены; флот демонстрационный</div>
+        <div class="muted-block">Ухоженный список авиакомпаний с анимацией</div>
       </div>
 
       <div class="grid" style="margin-top:14px">
         <div>
           <div class="panel">
             <h3>Авиакомпания</h3>
-            <div id="airlines" class="options"></div>
+            <div id="airlines" class="airline-groups" aria-label="Список авиакомпаний"></div>
 
             <h3 style="margin-top:14px">Длительность</h3>
             <div id="durations" class="options"></div>
@@ -120,15 +122,6 @@
             </div>
 
             <div id="result" class="result" role="status" aria-live="polite"></div>
-            <div class="small" style="margin-top:10px">Алгоритм старается назначать короткие самолёты на короткие рейсы и большие — на дальние.</div>
-          </div>
-
-          <div id="assignLogPanel" class="panel" style="margin-top:12px">
-            <h3>Журнал назначений</h3>
-            <div id="assignLog" class="small" style="margin-top:8px">Пока пусто</div>
-            <div style="margin-top:10px">
-              <button id="clearLog" class="btn btn-ghost">Очистить журнал</button>
-            </div>
           </div>
         </div>
 
@@ -148,9 +141,9 @@
   </div>
 
 <script>
-/* ============================
-   Embedded ROUTES (sample EDDF + EDDM)
-   ============================ */
+/* ---------------------------
+   Data (routes, airports, fleet)
+   --------------------------- */
 const ROUTES = [
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":70,"source":"embedded"},
@@ -175,9 +168,6 @@ const ROUTES = [
 ];
 ROUTES.forEach(r=>{ r.durationMinutes = Number.isFinite(Number(r.durationMinutes)) ? Number(r.durationMinutes) : NaN; });
 
-/* ============================
-   AIRPORTS (subset)
-   ============================ */
 const AIRPORTS = {
   "EDDF": { lat:50.0379, lon:8.5622 },
   "EDDM": { lat:48.3538, lon:11.7861 },
@@ -192,10 +182,6 @@ const AIRPORTS = {
   "EKCH": { lat:55.6179, lon:12.6560 }
 };
 
-/* ============================
-   Fleet (demo)
-   Each type has implied size and typical range category
-   ============================ */
 const FLEET = [
   { id: 'LH-A320-01', type: 'A320', model:'narrow', rangeKm: 6100, seats: 180, turnaround: 40, status: 'idle', locationICAO: 'EDDF', availableAt: 0 },
   { id: 'LH-A321-02', type: 'A321', model:'narrow', rangeKm: 6100, seats: 200, turnaround: 40, status: 'idle', locationICAO: 'EDDM', availableAt: 0 },
@@ -207,7 +193,59 @@ const FLEET = [
 
 const FLEET_LOG = [];
 
-/* UI refs */
+/* ---------------------------
+   Airlines list (includes new airlines from earlier messages)
+   --------------------------- */
+const AIRLINES = [
+  { name: "Lufthansa", hubs: ["EDDF","EDDM"] },
+  { name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"] },
+  { name: "Discover", hubs: ["EDDF"] },
+  { name: "Lufthansa CityLine", hubs: ["EDDF","EDDM"] },
+  { name: "AirDolomiti", hubs: ["EDDM"] },
+  { name: "Wideroe", hubs: ["ENBR"] },
+  { name: "SAS", hubs: ["EKCH","EKTB"] },
+  { name: "Austrian", hubs: ["LOWW"] },
+  { name: "Brussels Airlines", hubs: ["EBBR"] },
+  { name: "Edelweiss", hubs: ["LSZH"] },
+  { name: "Lufthansa City", hubs: ["EDDM"] },
+  { name: "Lufthansa Private Jet", hubs: ["EDDF"] },
+  { name: "Norwegian Airlines", hubs: ["ENGM","ENBR"] },
+  { name: "Condor", hubs: ["EDDH","EDDF"] },
+  { name: "Swiss", hubs: ["LSZH"] },
+  { name: "AirBaltic", hubs: ["EVRA","EVRA"] },
+  { name: "Lufthansa Cargo", hubs: ["EDDF"] },
+  { name: "Lufthansa Technik", hubs: ["EDDF"] },
+  { name: "ITA Airways", hubs: ["LIRF"] },
+  { name: "Finnair", hubs: ["EFHK"] },
+  { name: "AeroLogic", hubs: ["EDDF"] },
+  { name: "SunExpress", hubs: ["EDDF","EDDM"] }
+];
+
+/* ---------------------------
+   Helpers (escape, rand, haversine)
+   --------------------------- */
+function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pad(n){ return String(n).padStart(2,'0'); }
+
+function haversineKm(aLat,aLon,bLat,bLon){
+  const R=6371, toRad=x=>x*Math.PI/180;
+  const dLat=toRad(bLat-aLat), dLon=toRad(bLon-aLon);
+  const lat1=toRad(aLat), lat2=toRad(bLat);
+  const sinDlat=Math.sin(dLat/2), sinDlon=Math.sin(dLon/2);
+  const c=2*Math.asin(Math.sqrt(sinDlat*sinDlat + Math.cos(lat1)*Math.cos(lat2)*sinDlon*sinDlon));
+  return R*c;
+}
+function getAirportCoords(icao){ return AIRPORTS[icao] || null; }
+function estimateDistanceKm(fromICAO, toICAO){
+  const a = getAirportCoords(fromICAO), b = getAirportCoords(toICAO);
+  if(!a || !b) return null;
+  return Math.round(haversineKm(a.lat,a.lon,b.lat,b.lon));
+}
+
+/* ---------------------------
+   UI refs
+   --------------------------- */
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
 const genBtn = document.getElementById('gen');
@@ -226,32 +264,9 @@ const about = document.getElementById('about');
 let chosenAir = null;
 let chosenDur = null;
 
-/* UI data */
-const AIRLINES = [
-  { name: "Lufthansa", hubs: ["EDDF","EDDM"] },
-  { name: "Austrian", hubs: ["LOWW"] },
-  { name: "Swiss", hubs: ["LSZH"] },
-  { name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"] },
-  { name: "Brussels Airlines", hubs: ["EBBR"] },
-
-  { name: "AirBaltic", hubs: ["EVRA","EVRA"] },
-  { name: "Discover", hubs: ["EDDF"] },
-  { name: "Edelweiss", hubs: ["LSZH"] },
-  { name: "Lufthansa Cargo", hubs: ["EDDF"] },
-  { name: "Lufthansa CityLine", hubs: ["EDDF","EDDM"] },
-  { name: "Lufthansa City", hubs: ["EDDM"] },
-  { name: "Lufthansa Technik", hubs: ["EDDF"] },
-  { name: "AirDolomiti", hubs: ["EDDM"] },
-  { name: "Lufthansa Private Jet", hubs: ["EDDF"] },
-  { name: "ITA Airways", hubs: ["LIRF"] },
-  { name: "Wideroe", hubs: ["ENBR"] },
-  { name: "Norwegian Airlines", hubs: ["ENGM","ENBR"] },
-  { name: "Finnair", hubs: ["EFHK"] },
-  { name: "SAS", hubs: ["EKCH","EKTB"] },
-  { name: "Condor", hubs: ["EDDH","EDDF"] },
-  { name: "AeroLogic", hubs: ["EDDF"] },
-  { name: "SunExpress", hubs: ["EDDF","EDDM"] }
-];
+/* ---------------------------
+   Render durations (unchanged)
+   --------------------------- */
 const DURATIONS = [
   {label:"1-2ч",min:60,max:120},
   {label:"3-4ч",min:180,max:240},
@@ -260,41 +275,172 @@ const DURATIONS = [
   {label:"9-10ч",min:540,max:600},
   {label:"10+ч",min:601,max:1200}
 ];
-
-/* helpers */
-function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-function pad(n){ return String(n).padStart(2,'0'); }
-
-/* haversine */
-function haversineKm(aLat,aLon,bLat,bLon){
-  const R=6371, toRad=x=>x*Math.PI/180;
-  const dLat=toRad(bLat-aLat), dLon=toRad(bLon-aLon);
-  const lat1=toRad(aLat), lat2=toRad(bLat);
-  const sinDlat=Math.sin(dLat/2), sinDlon=Math.sin(dLon/2);
-  const c=2*Math.asin(Math.sqrt(sinDlat*sinDlat + Math.cos(lat1)*Math.cos(lat2)*sinDlon*sinDlon));
-  return R*c;
-}
-function getAirportCoords(icao){ return AIRPORTS[icao] || null; }
-function estimateDistanceKm(fromICAO, toICAO){
-  const a = getAirportCoords(fromICAO), b = getAirportCoords(toICAO);
-  if(!a || !b) return null;
-  return Math.round(haversineKm(a.lat,a.lon,b.lat,b.lon));
+function renderDurations(){
+  durationsWrap.innerHTML = '';
+  DURATIONS.forEach((d,i)=>{
+    const avg = Math.round(((d.min + d.max)/2)/60);
+    const el = document.createElement('div');
+    el.className = 'opt';
+    el.tabIndex = 0;
+    el.innerHTML = `<div class="icon">⌛</div><div style="min-width:0"><div style="font-weight:900">${esc(d.label)}</div><div class="small" style="margin-top:6px;color:var(--muted)">~ ${avg} ч</div></div>`;
+    el.addEventListener('click', ()=> selectDur(i));
+    el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
+    durationsWrap.appendChild(el);
+  });
 }
 
-/* classify distance into categories (km)
-   short: <= 800 km
-   medium: 801 - 3500 km
-   long: > 3500 km
-*/
-function distanceCategory(km){
-  if(km === null) return 'unknown';
-  if(km <= 800) return 'short';
-  if(km <= 3500) return 'medium';
-  return 'long';
+/* ---------------------------
+   New renderAirlines: grouped, collapsible, preserves original index selection
+   --------------------------- */
+function renderAirlines(){
+  // create sorted copy by nice name (ignore common prefixes)
+  const copy = AIRLINES.map((a,origIndex)=> Object.assign({__origIndex: origIndex}, a))
+    .sort((a,b)=>{
+      const na = a.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
+      const nb = b.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
+      return na.localeCompare(nb, 'ru') || a.name.localeCompare(b.name, 'ru');
+    });
+
+  // group by primary hub
+  const groups = {};
+  copy.forEach(a=>{
+    const hub = (Array.isArray(a.hubs) && a.hubs[0]) ? a.hubs[0] : '—';
+    if(!groups[hub]) groups[hub] = [];
+    groups[hub].push(a);
+  });
+
+  // deterministic hub order: EDDF, EDDM first, then alphabetical
+  const preferred = ['EDDF','EDDM'];
+  const hubs = Object.keys(groups).sort((x,y)=>{
+    const xi = preferred.indexOf(x), yi = preferred.indexOf(y);
+    if(xi !== -1 || yi !== -1) return (xi===-1?99:xi) - (yi===-1?99:yi);
+    return x.localeCompare(y, 'ru');
+  });
+
+  airlinesWrap.innerHTML = '';
+
+  hubs.forEach(hub=>{
+    const g = groups[hub];
+    const groupEl = document.createElement('div');
+    groupEl.className = 'airline-group';
+
+    // head
+    const head = document.createElement('div');
+    head.className = 'airline-group-head';
+    const title = document.createElement('div');
+    title.className = 'airline-group-title';
+    const badge = document.createElement('div');
+    badge.className = 'airline-badge';
+    badge.textContent = hub === '—' ? '—' : hub.replace(/[0-9]/g,'').slice(0,3);
+    const txt = document.createElement('div');
+    txt.innerHTML = `<div style="font-weight:900">${hub}</div><div class="airline-hub">${g.length} авиакомпаний</div>`;
+    title.appendChild(badge);
+    title.appendChild(txt);
+
+    const togg = document.createElement('div');
+    togg.className = 'toggle-icon';
+    togg.innerHTML = `<span class="chev collapsed">▾</span>`;
+
+    head.appendChild(title);
+    head.appendChild(togg);
+    groupEl.appendChild(head);
+
+    // list container (collapsible)
+    const list = document.createElement('div');
+    list.className = 'airline-list';
+    // we'll compute full height for animation
+    list.style.height = 'auto';
+    const itemsFrag = document.createDocumentFragment();
+
+    g.forEach(a=>{
+      const item = document.createElement('div');
+      item.className = 'airline-item';
+      item.tabIndex = 0;
+      item.setAttribute('data-orig-index', String(a.__origIndex)); // preserve original index
+      const initials = (a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')).toUpperCase();
+      item.innerHTML = `<div class="airline-badge" aria-hidden="true">${esc(initials)}</div>
+        <div style="min-width:0">
+          <div style="font-weight:900">${esc(a.name)}</div>
+          <div class="airline-meta">Хабы: ${a.hubs.join(', ')}</div>
+        </div>`;
+      // click selects airline by original index
+      item.addEventListener('click', ()=> {
+        const idx = Number(item.getAttribute('data-orig-index'));
+        selectAir(idx);
+        // highlight selected within UI
+        document.querySelectorAll('.airline-item').forEach(n=>n.classList.toggle('selected', n===item));
+      });
+      item.addEventListener('keypress', e=>{ if(e.key==='Enter') item.click(); });
+      itemsFrag.appendChild(item);
+    });
+
+    list.appendChild(itemsFrag);
+    groupEl.appendChild(list);
+    airlinesWrap.appendChild(groupEl);
+
+    // initial collapsed state: expanded, allow collapse
+    let collapsed = false;
+
+    function setCollapsed(c){
+      collapsed = Boolean(c);
+      const chev = groupEl.querySelector('.chev');
+      if(collapsed){
+        // collapse with animated height
+        const fullH = list.scrollHeight;
+        list.style.height = fullH + 'px';
+        requestAnimationFrame(()=> {
+          list.style.height = '0px';
+          chev.classList.add('collapsed');
+        });
+      } else {
+        // expand
+        const prev = list.style.height;
+        list.style.height = '0px';
+        requestAnimationFrame(()=> {
+          list.style.height = list.scrollHeight + 'px';
+          chev.classList.remove('collapsed');
+        });
+      }
+    }
+
+    // after transition, fix height to auto when expanded; when collapsed keep 0
+    list.addEventListener('transitionend', (e)=>{
+      if(e.propertyName !== 'height') return;
+      if(!collapsed){
+        list.style.height = 'auto';
+      }
+    });
+
+    // toggle on head click
+    head.addEventListener('click', ()=> {
+      if(collapsed){
+        // expand
+        list.style.height = '0px';
+        requestAnimationFrame(()=> {
+          list.style.height = list.scrollHeight + 'px';
+        });
+        collapsed = false;
+        groupEl.querySelector('.chev').classList.remove('collapsed');
+      } else {
+        // collapse
+        const fullH = list.scrollHeight;
+        list.style.height = fullH + 'px';
+        requestAnimationFrame(()=> {
+          list.style.height = '0px';
+        });
+        collapsed = true;
+        groupEl.querySelector('.chev').classList.add('collapsed');
+      }
+    });
+
+    // small toggle by double-clicking header to start collapsed if many groups (optional)
+    // setCollapsed(true); // uncomment to start collapsed
+  });
 }
 
-/* render fleet UI */
+/* ---------------------------
+   Fleet rendering & housekeeping
+   --------------------------- */
 function renderFleetList(){
   if(!fleetListEl) return;
   fleetListEl.innerHTML = '';
@@ -311,7 +457,6 @@ function renderFleetList(){
   });
 }
 
-/* housekeeper */
 function fleetHousekeeping(){
   const now = Date.now();
   let changed = false;
@@ -325,106 +470,42 @@ function fleetHousekeeping(){
     }
   });
   if(changed) renderFleetList();
-  renderAssignLog();
 }
 
-/* smart candidate selection:
-   - compute route distance and category
-   - prefer aircraft whose model suits the category:
-       * short  => regional/narrow
-       * medium => narrow
-       * long   => wide
-   - if no candidate in exact category -> expand search to adjacent categories
-   - respect range with safety factor
-   - final sort: category match > seats closeness (avoid huge under/overprovision) > idle time (not tracked here)
-*/
+/* ---------------------------
+   Simple assignment (keeps previous smart logic)
+   --------------------------- */
 function findSuitableAircraftSmart(route, nowTs=Date.now()){
   const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
-  const cat = distanceCategory(distanceKm);
   const safety = 0.95;
-
-  // map model preference per category
-  const pref = {
-    short: ['regional','narrow','wide'],
-    medium: ['narrow','regional','wide'],
-    long: ['wide','narrow','regional'],
-    unknown: ['narrow','regional','wide']
-  };
-  const preference = pref[cat] || pref.unknown;
-
-  // pool of idle or soon-available aircraft at same location
   const basePool = FLEET.filter(ac=>{
     if(ac.status === 'inFlight' && ac.availableAt > nowTs) return false;
     if((ac.locationICAO||'').toUpperCase() !== (route.fromICAO||'').toUpperCase()) return false;
     if(distanceKm === null) return true;
     return ac.rangeKm * safety >= distanceKm;
   });
-
-  // group by model and score
-  const scored = [];
-  basePool.forEach(ac=>{
-    const modelRank = preference.indexOf(ac.model);
-    const categoryScore = modelRank === -1 ? 3 : modelRank; // lower = better
-    // seatDiff: prefer aircraft capacity close to "expected" (approximate)
-    // expectedSeats: derive from distance: short->120, medium->180, long->280
-    let expectedSeats = 180;
-    if(cat === 'short') expectedSeats = 120;
-    if(cat === 'medium') expectedSeats = 180;
-    if(cat === 'long') expectedSeats = 280;
-    const seatDiff = Math.abs(ac.seats - expectedSeats);
-    // final score: categoryScore * 1000 + seatDiff
-    const score = categoryScore * 1000 + seatDiff;
-    scored.push({ ac, score, categoryScore, seatDiff });
-  });
-
-  // if none in basePool, fall back to more permissive list (ignore location)
-  if(scored.length === 0){
-    // allow repositioning: aircraft from other hubs (not ideal) but only if range allows
-    const reposition = FLEET.filter(ac=>{
-      if(ac.status === 'inFlight' && ac.availableAt > nowTs) return false;
-      if(distanceKm === null) return ac.rangeKm * safety >= (distanceKm || 0);
-      return ac.rangeKm * safety >= distanceKm;
-    }).map(ac=>{
-      const modelRank = preference.indexOf(ac.model);
-      const categoryScore = modelRank === -1 ? 4 : modelRank+1; // deprioritize reposition
-      let expectedSeats = 180;
-      if(cat === 'short') expectedSeats = 120;
-      if(cat === 'medium') expectedSeats = 180;
-      if(cat === 'long') expectedSeats = 280;
-      const seatDiff = Math.abs(ac.seats - expectedSeats);
-      const score = categoryScore * 1000 + seatDiff + 5000; // big penalty for reposition
-      return { ac, score, categoryScore, seatDiff };
-    });
-    scored.push(...reposition);
-  }
-
-  // sort ascending by score
-  scored.sort((a,b)=> a.score - b.score);
-
-  return { distanceKm, category: cat, candidates: scored.map(s=>s.ac) };
+  basePool.sort((a,b)=>Math.abs(a.seats-180) - Math.abs(b.seats-180)); // simple prefer mid-size
+  return { distanceKm, candidates: basePool };
 }
-
-/* assign using smart finder */
 function assignAircraftToRouteSmart(route){
   const now = Date.now();
-  const { distanceKm, category, candidates } = findSuitableAircraftSmart(route, now);
+  const { distanceKm, candidates } = findSuitableAircraftSmart(route, now);
   if(candidates.length === 0){
-    FLEET_LOG.push({ ts: now, event:'assign_failed', route: `${route.fromICAO}->${route.toICAO}`, distanceKm, category });
-    renderAssignLog();
-    return { ok:false, reason:'no_suitable', distanceKm, category };
+    FLEET_LOG.push({ ts: now, event:'assign_failed', route: `${route.fromICAO}->${route.toICAO}`, distanceKm });
+    return { ok:false, reason:'no_suitable', distanceKm };
   }
   const ac = candidates[0];
   const durationMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
   ac.status = 'inFlight';
   ac.availableAt = now + durationMs + ac.turnaround*60*1000;
   ac.nextLocation = route.toICAO;
-  FLEET_LOG.push({ ts: now, event:'assign', aircraft: ac.id, route: `${route.fromICAO}->${route.toICAO}`, durationMin: route.durationMinutes, distanceKm, category });
+  FLEET_LOG.push({ ts: now, event:'assign', aircraft: ac.id, route: `${route.fromICAO}->${route.toICAO}`, durationMin: route.durationMinutes, distanceKm });
   renderFleetList();
   renderAssignLog();
-  return { ok:true, aircraft: ac, distanceKm, category };
+  return { ok:true, aircraft: ac, distanceKm };
 }
 
-/* render assign log */
+/* assign log */
 function renderAssignLog(){
   if(!assignLogEl) return;
   const items = FLEET_LOG.slice(-12).reverse();
@@ -434,100 +515,16 @@ function renderAssignLog(){
   }
   assignLogEl.innerHTML = items.map(it=>{
     const t = new Date(it.ts).toLocaleTimeString();
-    if(it.event === 'assign') return `${t} — assign ${it.aircraft} ${it.route} (${it.durationMin} min, ${it.distanceKm || 'n/a'} km, ${it.category||'?'})`;
+    if(it.event === 'assign') return `${t} — assign ${it.aircraft} ${it.route} (${it.durationMin} min, ${it.distanceKm || 'n/a'} km)`;
     if(it.event === 'available') return `${t} — available ${it.aircraft} @ ${it.location}`;
-    if(it.event === 'assign_failed') return `${t} — assign_failed ${it.route} (dist ${it.distanceKm || 'n/a'} km, cat ${it.category || 'n/a'})`;
+    if(it.event === 'assign_failed') return `${t} — assign_failed ${it.route} (dist ${it.distanceKm || 'n/a'})`;
     return `${t} — ${it.event}`;
   }).map(s=>`<div style="margin-bottom:6px">${esc(s)}</div>`).join('');
 }
 
-/* rest of UI rendering (airlines/durations etc.) */
-function renderAirlines(){
-  // produce a cleaned copy sorted by name
-  const copy = AIRLINES.slice().sort((a,b)=>{
-    const na = a.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
-    const nb = b.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
-    return na.localeCompare(nb, 'ru') || a.name.localeCompare(b.name, 'ru');
-  });
-
-  // group by primary hub (first hub) — fallback '—'
-  const groups = {};
-  copy.forEach(a=>{
-    const hub = (Array.isArray(a.hubs) && a.hubs[0]) ? a.hubs[0] : '—';
-    if(!groups[hub]) groups[hub] = [];
-    groups[hub].push(a);
-  });
-
-  airlinesWrap.innerHTML = '';
-
-  // optional: keys in deterministic order (EDDF first, EDDM second, then alphabetic)
-  const preferred = ['EDDF','EDDM'];
-  const hubs = Object.keys(groups).sort((x,y)=>{
-    const xi = preferred.indexOf(x), yi = preferred.indexOf(y);
-    if(xi !== -1 || yi !== -1) return (xi===-1?99:xi) - (yi===-1?99:yi);
-    return x.localeCompare(y, 'ru');
-  });
-
-  hubs.forEach(hub=>{
-    const groupEl = document.createElement('div');
-    groupEl.className = 'airline-group';
-    const title = document.createElement('h4');
-    title.textContent = `Хаб ${hub}`;
-    groupEl.appendChild(title);
-
-    const list = document.createElement('div');
-    list.className = 'airline-list';
-
-    groups[hub].forEach((a,i)=>{
-      const item = document.createElement('div');
-      item.className = 'airline-item';
-      item.tabIndex = 0;
-      item.setAttribute('role','button');
-      // badge: initials
-      const initials = (a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')).toUpperCase();
-      item.innerHTML = `<div class="airline-badge" aria-hidden="true">${esc(initials)}</div>
-        <div style="min-width:0">
-          <div style="font-weight:900">${esc(a.name)}</div>
-          <div class="airline-meta">Хабы: ${a.hubs.join(', ')}</div>
-        </div>`;
-
-      item.addEventListener('click', ()=> selectAir(AIRLINES.indexOf(a)));
-      item.addEventListener('keypress', e=>{ if(e.key==='Enter') selectAir(AIRLINES.indexOf(a)); });
-      list.appendChild(item);
-    });
-
-    groupEl.appendChild(list);
-    airlinesWrap.appendChild(groupEl);
-  });
-}
-function renderDurations(){
-  durationsWrap.innerHTML = '';
-  DURATIONS.forEach((d,i)=>{
-    const avg = Math.round(((d.min + d.max)/2)/60);
-    const el = document.createElement('div');
-    el.className = 'opt';
-    el.tabIndex = 0;
-    el.innerHTML = `<div class="icon">⌛</div><div style="min-width:0"><div style="font-weight:900">${esc(d.label)}</div><div class="small" style="margin-top:6px;color:var(--muted)">~ ${avg} ч</div></div>`;
-    el.addEventListener('click', ()=> selectDur(i));
-    el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
-    durationsWrap.appendChild(el);
-  });
-}
-
-/* selection handlers */
-function selectAir(i){
-  chosenAir = i;
-  Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-  hideResult();
-}
-function selectDur(i){
-  chosenDur = i;
-  Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-  hideResult();
-}
-function hideResult(){ resultEl.style.display='none'; resultEl.innerHTML=''; }
-
-/* filtering same as before */
+/* ---------------------------
+   Duration filtering + generate flight
+   --------------------------- */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
@@ -543,7 +540,6 @@ function routesInDurationInterval(routes, durIdx){
   return best.slice(0,200);
 }
 
-/* generateFlight using smart assign */
 function generateFlight(){
   if (chosenAir === null) { alert('Выберите авиакомпанию'); return; }
   if (chosenDur === null) { alert('Выберите длительность'); return; }
@@ -557,11 +553,7 @@ function generateFlight(){
   const filteredByDur = routesInDurationInterval(pool, chosenDur);
   if(filteredByDur.length > 0) pool = filteredByDur;
   const route = pool[randInt(0, pool.length-1)];
-
-  // smart assign
   const assign = assignAircraftToRouteSmart(route);
-
-  // minutes
   let minutes;
   if (Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
   else {
@@ -570,16 +562,13 @@ function generateFlight(){
   }
   const hh = Math.floor(minutes/60), mm = minutes % 60;
   const time = pad(hh) + ':' + pad(mm);
-
   resultEl.style.display = 'block';
   let acHtml = '';
   if(assign.ok){
-    acHtml = `<div class="row"><div class="label">Aircraft</div><div class="val">${esc(assign.aircraft.id)} · ${esc(assign.aircraft.type)} · seats ${assign.aircraft.seats}</div></div>
-              <div class="row"><div class="label">Категория дистанции</div><div class="val">${esc(assign.category)} · ${assign.distanceKm || 'n/a'} km</div></div>`;
+    acHtml = `<div class="row"><div class="label">Aircraft</div><div class="val">${esc(assign.aircraft.id)} · ${esc(assign.aircraft.type)} · seats ${assign.aircraft.seats}</div></div>`;
   } else {
     acHtml = `<div class="row"><div class="label">Aircraft</div><div class="val" style="color:#ffcc88">Нет подходящего самолёта (расстояние ${assign.distanceKm || 'n/a'} km)</div></div>`;
   }
-
   resultEl.innerHTML = `
     <div class="row"><div class="label">Авиакомпания</div><div class="val">${esc(airline.name)}</div></div>
     <div class="row"><div class="label">Отправление</div><div class="val">${esc(route.fromCity)} <span class="icao">(${esc(route.fromICAO)})</span></div></div>
@@ -589,21 +578,51 @@ function generateFlight(){
     <div class="row"><div class="label">Источник</div><div class="val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Сгенерировано (интервал)'}</div></div>
   `;
   resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-  console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'assigned=', assign.ok ? assign.aircraft.id : 'none', 'category=', assign.category);
 }
 
-/* utility: demo/reset */
-function doDemo(){ selectAir(0); selectDur(3); generateFlight(); }
-function doReset(){ chosenAir = null; chosenDur = null; Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected')); Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; }
+/* ---------------------------
+   Selection helpers
+   --------------------------- */
+function selectAir(origIndex){
+  chosenAir = origIndex;
+  // visually mark selected airline item
+  document.querySelectorAll('.airline-item').forEach(n=>{
+    n.classList.toggle('selected', Number(n.getAttribute('data-orig-index')) === origIndex);
+  });
+  // also clear previous route/result
+  resultEl.style.display = 'none';
+  resultEl.innerHTML = '';
+}
+function selectDur(i){
+  chosenDur = i;
+  Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
+  resultEl.style.display = 'none';
+}
 
-/* fleet UI actions */
+/* ---------------------------
+   UI actions & init
+   --------------------------- */
 function refreshFleet(){ renderFleetList(); renderAssignLog(); }
 function showFleetLogConsole(){ console.table(FLEET_LOG.slice(-50)); alert('Флот лог выведен в консоль (последние события).'); }
 function clearAssignLog(){ FLEET_LOG.length = 0; renderAssignLog(); }
 
-/* init */
-function init(){ renderAirlines(); renderDurations(); routesCount.textContent = ROUTES.length; renderFleetList(); renderAssignLog(); genBtn.addEventListener('click', generateFlight); demoBtn.addEventListener('click', doDemo); resetBtn.addEventListener('click', doReset); refreshFleetBtn.addEventListener('click', refreshFleet); showFleetLogBtn.addEventListener('click', showFleetLogConsole); clearLogBtn.addEventListener('click', clearAssignLog); openDemo.addEventListener('click', ()=>{ alert('Демо: умное назначение флота включено. Нажмите Демо.'); doDemo(); }); about.addEventListener('click', ()=>{ alert('Lufthansa Group Virtual — демонстрационный генератор рейсов с назначением флота. Данные оценочные.'); }); }
-setInterval(fleetHousekeeping, 15 * 1000);
+function init(){
+  renderAirlines();
+  renderDurations();
+  routesCount.textContent = ROUTES.length;
+  renderFleetList();
+  renderAssignLog();
+  genBtn.addEventListener('click', generateFlight);
+  demoBtn.addEventListener('click', ()=>{ selectAir(0); selectDur(3); generateFlight(); });
+  resetBtn.addEventListener('click', ()=>{ chosenAir=null; chosenDur=null; document.querySelectorAll('.airline-item').forEach(n=>n.classList.remove('selected')); document.querySelectorAll('#durations .opt').forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; });
+  refreshFleetBtn.addEventListener('click', refreshFleet);
+  showFleetLogBtn.addEventListener('click', showFleetLogConsole);
+  clearLogBtn && clearLogBtn.addEventListener('click', clearAssignLog);
+  openDemo.addEventListener('click', ()=>{ alert('Демо: выбрано первая авиакомпания + интервал 7-8ч'); selectAir(0); selectDur(3); generateFlight(); });
+  about.addEventListener('click', ()=>{ alert('Lufthansa Group Virtual — демонстрационный генератор рейсов.'); });
+  // housekeeping
+  setInterval(fleetHousekeeping, 15 * 1000);
+}
 init();
 </script>
 </body>
