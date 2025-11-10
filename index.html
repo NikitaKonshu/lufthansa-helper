@@ -6,8 +6,8 @@
   <title>Lufthansa Group Virtual</title>
   <style>
     :root{
-      --bg:#021430; /* темно-синий */
-      --accent:#ffd400; /* жёлтый */
+      --bg:#021430;
+      --accent:#ffd400;
       --text:#ffffff;
       --card: rgba(255,255,255,0.03);
       --btn-bg: rgba(255,212,0,0.12);
@@ -16,95 +16,27 @@
       --muted: rgba(255,255,255,0.72);
     }
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-    body{
-      background:var(--bg);
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      box-sizing:border-box;
-    }
-    .app{
-      width:100%;
-      max-width:920px;
-      text-align:center;
-    }
-
-    h1{
-      color:var(--accent);
-      font-size:clamp(28px,4vw,44px);
-      margin:0 0 18px 0;
-      font-weight:700;
-      letter-spacing:0.6px;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:12px;
-      padding:20px;
-      box-shadow:0 6px 24px rgba(0,0,0,0.4);
-    }
-
-    .center{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:12px;
-    }
-
-    .btn{
-      background:var(--btn-bg);
-      border:2px solid rgba(255,212,0,0.18);
-      color:var(--accent);
-      padding:12px 22px;
-      border-radius:10px;
-      font-weight:700;
-      cursor:pointer;
-      font-size:16px;
-    }
-    .btn:active{transform:translateY(1px)}
-    .small{
-      font-size:14px;color:rgba(255,255,255,0.8)
-    }
-
-    /* Page layouts */
+    body{background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;}
+    .app{width:100%;max-width:920px;text-align:center;}
+    h1{color:var(--accent);font-size:clamp(28px,4vw,44px);margin:0 0 18px 0;font-weight:700;letter-spacing:0.6px;}
+    .card{background:var(--card);border-radius:12px;padding:20px;box-shadow:0 6px 24px rgba(0,0,0,0.4);}
+    .center{display:flex;flex-direction:column;align-items:center;gap:12px;}
+    .btn{background:var(--btn-bg);border:2px solid rgba(255,212,0,0.18);color:var(--accent);padding:12px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:16px;}
+    .small{font-size:14px;color:rgba(255,255,255,0.8)}
     .hidden{display:none}
     .options{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
-    .option{
-      background:rgba(255,255,255,0.02);
-      border-radius:10px;padding:10px 14px;
-      min-width:120px;text-align:center;cursor:pointer;border:1px solid transparent;
-      transition:all .12s ease;
-    }
+    .option{background:rgba(255,255,255,0.02);border-radius:10px;padding:10px 14px;min-width:120px;text-align:center;cursor:pointer;border:1px solid transparent;transition:all .12s ease;}
     .option:hover{transform:translateY(-3px)}
     .option.selected{border-color:rgba(255,212,0,0.35);box-shadow:0 8px 28px rgba(0,0,0,0.55)}
-
-    /* Улучшенный вид результата */
-    .result{
-      margin-top:18px;
-      text-align:left;
-      width:100%;
-      max-width:720px;
-      background:var(--result-bg);
-      padding:18px;border-radius:12px;border:1px solid var(--result-border);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-    }
-    .result .section{
-      padding:10px 0;
-      border-bottom:1px solid rgba(255,255,255,0.04);
-    }
+    .result{margin-top:18px;text-align:left;width:100%;max-width:720px;background:var(--result-bg);padding:18px;border-radius:12px;border:1px solid var(--result-border);box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);}
+    .result .section{padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
     .result .section:last-child{border-bottom:0}
     .row{display:flex;justify-content:space-between;gap:10px;align-items:center}
     .label{color:var(--muted);font-size:13px}
     .value{font-weight:800;font-size:18px;color:#ffffff;letter-spacing:0.2px}
     .icao{font-weight:900;color:var(--accent);font-size:20px}
     .flight-time{font-weight:900;color:var(--accent);font-size:20px}
-    @media(max-width:520px){
-      .row{flex-direction:column;align-items:flex-start}
-    }
-
-    /* small footer controls */
+    @media(max-width:520px){.row{flex-direction:column;align-items:flex-start}}
     .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
     .link{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;color:var(--text);cursor:pointer;font-size:13px}
     footer{margin-top:14px;color:rgba(255,255,255,0.5);font-size:13px}
@@ -112,7 +44,6 @@
 </head>
 <body>
   <div class="app card" role="application">
-    <!-- Page 1 -->
     <div id="page-start">
       <h1>Lufthansa Group Virtual</h1>
       <div class="center">
@@ -121,7 +52,6 @@
       </div>
     </div>
 
-    <!-- Page 2 -->
     <div id="page-select" class="hidden">
       <h1>Lufthansa Group Virtual</h1>
       <div class="center">
@@ -142,45 +72,47 @@
       </div>
     </div>
 
-    <footer style="text-align:center">Версия демо — редактируй список рейсов в скрипте</footer>
+    <footer style="text-align:center">Версия демо — редактируй данные в секции DATA</footer>
   </div>
 
   <script>
-    /*****************************************************************************
-     * DATASET
+    /**************************************************************************
+     * DATA — редактируй тут
      *
-     * Lufthansa — только из Frankfurt (EDDF) и Munich (EDDM).
-     * Добавляй новые маршруты в массив ROUTES.
-     *****************************************************************************/
+     * AIRLINES — объект {name, hubs: [ICAO,...]}
+     * ROUTES  — список маршрутов {fromCity,fromCountry,fromICAO,toCity,toCountry,toICAO}
+     * DURATIONS — как раньше
+     **************************************************************************/
+    const AIRLINES = [
+      {name: "Lufthansa", hubs: ["EDDF","EDDM"]},      // Lufthansa: Frankfurt, Munich
+      {name: "Austrian", hubs: ["LOWW"]},             // Austrian: Vienna only (LOWW)
+      {name: "Swiss", hubs: ["LSZH"]},                // Swiss: Zurich
+      {name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"]}, // пример: несколько хабов
+      {name: "Brussels Airlines", hubs: ["EBBR"]}     // Brussels
+    ];
+
     const ROUTES = [
-      // Lufthansa — Frankfurt
+      // Lufthansa Frankfurt
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Washington", toCountry:"United States", toICAO:"KDCA"},
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"New York", toCountry:"United States", toICAO:"KJFK"},
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Tokyo", toCountry:"Japan", toICAO:"RJAA"},
-      // Lufthansa — Munich
+      // Lufthansa Munich
       {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"London", toCountry:"United Kingdom", toICAO:"EGLL"},
       {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"Zurich", toCountry:"Switzerland", toICAO:"LSZH"},
       {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"Dubai", toCountry:"UAE", toICAO:"OMDB"},
-      // Примеры других операторов (если нужно)
-      {fromCity:"Berlin", fromCountry:"Germany", fromICAO:"EDDB", toCity:"Moscow", toCountry:"Russia", toICAO:"UUEE"},
-      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Frankfurt am Main", toCountry:"Germany", toICAO:"EDDF"}
-      // Добавляй и дублируй строки сюда до 800-900 записей
+      // Austrian (Vienna)
+      {fromCity:"Vienna", fromCountry:"Austria", fromICAO:"LOWW", toCity:"Berlin", toCountry:"Germany", toICAO:"EDDB"},
+      {fromCity:"Vienna", fromCountry:"Austria", fromICAO:"LOWW", toCity:"Moscow", toCountry:"Russia", toICAO:"UUEE"},
+      // Swiss (Zurich)
+      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Frankfurt am Main", toCountry:"Germany", toICAO:"EDDF"},
+      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Dubai", toCountry:"UAE", toICAO:"OMDB"},
+      // Brussels
+      {fromCity:"Brussels", fromCountry:"Belgium", fromICAO:"EBBR", toCity:"London", toCountry:"United Kingdom", toICAO:"EGLL"},
+      // Eurowings examples (from different hubs)
+      {fromCity:"Hamburg", fromCountry:"Germany", fromICAO:"EDDH", toCity:"Barcelona", toCountry:"Spain", toICAO:"LEBL"},
+      // ... добавляй свои строки; дублируй до 800-900 при необходимости
     ];
 
-    /*****************************************************************************
-     * AIRLINES
-     *****************************************************************************/
-    const AIRLINES = [
-      "Lufthansa",
-      "Swiss",
-      "Austrian",
-      "Eurowings",
-      "Brussels Airlines"
-    ];
-
-    /*****************************************************************************
-     * DURATIONS
-     *****************************************************************************/
     const DURATIONS = [
       {label:"1-2 часа", min:60, max:120},
       {label:"2-4 часа", min:121, max:240},
@@ -189,9 +121,9 @@
       {label:"10+ часов", min:601, max:1200}
     ];
 
-    /***************************************************************************
-     * UI and logic
-     ***************************************************************************/
+    /**************************************************************************
+     * UI / логика
+     **************************************************************************/
     const elStart = document.getElementById('page-start');
     const elSelect = document.getElementById('page-select');
     const btnStart = document.getElementById('btn-start');
@@ -201,8 +133,8 @@
     const btnGen = document.getElementById('btn-gen');
     const resultBox = document.getElementById('result');
 
-    let chosenAirline = null;
-    let chosenDuration = null;
+    let chosenAirlineIdx = null;
+    let chosenDurationIdx = null;
 
     function renderAirlines(){
       airlinesWrap.innerHTML = '';
@@ -211,7 +143,7 @@
         d.className = 'option';
         d.tabIndex = 0;
         d.role = 'button';
-        d.textContent = a;
+        d.textContent = a.name;
         d.onclick = () => selectAirline(i);
         d.onkeypress = (e) => { if(e.key==='Enter') selectAirline(i) };
         airlinesWrap.appendChild(d);
@@ -219,7 +151,7 @@
     }
 
     function selectAirline(idx){
-      chosenAirline = AIRLINES[idx];
+      chosenAirlineIdx = idx;
       Array.from(airlinesWrap.children).forEach((n,i)=> n.classList.toggle('selected', i===idx));
     }
 
@@ -238,35 +170,39 @@
     }
 
     function selectDuration(idx){
-      chosenDuration = DURATIONS[idx];
+      chosenDurationIdx = idx;
       Array.from(durationsWrap.children).forEach((n,i)=> n.classList.toggle('selected', i===idx));
     }
 
-    function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+    function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
     function pad(n){ return n.toString().padStart(2,'0'); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
     function generateFlight(){
-      if(!chosenAirline || !chosenDuration){
+      if(chosenAirlineIdx === null || chosenDurationIdx === null){
         alert('Выберите авиакомпанию и длительность рейса');
         return;
       }
-      // pick random route
-      const route = ROUTES[randInt(0, ROUTES.length-1)];
-      // Ensure Lufthansa only from EDDF or EDDM when Lufthansa selected
-      if(chosenAirline === 'Lufthansa'){
-        const filtered = ROUTES.filter(r => r.fromICAO === 'EDDF' || r.fromICAO === 'EDDM');
-        if(filtered.length) route = filtered[randInt(0, filtered.length-1)];
+      const airline = AIRLINES[chosenAirlineIdx];
+      const duration = DURATIONS[chosenDurationIdx];
+
+      // фильтруем маршруты по хабам авиакомпании
+      const filtered = ROUTES.filter(r => airline.hubs.includes(r.fromICAO));
+      if(filtered.length === 0){
+        resultBox.innerHTML = `<div class="section"><div class="row"><div class="label">Ошибка</div><div class="value">Для авиакомпании ${escapeHtml(airline.name)} нет маршрутов из её хабов. Добавь маршруты в ROUTES.</div></div></div>`;
+        resultBox.classList.remove('hidden');
+        return;
       }
-      // pick random flight minutes within chosenDuration
-      const minutes = randInt(chosenDuration.min, chosenDuration.max);
+
+      const route = filtered[randInt(0, filtered.length-1)];
+      const minutes = randInt(duration.min, duration.max);
       const hours = Math.floor(minutes/60);
       const mins = minutes % 60;
-      const flightTime = pad(hours) + ':' + pad(mins);
+      const flightTime = pad(hours)+':'+pad(mins);
 
-      // build result HTML with clearer sections
       const html = `
         <div class="section">
-          <div class="row"><div class="label">Авиакомпания</div><div class="value">${escapeHtml(chosenAirline)}</div></div>
+          <div class="row"><div class="label">Авиакомпания</div><div class="value">${escapeHtml(airline.name)}</div></div>
         </div>
 
         <div class="section">
@@ -286,7 +222,7 @@
         </div>
 
         <div style="margin-top:10px" class="section">
-          <div class="small">Данные случайно сгенерированы — редактируй ROUTES в скрипте</div>
+          <div class="small">Данные случайно сгенерированы — редактируй DATA в скрипте</div>
         </div>
       `;
       resultBox.innerHTML = html;
@@ -294,26 +230,13 @@
       resultBox.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
 
-    function escapeHtml(s){
-      return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    }
-
-    btnStart.addEventListener('click', () => {
-      elStart.classList.add('hidden');
-      elSelect.classList.remove('hidden');
-      renderAirlines();
-      renderDurations();
-    });
-    btnBack.addEventListener('click', () => {
-      elSelect.classList.add('hidden');
-      elStart.classList.remove('hidden');
-      chosenAirline = null; chosenDuration = null;
-      resultBox.classList.add('hidden');
-    });
+    // навигация
+    btnStart.addEventListener('click', () => { elStart.classList.add('hidden'); elSelect.classList.remove('hidden'); renderAirlines(); renderDurations(); });
+    btnBack.addEventListener('click', () => { elSelect.classList.add('hidden'); elStart.classList.remove('hidden'); chosenAirlineIdx=null; chosenDurationIdx=null; resultBox.classList.add('hidden'); });
     btnGen.addEventListener('click', generateFlight);
     btnStart.addEventListener('keypress', (e)=> { if(e.key==='Enter') btnStart.click(); });
 
-    (function initPreview(){ renderAirlines(); renderDurations(); })();
+    (function init(){ renderAirlines(); renderDurations(); })();
   </script>
 </body>
 </html>
