@@ -3,79 +3,95 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — fleet (compact)</title>
+  <title>Lufthansa Group Virtual — UI refined</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
       --bg-1:#041528; --bg-2:#082d46; --accent:#ffd700; --muted:#9fb6d6; --text:#eaf4ff;
       --card:#072033; --glass:rgba(255,255,255,0.03); --radius:12px; --shadow:0 14px 40px rgba(2,8,20,0.6);
-      --gap:10px; --transition:200ms; --max-width:1100px;
+      --gap:10px; --transition:220ms; --max-width:1200px;
+      --panel-padding:14px;
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
-      margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2) 90%);color:var(--text);
+      margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2) 92%);color:var(--text);
       display:flex;align-items:flex-start;justify-content:center;padding:18px;
     }
     .wrap{width:100%;max-width:var(--max-width);margin-bottom:40px}
-    .hero{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(90deg,#03243a,#073a46);padding:14px;border-radius:10px;box-shadow:var(--shadow)}
+    .hero{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(90deg,#03243a,#063a59);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
     .brand{display:flex;gap:12px;align-items:center}
     .logo{width:56px;height:56px;border-radius:8px;background:linear-gradient(180deg,#063a59,#012938);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900;font-size:18px}
     .title{margin:0;font-size:16px;color:var(--accent)}
     .subtitle{margin:0;font-size:12px;color:var(--muted)}
     .hero-actions{display:flex;gap:8px;align-items:center}
-    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:0;font-weight:700;background:transparent;color:var(--text);transition:transform var(--transition)}
-    .btn-primary{background:var(--accent);color:#04202a}
+    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:0;font-weight:700;background:transparent;color:var(--text);transition:transform var(--transition),box-shadow var(--transition)}
+    .btn-primary{background:var(--accent);color:#04202a;box-shadow:0 8px 18px rgba(255,215,0,0.08)}
     .btn-ghost{border:1px solid rgba(255,255,255,0.06)}
     .card{margin-top:12px;background:linear-gradient(180deg,var(--card),#043044);padding:12px;border-radius:10px;box-shadow:var(--shadow)}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
-    @media(max-width:960px){.grid{grid-template-columns:1fr}}
-    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));padding:10px;border-radius:10px}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px}
+    @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));padding:var(--panel-padding);border-radius:10px}
     h3{margin:0;font-size:13px;color:var(--muted);font-weight:800}
     .small{font-size:13px;color:var(--muted)}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .result{margin-top:10px;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.06));display:none}
-    .row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
-    .label{color:var(--muted);font-size:12px}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .result{margin-top:12px;padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.06));display:none}
+    .row{display:flex;justify-content:space-between;gap:10px;margin:8px 0;align-items:center}
+    .label{color:var(--muted);font-size:13px}
     .val{font-weight:800}
     .icao{color:var(--accent);font-weight:800;font-size:12px}
 
-    /* airlines list (compact + collapsible) */
-    .airline-groups{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .airline-group{border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg,rgba(255,255,255,0.005),transparent)}
-    .airline-group-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;cursor:pointer}
-    .airline-group-title{display:flex;align-items:center;gap:10px}
+    /* ---------- Airlines: 3-column hub groups ---------- */
+    .airline-groups{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:12px;
+    }
+    @media(max-width:1100px){
+      .airline-groups{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:700px){
+      .airline-groups{grid-template-columns:1fr}
+    }
+
+    .airline-group{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.004),transparent)}
+    .airline-group-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;user-select:none}
+    .airline-group-title{display:flex;align-items:center;gap:12px;min-width:0}
     .airline-hub{font-size:12px;color:var(--muted)}
+    .toggle-icon{transition:transform var(--transition);color:var(--muted);font-weight:800}
     .airline-list{overflow:hidden;transition:height var(--transition) cubic-bezier(.2,.9,.2,1);display:block}
-    .airline-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid rgba(255,255,255,0.01);cursor:pointer}
+    .airline-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-top:1px solid rgba(255,255,255,0.01);cursor:pointer;min-height:44px}
     .airline-item:hover{background:rgba(255,255,255,0.01)}
     .airline-item.selected{background:linear-gradient(90deg, rgba(255,215,0,0.06), rgba(255,215,0,0.02))}
-    .airline-badge{width:36px;height:36px;border-radius:6px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);flex-shrink:0}
-    .airline-meta{font-size:12px;color:var(--muted);line-height:1.05}
+    .airline-badge{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent);flex-shrink:0}
+    .airline-meta{font-size:12px;color:var(--muted);line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    /* fleet list compact */
+    /* ---------- Fleet: redesigned bottom / compact ---------- */
+    .fleet-panel{margin-top:10px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#052b3a,#043141);border:1px solid rgba(255,255,255,0.03)}
     .fleet-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-    .fleet-row{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02)}
-    .fleet-left{display:flex;align-items:center;gap:10px;min-width:0}
-    .plane-type{width:44px;height:44px;border-radius:6px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent)}
+    .fleet-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);border:1px solid rgba(255,255,255,0.02)}
+    .fleet-left{display:flex;align-items:center;gap:12px;min-width:0}
+    .plane-type{width:56px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:13px}
     .fleet-main{display:flex;flex-direction:column;min-width:0}
-    .fleet-line-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
     .fleet-name{font-weight:900;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .fleet-sub{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .fleet-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+    .fleet-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;min-width:84px}
     .fleet-meta{font-size:12px;color:var(--muted)}
-    .badge-small{padding:6px 8px;border-radius:8px;background:rgba(0,0,0,0.12);font-weight:700;font-size:12px}
+    .status-badge{padding:6px 8px;border-radius:8px;font-weight:800;font-size:12px}
 
-    /* responsive: hide less important on small screens */
+    /* bottom actions bar improved */
+    .bottom-bar{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+    .muted-note{font-size:12px;color:var(--muted)}
+
+    /* responsive adjustments */
     @media(max-width:520px){
-      .grid{gap:10px}
-      .hero{padding:10px}
-      .logo{width:46px;height:46px;font-size:16px}
-      .airline-badge{width:32px;height:32px}
-      .plane-type{width:36px;height:36px}
-      .fleet-meta{display:none}
-      .fleet-right{min-width:0}
-      .airline-group-head{padding:8px}
+      :root{--panel-padding:10px}
+      .logo{width:48px;height:48px}
+      .airline-badge{width:30px;height:30px}
+      .plane-type{width:46px;height:38px;font-size:12px}
+      .fleet-right{min-width:0;align-items:flex-start}
+      .fleet-row{padding:8px}
       .airline-item{padding:8px}
     }
   </style>
@@ -87,7 +103,7 @@
         <div class="logo" aria-hidden="true">LH</div>
         <div>
           <h1 class="title">Lufthansa Group Virtual</h1>
-          <div class="subtitle">Генерация рейсов — компактный флот и хабы</div>
+          <div class="subtitle">Генератор рейсов — аккуратный и адаптивный UI</div>
         </div>
       </div>
       <div class="hero-actions">
@@ -100,12 +116,13 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 id="main-title" style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Нажми на группу, чтобы свернуть; клик по авиакомпании выбирает хаб</div>
+          <div class="small" style="margin-top:6px">Группы хабов в три колонки; коснись заголовка группы — свернёшь/развернёшь</div>
         </div>
         <div class="small">Данные демонстрационные</div>
       </div>
 
       <div class="grid" style="margin-top:12px">
+        <!-- left: airlines and durations -->
         <div>
           <div class="panel">
             <h3>Авиакомпания</h3>
@@ -118,31 +135,55 @@
               <button id="gen" class="btn btn-primary">Сгенерировать</button>
               <button id="demo" class="btn btn-ghost">Демо</button>
               <button id="reset" class="btn btn-ghost">Сброс</button>
+              <div style="flex:1"></div>
+              <div class="muted-note">Выбрано: <span id="selectedInfo">—</span></div>
             </div>
 
             <div id="result" class="result" role="status" aria-live="polite"></div>
           </div>
+
+          <!-- improved bottom fleet panel inside left column for better flow -->
+          <div class="fleet-panel" style="margin-top:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div style="display:flex;flex-direction:column">
+                <div style="font-weight:900">Флот</div>
+                <div class="small" style="margin-top:4px">Компактный список; город и ICAO показаны</div>
+              </div>
+              <div class="bottom-bar">
+                <button id="refreshFleet" class="btn btn-ghost">Обновить</button>
+                <button id="showFleetLog" class="btn btn-ghost">Показать лог</button>
+              </div>
+            </div>
+
+            <div id="fleetList" class="fleet-list"></div>
+          </div>
         </div>
 
+        <!-- right: info & summary -->
         <aside class="panel info" aria-label="Информация">
-          <h3>Флот</h3>
-          <div id="fleetList" class="fleet-list" style="margin-top:8px"></div>
+          <h3>Инфо</h3>
+          <div style="margin-top:8px" class="small">Всего маршрутов: <strong id="routesCount">—</strong></div>
+          <div style="margin-top:6px" class="small">Хабы: EDDF — Frankfurt, EDDM — Munich</div>
 
-          <div style="margin-top:10px;display:flex;gap:8px">
-            <button id="refreshFleet" class="btn btn-ghost">Обновить флот</button>
-            <button id="showFleetLog" class="btn btn-ghost">Показать лог</button>
+          <h3 style="margin-top:12px">Журнал назначений</h3>
+          <div id="assignLog" class="small" style="margin-top:8px">Пока пусто</div>
+
+          <div style="margin-top:12px">
+            <button id="clearLog" class="btn btn-ghost">Очистить журнал</button>
           </div>
 
-          <h3 style="margin-top:12px">Инфо</h3>
-          <div class="small" style="margin-top:8px">Всего маршрутов: <strong id="routesCount">—</strong></div>
-          <div class="small" style="margin-top:6px">Хабы: EDDF — Frankfurt, EDDM — Munich</div>
+          <h3 style="margin-top:12px">Подсказки</h3>
+          <div class="small" style="margin-top:8px">
+            - Нажми на название группы, чтобы свернуть/развернуть<br>
+            - На телефоне список автоматически упрощается
+          </div>
         </aside>
       </div>
     </section>
   </div>
 
 <script>
-/* ======= Data ======= */
+/* ================= DATA (same demo data) ================= */
 const ROUTES = [
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120,"source":"embedded"},
   {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":70,"source":"embedded"},
@@ -167,7 +208,6 @@ const ROUTES = [
 ];
 ROUTES.forEach(r=>{ r.durationMinutes = Number.isFinite(Number(r.durationMinutes)) ? Number(r.durationMinutes) : NaN; });
 
-/* Airport info now includes city names to show in fleet */
 const AIRPORTS = {
   "EDDF": { lat:50.0379, lon:8.5622, city:"Frankfurt" },
   "EDDM": { lat:48.3538, lon:11.7861, city:"Munich" },
@@ -184,7 +224,6 @@ const AIRPORTS = {
   "EBBR": { lat:50.9014, lon:4.4844, city:"Brussels" }
 };
 
-/* Fleet demo pool */
 const FLEET = [
   { id: 'LH-A320-01', type: 'A320', model:'narrow', rangeKm: 6100, seats: 180, turnaround: 40, status: 'idle', locationICAO: 'EDDF', availableAt: 0 },
   { id: 'LH-A321-02', type: 'A321', model:'narrow', rangeKm: 6100, seats: 200, turnaround: 40, status: 'idle', locationICAO: 'EDDM', availableAt: 0 },
@@ -196,7 +235,6 @@ const FLEET = [
 
 const FLEET_LOG = [];
 
-/* Airlines (kept as array, indices used for selection) */
 const AIRLINES = [
   { name: "Lufthansa", hubs: ["EDDF","EDDM"] },
   { name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"] },
@@ -222,7 +260,7 @@ const AIRLINES = [
   { name: "SunExpress", hubs: ["EDDF","EDDM"] }
 ];
 
-/* ======= Helpers ======= */
+/* ================ Helpers ================ */
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function pad(n){ return String(n).padStart(2,'0'); }
@@ -235,16 +273,14 @@ function haversineKm(aLat,aLon,bLat,bLon){
   const c=2*Math.asin(Math.sqrt(sinDlat*sinDlat + Math.cos(lat1)*Math.cos(lat2)*sinDlon*sinDlon));
   return R*c;
 }
-function getAirportInfo(icao){
-  return AIRPORTS[icao] || null;
-}
+function getAirportInfo(icao){ return AIRPORTS[icao] || null; }
 function estimateDistanceKm(fromICAO, toICAO){
   const a = getAirportInfo(fromICAO), b = getAirportInfo(toICAO);
   if(!a || !b) return null;
   return Math.round(haversineKm(a.lat,a.lon,b.lat,b.lon));
 }
 
-/* ======= UI refs ======= */
+/* ================ UI refs ================ */
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
 const genBtn = document.getElementById('gen');
@@ -255,13 +291,16 @@ const routesCount = document.getElementById('routesCount');
 const fleetListEl = document.getElementById('fleetList');
 const refreshFleetBtn = document.getElementById('refreshFleet');
 const showFleetLogBtn = document.getElementById('showFleetLog');
+const assignLogEl = document.getElementById('assignLog');
+const clearLogBtn = document.getElementById('clearLog');
+const selectedInfo = document.getElementById('selectedInfo');
 const openDemo = document.getElementById('openDemo');
 const about = document.getElementById('about');
 
 let chosenAir = null;
 let chosenDur = null;
 
-/* ======= Render durations ======= */
+/* ================ Render durations ================ */
 const DURATIONS = [
   {label:"1-2ч",min:60,max:120},
   {label:"3-4ч",min:180,max:240},
@@ -277,14 +316,17 @@ function renderDurations(){
     const el = document.createElement('div');
     el.className = 'opt';
     el.tabIndex = 0;
-    el.innerHTML = `<div style="display:flex;align-items:center;gap:10px"><div class="icon">⌛</div><div style="min-width:0"><div style="font-weight:900">${esc(d.label)}</div><div class="small" style="margin-top:6px;color:var(--muted)">~ ${avg} ч</div></div></div>`;
+    el.style.display = 'flex';
+    el.style.alignItems = 'center';
+    el.style.gap = '10px';
+    el.innerHTML = `<div class="icon">⌛</div><div style="min-width:0"><div style="font-weight:900">${esc(d.label)}</div><div class="small" style="margin-top:6px;color:var(--muted)">~ ${avg} ч</div></div>`;
     el.addEventListener('click', ()=> selectDur(i));
     el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
     durationsWrap.appendChild(el);
   });
 }
 
-/* ======= Render airlines (grouped, collapsible) ======= */
+/* ================ Render airlines: 3-column groups ================ */
 function renderAirlines(){
   const copy = AIRLINES.map((a,origIndex)=> Object.assign({__origIndex: origIndex}, a))
     .sort((a,b)=>{
@@ -322,7 +364,7 @@ function renderAirlines(){
     badge.className = 'airline-badge';
     badge.textContent = hub === '—' ? '—' : hub;
     const txt = document.createElement('div');
-    txt.innerHTML = `<div style="font-weight:900">${hub}</div><div class="airline-hub">${g.length} авиакомпан${g.length===1?'ия':'ии'}</div>`;
+    txt.innerHTML = `<div style="font-weight:900">${hub}</div><div class="airline-hub">${g.length} авиокомпан${g.length===1?'ия':'ии'}</div>`;
     title.appendChild(badge);
     title.appendChild(txt);
 
@@ -362,7 +404,7 @@ function renderAirlines(){
     groupEl.appendChild(list);
     airlinesWrap.appendChild(groupEl);
 
-    // start expanded
+    // collapse/expand logic
     let collapsed = false;
     head.addEventListener('click', ()=>{
       const chev = head.querySelector('.chev');
@@ -374,13 +416,11 @@ function renderAirlines(){
         collapsed = true;
       } else {
         // expand
-        const prev = list.style.height;
         list.style.height = '0px';
         requestAnimationFrame(()=>{ list.style.height = list.scrollHeight + 'px'; head.querySelector('.chev').style.transform = 'rotate(0deg)'; });
         collapsed = false;
       }
     });
-
     list.addEventListener('transitionend', (e)=>{
       if(e.propertyName !== 'height') return;
       if(!collapsed) list.style.height = 'auto';
@@ -388,7 +428,7 @@ function renderAirlines(){
   });
 }
 
-/* ======= Fleet rendering (compact) ======= */
+/* ================ Fleet render: compact, city+ICAO ================ */
 function renderFleetList(){
   if(!fleetListEl) return;
   fleetListEl.innerHTML = '';
@@ -396,44 +436,29 @@ function renderFleetList(){
     const div = document.createElement('div');
     div.className = 'fleet-row';
 
-    // left: type icon + id/name
     const left = document.createElement('div'); left.className = 'fleet-left';
-    const typeBox = document.createElement('div'); typeBox.className = 'plane-type';
-    typeBox.textContent = ac.type;
+    const typeBox = document.createElement('div'); typeBox.className = 'plane-type'; typeBox.textContent = ac.type;
     const main = document.createElement('div'); main.className = 'fleet-main';
-    const nameLine = document.createElement('div'); nameLine.className = 'fleet-line-top';
-    const name = document.createElement('div'); name.className = 'fleet-name'; name.textContent = ac.id + '  ';
+    const name = document.createElement('div'); name.className = 'fleet-name'; name.textContent = ac.id;
     const sub = document.createElement('div'); sub.className = 'fleet-sub';
-
-    // location with city if available
     const info = getAirportInfo(ac.locationICAO);
-    if(info && info.city){
-      sub.textContent = `${info.city} (${ac.locationICAO})`;
-    } else {
-      sub.textContent = `${ac.locationICAO}`;
-    }
-    nameLine.appendChild(name);
-    main.appendChild(nameLine);
+    sub.textContent = info && info.city ? `${info.city} (${ac.locationICAO})` : ac.locationICAO;
+    main.appendChild(name);
     main.appendChild(sub);
-
     left.appendChild(typeBox);
     left.appendChild(main);
 
-    // right: meta (range, seats, status)
     const right = document.createElement('div'); right.className = 'fleet-right';
-    const meta = document.createElement('div'); meta.className = 'fleet-meta';
-    meta.textContent = `${ac.rangeKm} km · ${ac.seats} seats`;
-    const status = document.createElement('div'); status.innerHTML = ac.status === 'idle' ? `<span class="badge-small" style="background:#0b4f2b;color:#bff2be">idle</span>` : `<span class="badge-small" style="background:#5a3f00;color:#fff7d6">inFlight</span>`;
-    right.appendChild(meta);
-    right.appendChild(status);
+    const meta = document.createElement('div'); meta.className = 'fleet-meta'; meta.textContent = `${ac.rangeKm} km · ${ac.seats} seats`;
+    const status = document.createElement('div'); status.innerHTML = ac.status === 'idle' ? `<span class="status-badge" style="background:#083b22;color:#bff2be">idle</span>` : `<span class="status-badge" style="background:#603f00;color:#fff0b8">inFlight</span>`;
+    right.appendChild(meta); right.appendChild(status);
 
-    div.appendChild(left);
-    div.appendChild(right);
+    div.appendChild(left); div.appendChild(right);
     fleetListEl.appendChild(div);
   });
 }
 
-/* housekeeper: free aircraft after availableAt */
+/* housekeeper */
 function fleetHousekeeping(){
   const now = Date.now();
   let changed = false;
@@ -447,9 +472,10 @@ function fleetHousekeeping(){
     }
   });
   if(changed) renderFleetList();
+  renderAssignLog();
 }
 
-/* ======= Simple smart assign (keeps earlier behavior) ======= */
+/* ================ Assignment (keeps prior logic) ================ */
 function findSuitableAircraftSmart(route, nowTs=Date.now()){
   const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
   const safety = 0.95;
@@ -467,6 +493,7 @@ function assignAircraftToRouteSmart(route){
   const { distanceKm, candidates } = findSuitableAircraftSmart(route, now);
   if(candidates.length === 0){
     FLEET_LOG.push({ ts: now, event:'assign_failed', route: `${route.fromICAO}->${route.toICAO}`, distanceKm });
+    renderAssignLog();
     return { ok:false, reason:'no_suitable', distanceKm };
   }
   const ac = candidates[0];
@@ -480,10 +507,24 @@ function assignAircraftToRouteSmart(route){
   return { ok:true, aircraft: ac, distanceKm };
 }
 
-/* assign log */
-function renderAssignLog(){ /* kept minimal; console used for details */ }
+/* assign log rendering */
+function renderAssignLog(){
+  if(!assignLogEl) return;
+  const items = FLEET_LOG.slice(-12).reverse();
+  if(items.length === 0){
+    assignLogEl.textContent = 'Пока пусто';
+    return;
+  }
+  assignLogEl.innerHTML = items.map(it=>{
+    const t = new Date(it.ts).toLocaleTimeString();
+    if(it.event === 'assign') return `${t} — assign ${it.aircraft} ${it.route} (${it.durationMin} min, ${it.distanceKm || 'n/a'} km)`;
+    if(it.event === 'available') return `${t} — available ${it.aircraft} @ ${it.location}`;
+    if(it.event === 'assign_failed') return `${t} — assign_failed ${it.route} (dist ${it.distanceKm || 'n/a'})`;
+    return `${t} — ${it.event}`;
+  }).map(s=>`<div style="margin-bottom:6px">${esc(s)}</div>`).join('');
+}
 
-/* duration filter & generate */
+/* ================ Filtering & generate ================ */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
@@ -539,12 +580,13 @@ function generateFlight(){
   resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
-/* selection helpers */
+/* ================ Selection helpers ================ */
 function selectAir(origIndex){
   chosenAir = origIndex;
   document.querySelectorAll('.airline-item').forEach(n=>{
     n.classList.toggle('selected', Number(n.getAttribute('data-orig-index')) === origIndex);
   });
+  selectedInfo.textContent = AIRLINES[origIndex] ? AIRLINES[origIndex].name + ' · ' + AIRLINES[origIndex].hubs.join(',') : '—';
   resultEl.style.display = 'none';
   resultEl.innerHTML = '';
 }
@@ -554,22 +596,25 @@ function selectDur(i){
   resultEl.style.display = 'none';
 }
 
-/* ui actions */
-function refreshFleet(){ renderFleetList(); }
+/* ================ UI actions ================ */
+function refreshFleet(){ renderFleetList(); renderAssignLog(); }
 function showFleetLogConsole(){ console.table(FLEET_LOG.slice(-50)); alert('Лог флота выведен в консоль.'); }
+function clearAssignLog(){ FLEET_LOG.length = 0; renderAssignLog(); }
 
-/* init */
+/* ================ Init ================ */
 function init(){
   renderAirlines();
   renderDurations();
   routesCount.textContent = ROUTES.length;
   renderFleetList();
+  renderAssignLog();
   genBtn.addEventListener('click', generateFlight);
   demoBtn.addEventListener('click', ()=>{ selectAir(0); selectDur(3); generateFlight(); });
-  resetBtn.addEventListener('click', ()=>{ chosenAir=null; chosenDur=null; document.querySelectorAll('.airline-item').forEach(n=>n.classList.remove('selected')); document.querySelectorAll('#durations .opt').forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; });
+  resetBtn.addEventListener('click', ()=>{ chosenAir=null; chosenDur=null; document.querySelectorAll('.airline-item').forEach(n=>n.classList.remove('selected')); document.querySelectorAll('#durations .opt').forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; selectedInfo.textContent='—'; });
   refreshFleetBtn.addEventListener('click', refreshFleet);
   showFleetLogBtn.addEventListener('click', showFleetLogConsole);
-  openDemo.addEventListener('click', ()=>{ alert('Демо: первая авиакомпания + 7-8ч'); selectAir(0); selectDur(3); generateFlight(); });
+  clearLogBtn && clearLogBtn.addEventListener('click', clearAssignLog);
+  openDemo.addEventListener('click', ()=>{ alert('Демо: выбирается первая авиакомпания + 7-8ч'); selectAir(0); selectDur(3); generateFlight(); });
   about.addEventListener('click', ()=>{ alert('Lufthansa Group Virtual — демонстрационный генератор рейсов.'); });
   setInterval(fleetHousekeeping, 15 * 1000);
 }
