@@ -3,143 +3,109 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — Упрощённый</title>
-  <meta name="description" content="Генератор тестовых рейсов — простой интерфейс" />
+  <title>Lufthansa Group Virtual — Время в приоритете</title>
+  <meta name="description" content="Генератор тестовых рейсов — выбор времени и направлений на одном уровне" />
   <style>
     :root{
       --bg:#021428;
-      --card:#071a33;
       --accent:#ffd400;
       --muted:#9fb6d6;
       --white:#ffffff;
       --glass: rgba(255,255,255,0.03);
-      --glass-2: rgba(255,255,255,0.02);
       --btn-grad: linear-gradient(180deg, rgba(255,212,0,0.14), rgba(255,212,0,0.08));
       --shadow: 0 14px 40px rgba(2,8,20,0.65);
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      min-height:100vh;
-      font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+      margin:0;min-height:100vh;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
       background:
         radial-gradient(800px 400px at 10% 10%, rgba(255,212,0,0.02), transparent),
         linear-gradient(180deg,var(--bg), #02162a 80%);
-      color:var(--white);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
+      color:var(--white);display:flex;align-items:center;justify-content:center;padding:28px;
     }
     .wrap{width:100%;max-width:980px}
-    .hero{
-      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:14px;
-      padding:28px;
-      display:flex;
-      gap:24px;
-      align-items:center;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(255,255,255,0.03);
-      margin-bottom:20px;
-    }
-    .logo{
-      width:88px;height:88px;border-radius:14px;
-      background:linear-gradient(135deg,#07203a,#0f3766);
-      display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);
-      font-size:26px;flex:0 0 88px;
-      box-shadow:0 8px 24px rgba(2,8,20,0.55), inset 0 1px 0 rgba(255,255,255,0.02);
-      border:1px solid rgba(255,212,0,0.06);
-    }
-    .hero-body{flex:1;min-width:0}
-    .title{font-size:clamp(20px,3.4vw,34px);margin:0;color:var(--accent);font-weight:800}
-    .subtitle{margin:8px 0 0 0;color:var(--muted);font-size:15px}
-    .hero-cta{margin-top:16px;display:flex;gap:12px;align-items:center}
-    .btn-primary{
-      background:var(--btn-grad);
-      color:var(--accent);
-      border:2px solid rgba(255,212,0,0.14);
-      padding:12px 22px;border-radius:12px;font-weight:800;cursor:pointer;font-size:15px;
-      box-shadow:0 10px 26px rgba(2,8,20,0.45);
-    }
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:10px 14px;border-radius:10px;cursor:pointer}
+    .hero{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;padding:24px;display:flex;gap:20px;align-items:center;box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.03);margin-bottom:18px;}
+    .logo{width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,#07203a,#0f3766);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:24px}
+    .title{font-size:22px;margin:0;color:var(--accent);font-weight:800}
+    .subtitle{margin:6px 0 0 0;color:var(--muted);font-size:14px}
+    .btn-primary{background:var(--btn-grad);color:var(--accent);border:2px solid rgba(255,212,0,0.14);
+      padding:10px 18px;border-radius:12px;font-weight:800;cursor:pointer}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--white);padding:8px 12px;border-radius:10px;cursor:pointer}
 
-    .card{
-      background:var(--glass);
-      border-radius:12px;padding:20px;border:1px solid rgba(255,255,255,0.03);
-      box-shadow:0 10px 30px rgba(0,0,0,0.5);
-      text-align:center;
-    }
-    h1.page-title{color:var(--accent);margin:8px 0 6px 0;font-size:20px}
+    .card{background:var(--glass);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03);
+      box-shadow:0 10px 30px rgba(0,0,0,0.5);text-align:center}
+    h1.page-title{color:var(--accent);margin:6px 0 8px 0;font-size:18px}
     .lead{color:var(--muted);font-size:13px;margin-bottom:12px}
 
-    /* options grid */
-    .options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+    /* two columns layout: airlines and durations side by side on wide screens */
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+    @media(max-width:900px){ .grid{grid-template-columns:1fr} }
+
+    .block-title{color:var(--muted);font-weight:700;margin-bottom:8px;text-align:left}
+
+    .options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
     .option{
       background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;gap:12px;align-items:center;
-      transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease;
+      border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;display:flex;gap:10px;align-items:center;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     }
     .option:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,8,20,0.55)}
-    .option .icon{
-      width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:16px;border:1px solid rgba(255,212,0,0.04)
-    }
+    .option .icon{width:42px;height:42px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:16px;border:1px solid rgba(255,212,0,0.04)}
     .option .meta{flex:1;text-align:left}
     .option .meta .name{font-weight:800;color:#fff}
     .option .meta .sub{color:var(--muted);font-size:13px;margin-top:4px}
     .option.selected{border-color:rgba(255,212,0,0.28);box-shadow:0 22px 48px rgba(2,8,20,0.6)}
 
     .controls{display:flex;gap:12px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-    .result{
-      margin-top:18px;text-align:left;width:100%;max-width:820px;margin-left:auto;margin-right:auto;
-      background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
-      padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.01);
-    }
+    .result{margin-top:18px;text-align:left;width:100%;max-width:820px;margin-left:auto;margin-right:auto;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow: inset 0 2px 0 rgba(255,255,255,0.01);}
     .r-row{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:8px 0}
     .r-label{color:var(--muted);font-size:13px}
     .r-val{font-weight:800;color:#fff}
     .icao{color:var(--accent);font-weight:900}
     .flight-time{color:var(--accent);font-weight:900;font-size:20px}
-    @media(max-width:640px){ .hero{flex-direction:column;align-items:flex-start} .logo{width:64px;height:64px;font-size:20px} }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="hero" aria-hidden="false">
+    <div class="hero">
       <div class="logo">LGV</div>
-      <div class="hero-body">
+      <div style="flex:1">
         <h2 class="title">Lufthansa Group Virtual</h2>
-        <div class="subtitle">Простой генератор тестовых рейсов — быстро и понятно</div>
-        <div class="hero-cta">
-          <button id="btn-start" class="btn-primary" aria-label="Начать">Начать</button>
-          <button id="btn-demo" class="btn-ghost" aria-label="Демо">Демо</button>
-        </div>
+        <div class="subtitle">Выбирай авиакомпанию и интервал времени — оба блока равнозначны</div>
       </div>
-      <div style="min-width:160px;text-align:right">
-        <div class="lead" style="opacity:0.9">Версия демо</div>
-        <div class="lead" style="margin-top:10px;color:var(--muted)">Редактируй данные в DATA</div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+        <button id="btn-start" class="btn-primary">Начать</button>
+        <button id="btn-demo" class="btn-ghost">Демо</button>
       </div>
     </div>
 
-    <div id="main-card" class="card" role="application" aria-live="polite" style="display:none">
+    <div id="main-card" class="card" style="display:none">
       <h1 class="page-title">Генерация рейса</h1>
-      <div class="lead">Выберите авиакомпанию и длительность полёта</div>
+      <div class="lead">Авиакомпания и длительность имеют одинаковый приоритет — выбранная длительность используется в первую очередь</div>
 
-      <div style="margin-top:12px;max-width:880px;margin-left:auto;margin-right:auto;text-align:left">
-        <div style="margin-bottom:8px;color:var(--muted);font-weight:700">Авиакомпания</div>
-        <div id="airlines" class="options-grid" role="list"></div>
-
-        <div style="margin-top:14px;margin-bottom:8px;color:var(--muted);font-weight:700">Длительность</div>
-        <div id="durations" class="options-grid" role="list"></div>
-
-        <div class="controls">
-          <button id="btn-gen" class="btn-primary">Сгенерировать</button>
-          <button id="btn-back" class="btn-ghost">Назад</button>
+      <div class="grid">
+        <!-- Left: Airlines -->
+        <div>
+          <div class="block-title">Авиакомпания</div>
+          <div id="airlines" class="options-grid" role="list"></div>
         </div>
 
-        <div id="result" class="result" style="display:none"></div>
+        <!-- Right: Durations -->
+        <div>
+          <div class="block-title">Длительность</div>
+          <div id="durations" class="options-grid" role="list"></div>
+        </div>
       </div>
+
+      <div class="controls">
+        <button id="btn-gen" class="btn-primary">Сгенерировать</button>
+        <button id="btn-back" class="btn-ghost">Назад</button>
+      </div>
+
+      <div id="result" class="result" style="display:none" aria-live="polite"></div>
     </div>
   </div>
 
@@ -166,11 +132,14 @@
       {fromCity:"Hamburg", fromCountry:"Germany", fromICAO:"EDDH", toCity:"Barcelona", toCountry:"Spain", toICAO:"LEBL"}
     ];
 
+    // Неперекрывающиеся интервалы в минутах (сейчас больше окон как просил)
     const DURATIONS = [
-      {label:"1-2 часа", min:60, max:120},
-      {label:"2-4 часа", min:121, max:240},
-      {label:"4-6 часов", min:241, max:360},
-      {label:"6+ часов", min:361, max:1200}
+      {label:"1-2ч",  min:60,  max:120},
+      {label:"3-4ч",  min:180, max:240},
+      {label:"5-6ч",  min:300, max:360},
+      {label:"7-8ч",  min:420, max:480},
+      {label:"9-10ч", min:540, max:600},
+      {label:"10+ч",  min:601, max:1200}
     ];
 
     /**************************************************************************
@@ -207,11 +176,12 @@
     function renderDurations(){
       durationsWrap.innerHTML = '';
       DURATIONS.forEach((d,i) => {
+        const avg = Math.round(((d.min + d.max) / 2) / 60);
         const node = document.createElement('div');
         node.className = 'option';
         node.tabIndex = 0;
         node.role = 'button';
-        node.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${d.label}</div><div class="sub">~ ${Math.round((d.min+d.max)/2/60)} ч</div></div>`;
+        node.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${d.label}</div><div class="sub">~ ${avg} ч</div></div>`;
         node.onclick = () => selectDur(i);
         node.onkeypress = (e) => { if(e.key==='Enter') selectDur(i) };
         durationsWrap.appendChild(node);
@@ -238,6 +208,7 @@
       const airline = AIRLINES[chosenAirIdx];
       const duration = DURATIONS[chosenDurIdx];
 
+      // фильтруем маршруты по хабам авиакомпании
       const filtered = ROUTES.filter(r => airline.hubs.includes(r.fromICAO));
       if(filtered.length === 0){
         resultBox.innerHTML = `<div class="r-row"><div class="r-label">Ошибка</div><div class="r-val">Нет маршрутов из хабов ${escapeHtml(airline.name)}. Добавь в DATA.</div></div>`;
@@ -245,9 +216,21 @@
         return;
       }
 
-      let route = filtered[randInt(0, filtered.length-1)];
-      // время: если есть durationMinutes — используем, иначе случайное в выбранном диапазоне
-      let minutes = (route.durationMinutes && Number.isFinite(route.durationMinutes)) ? Math.round(route.durationMinutes) : randInt(duration.min, duration.max);
+      // выбираем маршрут случайно
+      const route = filtered[randInt(0, filtered.length-1)];
+
+      // ВАЖНО: приоритет у выбранного интервала (chosenDurIdx).
+      // Если пользователь выбрал интервал — время генерируется строго в нём.
+      // durationMinutes используется ТОЛЬКО если пользователь НЕ выбрал интервал.
+      let minutes;
+      if (chosenDurIdx !== null) {
+        minutes = randInt(duration.min, duration.max);
+      } else if (route.durationMinutes && Number.isFinite(route.durationMinutes)) {
+        minutes = Math.round(route.durationMinutes);
+      } else {
+        minutes = randInt(60, 240); // запасной диапазон
+      }
+
       const hh = Math.floor(minutes/60), mm = minutes % 60;
       const flightTime = pad(hh) + ':' + pad(mm);
 
@@ -258,6 +241,7 @@
         <div class="r-row"><div class="r-label">Прибытие</div><div class="r-val">${escapeHtml(route.toCity)}</div></div>
         <div class="r-row"><div class="r-label">ICAO прибытия</div><div class="r-val icao">${escapeHtml(route.toICAO)}</div></div>
         <div class="r-row" style="margin-top:8px"><div class="r-label">Время в полёте</div><div class="r-val flight-time">${flightTime}</div></div>
+        <div class="r-row" style="margin-top:6px"><div class="r-label">Источник времени</div><div class="r-val">${chosenDurIdx !== null ? 'Выбранный интервал' : (route.durationMinutes ? 'durationMinutes в DATA' : 'случайный диапазон')}</div></div>
       `;
       resultBox.style.display = 'block';
       resultBox.scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -265,11 +249,11 @@
 
     // navigation
     btnStart.addEventListener('click', () => { elHero.style.display = 'none'; elMain.style.display = 'block'; renderAirlines(); renderDurations(); });
-    btnDemo.addEventListener('click', () => { elHero.style.display = 'none'; elMain.style.display = 'block'; renderAirlines(); renderDurations(); selectAir(0); selectDur(1); });
+    btnDemo.addEventListener('click', () => { elHero.style.display = 'none'; elMain.style.display = 'block'; renderAirlines(); renderDurations(); selectAir(0); selectDur(0); });
     btnBack.addEventListener('click', () => { elMain.style.display = 'none'; elHero.style.display = 'flex'; chosenAirIdx = null; chosenDurIdx = null; resultBox.style.display = 'none'; Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected')); Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected')); });
     btnGen.addEventListener('click', generateFlight);
 
-    // init preview
+    // init
     (function init(){ renderAirlines(); renderDurations(); })();
   </script>
 </body>
