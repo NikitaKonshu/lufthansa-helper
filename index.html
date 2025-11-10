@@ -3,337 +3,220 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — improved</title>
+  <title>Lufthansa Group Virtual — embedded</title>
+  <meta name="color-scheme" content="dark light">
   <style>
     :root{
-      --bg-1:#041026; --bg-2:#07263f; --accent:#ffd24d; --muted:#9fb6d6; --text:#eaf4ff;
-      --card:#071b2b; --card-2:#082731; --radius:14px; --shadow:0 14px 40px rgba(2,8,20,0.6);
-      --glass:rgba(255,255,255,0.03); --gap:12px; --transition:180ms;
+      --bg:#071826;
+      --card:#0d2b3a;
+      --accent:#ffd24d;
+      --muted:#9fb6d6;
+      --text:#eaf4ff;
+      --glass:rgba(255,255,255,0.03);
+      --radius:14px;
+      --gap:12px;
+      --shadow:0 12px 32px rgba(2,8,20,0.6);
+      --transition:170ms cubic-bezier(.2,.9,.3,1);
+      --max-width:980px;
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:var(--text);display:flex;align-items:flex-start;justify-content:center;padding:20px}
-    .wrap{width:100%;max-width:1100px}
-    .hero{display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(90deg,var(--card),var(--card-2));padding:16px;border-radius:var(--radius);box-shadow:var(--shadow)}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;background:linear-gradient(180deg,var(--bg),#042536 95%);color:var(--text);
+      display:flex;align-items:flex-start;justify-content:center;padding:18px;
+    }
+    .wrap{width:100%;max-width:var(--max-width);margin-bottom:36px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:12px;background:linear-gradient(90deg,#083b54,#063048);box-shadow:var(--shadow)}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(180deg,#083b63,#042a47);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
-    .title{font-size:18px;color:var(--accent);margin:0}
-    .subtitle{font-size:13px;color:var(--muted);margin-top:6px}
-    .hero-actions{display:flex;gap:8px;align-items:center}
-    .btn{cursor:pointer;padding:8px 12px;border-radius:10px;border:0;font-weight:800;background:transparent;color:var(--text);transition:transform var(--transition)}
-    .btn-primary{background:var(--accent);color:#04202a}
+    .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(180deg,#083b63,#042a47);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900;font-size:18px}
+    .title{margin:0;font-size:18px;color:var(--accent);font-weight:900}
+    .subtitle{margin:0;font-size:13px;color:var(--muted)}
+    .card{margin-top:14px;background:linear-gradient(180deg,var(--card),#062c3f);padding:14px;border-radius:12px;box-shadow:var(--shadow)}
+    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .left{flex:1;min-width:0}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{cursor:pointer;padding:10px 14px;border-radius:10px;border:0;font-weight:800;background:transparent;color:var(--text);transition:transform var(--transition)}
+    .btn-primary{background:var(--accent);color:#06202a}
     .btn-ghost{border:1px solid rgba(255,255,255,0.06)}
-    .card{margin-top:14px;background:var(--glass);padding:14px;border-radius:12px}
-    .grid{display:grid;grid-template-columns:1fr 360px;gap:16px}
-    @media(max-width:980px){.grid{grid-template-columns:1fr}}
-    .panel{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.008));padding:12px;border-radius:10px}
-    .panel h3{margin:0;font-size:13px;color:var(--muted);font-weight:800}
-    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:10px}
-    .opt{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
-    .opt:hover{transform:translateY(-4px)}
-    .opt.selected{border-color:rgba(255,210,77,0.24);box-shadow:0 12px 40px rgba(1,6,15,0.45)}
-    .icon{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
-    .meta .name{font-weight:800}
-    .meta .sub{font-size:12px;color:var(--muted)}
-    .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
-    .result{margin-top:12px;padding:12px;border-radius:10px;background:rgba(0,0,0,0.14);display:none}
-    .row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
-    .label{color:var(--muted);font-size:13px}
-    .val{font-weight:900}
-    .file-row{display:flex;gap:8px;align-items:center}
-    input[type="file"]{display:none}
-    .small{font-size:12px;color:var(--muted)}
-    .footer-note{margin-top:10px;color:var(--muted);font-size:12px}
-    @media(max-width:520px){
-      body{padding:12px}
-      .logo{width:56px;height:56px}
+    .small{font-size:13px;color:var(--muted)}
+    .note{font-size:12px;color:var(--muted);margin-top:10px}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:12px}
+    @media(max-width:960px){.grid{grid-template-columns:1fr}}
+    .panel{background:var(--glass);padding:12px;border-radius:10px}
+    .options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+    .option{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;transition:transform var(--transition),box-shadow var(--transition)}
+    .option:hover{transform:translateY(-4px)}
+    .option.selected{border-color:rgba(255,210,77,0.22);box-shadow:0 10px 30px rgba(1,6,12,0.45)}
+    .ico{width:40px;height:40px;border-radius:9px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:900}
+    .result{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,0.14),rgba(0,0,0,0.08));display:none}
+    .r-row{display:flex;justify-content:space-between;gap:10px;margin:8px 0}
+    .r-label{color:var(--muted);font-size:13px}
+    .r-val{font-weight:900}
+    .r-icao{color:var(--accent);font-weight:900}
+    @media(max-width:480px){
+      .logo{width:48px;height:48px;font-size:16px}
       .title{font-size:16px}
-      .opt{padding:8px}
-      .icon{width:30px;height:30px}
-      .meta .name{font-size:13px}
+      .option{padding:8px}
+      .ico{width:34px;height:34px}
+      .controls{gap:8px}
+      .btn{padding:8px 10px;font-size:14px}
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="hero" id="hero">
+  <div class="wrap" id="app">
+    <header class="header" role="banner" aria-label="Lufthansa Group Virtual">
       <div class="brand">
-        <div class="logo">LGV</div>
+        <div class="logo" aria-hidden="true">LGV</div>
         <div>
           <h1 class="title">Lufthansa Group Virtual</h1>
-          <div class="subtitle">Генератор рейсов — улучшенная фильтрация, загрузка файлов и мобильный интерфейс</div>
+          <p class="subtitle">Генератор рейсов — встроенные маршруты, мобильная адаптация</p>
         </div>
       </div>
-      <div class="hero-actions">
-        <button id="openBtn" class="btn btn-primary">Открыть</button>
-        <button id="demoBtn" class="btn btn-ghost">Демо</button>
+      <div>
+        <div class="small" style="text-align:right">Данные встроены в страницу; нет загрузки файлов</div>
       </div>
-    </div>
+    </header>
 
-    <div class="card" id="mainCard" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
+    <main class="card" role="main">
+      <div class="top">
+        <div class="left">
           <h2 style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Выберите авиакомпанию и интервал длительности. Поддерживаются routes.json и routes.csv (локальная загрузка).</div>
-        </div>
-        <div style="text-align:right">
-          <div class="small">Файл: <span id="extStatus">нет</span></div>
-          <div style="margin-top:6px" class="file-row">
-            <label for="fileInput" class="btn btn-ghost" id="uploadLabel">Загрузить файл</label>
-            <input id="fileInput" type="file" accept=".json,.csv" />
-          </div>
-        </div>
-      </div>
+          <p class="small" style="margin-top:6px">Выберите авиакомпанию и интервал длительности — результат появится ниже</p>
 
-      <div class="grid" style="margin-top:12px">
-        <div class="panel">
-          <h3>Параметры</h3>
-
-          <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
-            <div style="flex:1;">
-              <div style="font-size:13px;color:var(--muted);font-weight:800">Авиакомпания</div>
-              <div id="airlines" class="options" style="margin-top:10px"></div>
-            </div>
-            <div style="width:260px;">
-              <div style="font-size:13px;color:var(--muted);font-weight:800">Длительность</div>
-              <div id="durations" class="options" style="margin-top:10px"></div>
-            </div>
+          <div style="margin-top:12px">
+            <div style="font-size:13px;color:var(--muted);font-weight:800">Авиакомпания</div>
+            <div id="airlines" class="options" style="margin-top:8px"></div>
           </div>
 
-          <div class="controls">
-            <button id="genBtn" class="btn btn-primary">Сгенерировать</button>
-            <button id="backBtn" class="btn btn-ghost">Назад</button>
-            <div class="small" id="hint" style="align-self:center;color:var(--muted)">CSV/JSON: fromCity,fromCountry,fromICAO,toCity,toCountry,toICAO,durationMinutes[,notes,source]</div>
+          <div style="margin-top:12px">
+            <div style="font-size:13px;color:var(--muted);font-weight:800">Длительность</div>
+            <div id="durations" class="options" style="margin-top:8px"></div>
+          </div>
+
+          <div class="controls" aria-hidden="false" style="margin-top:12px">
+            <button id="gen" class="btn btn-primary" aria-label="Сгенерировать рейс">Сгенерировать</button>
+            <button id="demo" class="btn btn-ghost" aria-label="Демо: Lufthansa + 7-8ч">Демо</button>
+            <button id="reset" class="btn btn-ghost" aria-label="Сбросить выбор">Сброс</button>
           </div>
 
           <div id="result" class="result" role="status" aria-live="polite"></div>
-          <div class="footer-note">Если время в списке не совпадает с реальным — загрузите routes.csv/json с точными durationMinutes (FR24 или официальный источник)</div>
+          <div class="note">Показываем реальное время из поля durationMinutes. Если для маршрута нет durationMinutes — время будет сгенерировано внутри выбранного интервала.</div>
         </div>
 
-        <div class="panel">
-          <h3>Информация</h3>
-          <div style="margin-top:8px" class="small">Loaded routes: <span id="routesCount">—</span></div>
-          <div style="margin-top:8px" class="small">Статус файла: <span id="fileInfo">—</span></div>
-          <div style="margin-top:12px;display:flex;gap:8px">
-            <button id="exportBtn" class="btn btn-ghost">Экспортировать routes → JSON</button>
-            <button id="validateBtn" class="btn btn-ghost">Проверить durationMinutes</button>
+        <aside style="width:320px">
+          <div class="panel">
+            <h3 style="margin:0;color:var(--muted)">Инфо</h3>
+            <div style="margin-top:10px" class="small">Всего маршрутов: <strong id="count">—</strong></div>
+            <div style="margin-top:8px" class="small">Данные вшиты в страницу для мгновенного доступа.</div>
+            <div style="margin-top:12px">
+              <button id="inspect" class="btn btn-ghost">Показать 10 маршрутов в консоли</button>
+            </div>
           </div>
-          <div id="validateLog" style="margin-top:12px;color:var(--muted);font-size:13px"></div>
-        </div>
+        </aside>
       </div>
-    </div>
+    </main>
   </div>
 
 <script>
-/* ======================
-   Fallback DATA (keeps previous changes)
-   ====================== */
-let AIRLINES = [
-  {name:"Lufthansa", hubs:["EDDF","EDDM"]},
-  {name:"Austrian", hubs:["LOWW"]},
-  {name:"Swiss", hubs:["LSZH"]},
-  {name:"Eurowings", hubs:["EDDF","EDDM","EDDH"]},
-  {name:"Brussels Airlines", hubs:["EBBR"]}
+/* ============================
+   Embedded ROUTES (EDDF + EDDM)
+   - durationMinutes numeric
+   ============================ */
+const ROUTES = [
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":120,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":70,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":75,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Paris","toCountry":"France","toICAO":"LFPG","durationMinutes":85,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Munich","toCountry":"Germany","toICAO":"EDDM","durationMinutes":50,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Stockholm","toCountry":"Sweden","toICAO":"ESSA","durationMinutes":150,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Reykjavik","toCountry":"Iceland","toICAO":"BIRK","durationMinutes":235,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Dubai","toCountry":"UAE","toICAO":"OMDB","durationMinutes":420,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"London","toCountry":"United Kingdom","toICAO":"EGLL","durationMinutes":85,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Amsterdam","toCountry":"Netherlands","toICAO":"EHAM","durationMinutes":75,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":60,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Paris","toCountry":"France","toICAO":"LFPG","durationMinutes":95,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"New York","toCountry":"United States","toICAO":"KJFK","durationMinutes":450,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Oslo","toCountry":"Norway","toICAO":"ENGM","durationMinutes":135,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Milan","toCountry":"Italy","toICAO":"LIMC","durationMinutes":95,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Rome","toCountry":"Italy","toICAO":"LIRF","durationMinutes":120,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Vienna","toCountry":"Austria","toICAO":"LOWW","durationMinutes":80,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Vienna","toCountry":"Austria","toICAO":"LOWW","durationMinutes":75,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":145,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Madrid","toCountry":"Spain","toICAO":"LEMD","durationMinutes":150,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Zurich","toCountry":"Switzerland","toICAO":"LSZH","durationMinutes":55,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Hamburg","toCountry":"Germany","toICAO":"EDDH","durationMinutes":45,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Hamburg","toCountry":"Germany","toICAO":"EDDH","durationMinutes":60,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":195,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Istanbul","toCountry":"Turkey","toICAO":"LTFM","durationMinutes":185,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Lisbon","toCountry":"Portugal","toICAO":"LPPT","durationMinutes":185,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":95,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Copenhagen","toCountry":"Denmark","toICAO":"EKCH","durationMinutes":85,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Edinburgh","toCountry":"United Kingdom","toICAO":"EGPH","durationMinutes":145,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Edinburgh","toCountry":"United Kingdom","toICAO":"EGPH","durationMinutes":150,"source":"embedded"},
+  {"fromCity":"Frankfurt am Main","fromCountry":"Germany","fromICAO":"EDDF","toCity":"Tel Aviv","toCountry":"Israel","toICAO":"LLBG","durationMinutes":255,"source":"embedded"},
+  {"fromCity":"Munich","fromCountry":"Germany","fromICAO":"EDDM","toCity":"Tel Aviv","toCountry":"Israel","toICAO":"LLBG","durationMinutes":260,"source":"embedded"}
 ];
-
-// fallback routes; will be replaced on load/upload
-let ROUTES = [
-  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"Oslo",toCountry:"Norway",toICAO:"ENGM",durationMinutes:120,source:"fallback"},
-  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"New York",toCountry:"United States",toICAO:"KJFK",durationMinutes:450,source:"fallback"},
-  {fromCity:"Munich",fromCountry:"Germany",fromICAO:"EDDM",toCity:"London",toCountry:"United Kingdom",toICAO:"EGLL",durationMinutes:85,source:"fallback"}
+/* ============================
+   Airlines list (keeps previous UX)
+   ============================ */
+const AIRLINES = [
+  { name: "Lufthansa", hubs: ["EDDF","EDDM"] },
+  { name: "Austrian", hubs: ["LOWW"] },
+  { name: "Swiss", hubs: ["LSZH"] },
+  { name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"] },
+  { name: "Brussels Airlines", hubs: ["EBBR"] }
 ];
 
 const DURATIONS = [
-  {label:"1-2ч",min:60,max:120},
-  {label:"3-4ч",min:180,max:240},
-  {label:"5-6ч",min:300,max:360},
-  {label:"7-8ч",min:420,max:480},
-  {label:"9-10ч",min:540,max:600},
-  {label:"10+ч",min:601,max:1200}
+  { label: "1-2ч", min: 60, max: 120 },
+  { label: "3-4ч", min: 180, max: 240 },
+  { label: "5-6ч", min: 300, max: 360 },
+  { label: "7-8ч", min: 420, max: 480 },
+  { label: "9-10ч", min: 540, max: 600 },
+  { label: "10+ч", min: 601, max: 1200 }
 ];
 
-/* ======================
-   Refs
-   ====================== */
-const openBtn = document.getElementById('openBtn');
-const demoBtn = document.getElementById('demoBtn');
-const mainCard = document.getElementById('mainCard');
+/* Refs */
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
-const genBtn = document.getElementById('genBtn');
-const backBtn = document.getElementById('backBtn');
+const genBtn = document.getElementById('gen');
+const demoBtn = document.getElementById('demo');
+const resetBtn = document.getElementById('reset');
 const resultEl = document.getElementById('result');
-const extStatus = document.getElementById('extStatus');
-const routesCount = document.getElementById('routesCount');
-const fileInput = document.getElementById('fileInput');
-const fileInfo = document.getElementById('fileInfo');
-const uploadLabel = document.getElementById('uploadLabel');
-const exportBtn = document.getElementById('exportBtn');
-const validateBtn = document.getElementById('validateBtn');
-const validateLog = document.getElementById('validateLog');
+const countEl = document.getElementById('count');
+const inspectBtn = document.getElementById('inspect');
 
 let chosenAir = null;
 let chosenDur = null;
 
-/* ======================
-   Helpers
-   ====================== */
+/* Helpers */
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
 function pad(n){ return String(n).padStart(2,'0'); }
 
-/* ======================
-   Normalization / Parsers
-   ====================== */
-function ensureNumericDurations(routes){
-  const bad = [];
+/* Ensure durations numeric (embedded already numeric but keep safety) */
+function ensureNumeric(routes){
   routes.forEach(r=>{
-    if (r.durationMinutes === undefined || r.durationMinutes === null || r.durationMinutes === ''){
-      r.durationMinutes = NaN;
-      bad.push({route:r, reason:'missing'});
-      return;
-    }
-    const n = Number(r.durationMinutes);
-    if (!Number.isFinite(n)){
-      r.durationMinutes = NaN;
-      bad.push({route:r, reason:'non-numeric'});
-    } else {
-      r.durationMinutes = Math.round(n);
-    }
+    if(r.durationMinutes === undefined || r.durationMinutes === null || r.durationMinutes === '') r.durationMinutes = NaN;
+    else r.durationMinutes = Number(r.durationMinutes);
+    if(!Number.isFinite(r.durationMinutes)) r.durationMinutes = NaN;
   });
-  if (bad.length){
-    console.warn('Routes with missing/non-numeric durationMinutes (sample):', bad.slice(0,10));
-  }
   return routes;
 }
+ensureNumeric(ROUTES);
 
-function normalizeRoutes(data){
-  if(!Array.isArray(data)) return [];
-  const out = data.map(item=>{
-    return {
-      fromCity: item.fromCity || item.from || '',
-      fromCountry: item.fromCountry || item.from_country || '',
-      fromICAO: (item.fromICAO || item.from_icao || item.from || '').toUpperCase(),
-      toCity: item.toCity || item.to || '',
-      toCountry: item.toCountry || item.to_country || '',
-      toICAO: (item.toICAO || item.to_icao || item.to || '').toUpperCase(),
-      durationMinutes: item.durationMinutes !== undefined ? item.durationMinutes : (item.duration_minutes !== undefined ? item.duration_minutes : undefined),
-      notes: item.notes || item.note || '',
-      source: item.source || ''
-    };
-  }).filter(r => r.fromICAO && r.toICAO);
-  return ensureNumericDurations(out);
-}
-
-/* Basic CSV parser (header required). Handles simple CSV without multiline quoted fields. */
-function parseCSV(text){
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
-  if(lines.length===0) return [];
-  const header = lines.shift().split(',').map(h=>h.trim());
-  return lines.map(line=>{
-    const cols = line.split(',').map(c=>c.trim());
-    const obj = {};
-    header.forEach((h,i)=> obj[h] = cols[i] !== undefined ? cols[i] : '');
-    if (obj.durationMinutes) obj.durationMinutes = Number(obj.durationMinutes);
-    return obj;
-  });
-}
-
-/* ======================
-   External autoload (root) and upload
-   ====================== */
-async function tryAutoLoadRoot(){
-  // try routes.json
-  try {
-    const r = await fetch('routes.json', {cache:'no-cache'});
-    if (r.ok){
-      const data = await r.json();
-      const normalized = normalizeRoutes(data);
-      if (normalized.length>0){
-        ROUTES = normalized;
-        extStatus.textContent = 'routes.json';
-        routesCount.textContent = ROUTES.length;
-        fileInfo.textContent = `Auto-loaded routes.json (${ROUTES.length})`;
-        console.log('Auto-loaded routes.json', ROUTES.length);
-        return;
-      }
-    }
-  } catch(e){ /* ignore */ }
-
-  // try routes.csv
-  try {
-    const r2 = await fetch('routes.csv', {cache:'no-cache'});
-    if (r2.ok){
-      const txt = await r2.text();
-      const parsed = parseCSV(txt);
-      const normalized = normalizeRoutes(parsed);
-      if (normalized.length>0){
-        ROUTES = normalized;
-        extStatus.textContent = 'routes.csv';
-        routesCount.textContent = ROUTES.length;
-        fileInfo.textContent = `Auto-loaded routes.csv (${ROUTES.length})`;
-        console.log('Auto-loaded routes.csv', ROUTES.length);
-        return;
-      }
-    }
-  } catch(e){ /* ignore */ }
-
-  // fallback
-  routesCount.textContent = ROUTES.length;
-  extStatus.textContent = 'нет';
-  fileInfo.textContent = 'Используется встроенный набор (fallback)';
-  console.log('No external file found, using fallback routes:', ROUTES.length);
-}
-
-fileInput.addEventListener('change', async (e) => {
-  const f = e.target.files && e.target.files[0];
-  if (!f) return;
-  fileInfo.textContent = `Файл ${f.name} — загружается...`;
-  try {
-    const text = await f.text();
-    if (f.name.toLowerCase().endsWith('.json')){
-      const data = JSON.parse(text);
-      const normalized = normalizeRoutes(data);
-      if (normalized.length===0) throw new Error('no valid routes in JSON');
-      ROUTES = normalized;
-      extStatus.textContent = f.name;
-      routesCount.textContent = ROUTES.length;
-      fileInfo.textContent = `Загружено ${ROUTES.length} маршрутов (${f.name})`;
-      console.log('Loaded local JSON', ROUTES.length);
-    } else if (f.name.toLowerCase().endsWith('.csv')){
-      const parsed = parseCSV(text);
-      const normalized = normalizeRoutes(parsed);
-      if (normalized.length===0) throw new Error('no valid routes in CSV');
-      ROUTES = normalized;
-      extStatus.textContent = f.name;
-      routesCount.textContent = ROUTES.length;
-      fileInfo.textContent = `Загружено ${ROUTES.length} маршрутов (${f.name})`;
-      console.log('Loaded local CSV', ROUTES.length);
-    } else {
-      throw new Error('unsupported file type');
-    }
-    // reset UI
-    chosenAir = null; chosenDur = null;
-    renderAirlines(); renderDurations();
-    hideResult();
-  } catch(err){
-    console.error(err);
-    fileInfo.textContent = `Ошибка: ${err.message}`;
-  } finally {
-    fileInput.value = '';
-  }
-});
-
-/* ======================
-   Render UI
-   ====================== */
+/* Render controls */
 function renderAirlines(){
   airlinesWrap.innerHTML = '';
   AIRLINES.forEach((a,i)=>{
     const el = document.createElement('div');
-    el.className = 'opt';
+    el.className = 'option';
     el.tabIndex = 0;
-    el.innerHTML = `<div class="icon">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
-                    <div class="meta"><div class="name">${esc(a.name)}</div><div class="sub">Хабы: ${a.hubs.join(', ')}</div></div>`;
+    el.innerHTML = `<div class="ico">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
+                    <div style="min-width:0"><div style="font-weight:800">${esc(a.name)}</div><div class="small" style="margin-top:4px;color:var(--muted)">Хабы: ${a.hubs.join(', ')}</div></div>`;
     el.addEventListener('click', ()=> selectAir(i));
     el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectAir(i); });
     airlinesWrap.appendChild(el);
@@ -343,20 +226,18 @@ function renderAirlines(){
 function renderDurations(){
   durationsWrap.innerHTML = '';
   DURATIONS.forEach((d,i)=>{
-    const avgH = Math.round(((d.min + d.max)/2)/60);
+    const avg = Math.round(((d.min + d.max)/2)/60);
     const el = document.createElement('div');
-    el.className = 'opt';
+    el.className = 'option';
     el.tabIndex = 0;
-    el.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${esc(d.label)}</div><div class="sub">~ ${avgH} ч</div></div>`;
+    el.innerHTML = `<div class="ico">⌛</div><div style="min-width:0"><div style="font-weight:800">${esc(d.label)}</div><div class="small" style="margin-top:4px;color:var(--muted)">~ ${avg} ч</div></div>`;
     el.addEventListener('click', ()=> selectDur(i));
     el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectDur(i); });
     durationsWrap.appendChild(el);
   });
 }
 
-/* ======================
-   Selection handlers
-   ====================== */
+/* Selection */
 function selectAir(i){
   chosenAir = i;
   Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
@@ -369,156 +250,94 @@ function selectDur(i){
 }
 function hideResult(){ resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
-/* ======================
-   Filtering helpers
-   ====================== */
+/* Filtering: first by hubs, then by duration interval; fallback to nearest */
 function routesInDurationInterval(routes, durIdx){
   if(typeof durIdx !== 'number' || durIdx === null) return routes.slice();
   const interval = DURATIONS[durIdx];
   if(!interval) return routes.slice();
 
-  // filter only routes with numeric duration
   const matched = routes.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
-  if(matched.length > 0) return matched;
+  if(matched.length>0) return matched;
 
-  // fallback: find nearest by absolute difference to interval midpoint
-  const midpoint = (interval.min + interval.max) / 2;
+  const midpoint = (interval.min + interval.max)/2;
   const withNum = routes.filter(r => Number.isFinite(r.durationMinutes));
-  if(withNum.length === 0) return [];
-  // compute minimal diff
+  if(withNum.length===0) return [];
   let bestDiff = Infinity;
-  withNum.forEach(r => {
-    const d = Math.abs(r.durationMinutes - midpoint);
-    if(d < bestDiff) bestDiff = d;
-  });
-  // return subset with minimal diff (and some slack)
+  withNum.forEach(r=>{ const d = Math.abs(r.durationMinutes - midpoint); if(d < bestDiff) bestDiff = d; });
   const best = withNum.filter(r => Math.abs(r.durationMinutes - midpoint) <= bestDiff + 0.5);
-  return best.slice(0, 200);
+  return best.slice(0,200);
 }
 
-/* ======================
-   Core generation logic
-   ====================== */
+/* Core generate (uses route.durationMinutes if numeric) */
 function generateFlight(){
-  if (chosenAir === null) { alert('Выберите авиакомпанию'); return; }
-  if (chosenDur === null) { alert('Выберите длительность'); return; }
+  if(chosenAir === null){ alert('Выберите авиакомпанию'); return; }
+  if(chosenDur === null){ alert('Выберите длительность'); return; }
 
   const airline = AIRLINES[chosenAir];
 
-  // 1) routes from airline hubs
   let pool = ROUTES.filter(r => airline.hubs.includes((r.fromICAO||'').toUpperCase()));
-  if(pool.length === 0){
+  if(pool.length===0){
     resultEl.style.display = 'block';
-    resultEl.innerHTML = `<div class="row"><div class="label">Ошибка</div><div class="val">Нет маршрутов из хабов ${esc(airline.name)}. Загрузите routes.json/csv или добавьте в DATA.</div></div>`;
+    resultEl.innerHTML = `<div class="r-row"><div class="r-label">Ошибка</div><div class="r-val">Нет маршрутов из хабов ${esc(airline.name)}.</div></div>`;
     return;
   }
 
-  // 2) apply duration filter (if chosen)
-  if (typeof chosenDur === 'number'){
-    const filteredByDur = routesInDurationInterval(pool, chosenDur);
-    if(filteredByDur.length > 0){
-      pool = filteredByDur;
-      console.log('Filtered pool by duration: count =', pool.length);
-    } else {
-      console.warn('No numeric duration matches in hub pool; using original hub pool.');
-    }
-  }
+  const filtered = routesInDurationInterval(pool, chosenDur);
+  if(filtered.length>0) pool = filtered;
 
-  // 3) pick random route
   const route = pool[randInt(0, pool.length-1)];
 
-  // 4) determine minutes to display: prefer route.durationMinutes when numeric
   let minutes;
-  if (Number.isFinite(route.durationMinutes)) {
-    minutes = Math.round(route.durationMinutes);
-  } else {
-    // fallback to chosen interval or safe range
-    if (typeof chosenDur === 'number'){
-      const interval = DURATIONS[chosenDur];
-      minutes = randInt(interval.min, interval.max);
-    } else {
-      minutes = randInt(60,240);
-    }
+  if(Number.isFinite(route.durationMinutes)) minutes = Math.round(route.durationMinutes);
+  else {
+    const interval = DURATIONS[chosenDur];
+    minutes = randInt(interval.min, interval.max);
   }
 
-  // render result
   const hh = Math.floor(minutes/60), mm = minutes % 60;
   const time = pad(hh) + ':' + pad(mm);
 
   resultEl.style.display = 'block';
   resultEl.innerHTML = `
-    <div class="row"><div class="label">Авиакомпания</div><div class="val">${esc(airline.name)}</div></div>
-    <div class="row"><div class="label">Отправление</div><div class="val">${esc(route.fromCity)} <span class="small">(${esc(route.fromICAO)})</span></div></div>
-    <div class="row"><div class="label">Прибытие</div><div class="val">${esc(route.toCity)} <span class="small">(${esc(route.toICAO)})</span></div></div>
-    <div class="row"><div class="label">Время в полёте</div><div class="val">${time}</div></div>
-    <div class="row"><div class="label">Источник времени</div><div class="val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Generated (interval)'}</div></div>
+    <div class="r-row"><div class="r-label">Авиакомпания</div><div class="r-val">${esc(airline.name)}</div></div>
+    <div class="r-row"><div class="r-label">Отправление</div><div class="r-val">${esc(route.fromCity)} <span class="small r-icao">(${esc(route.fromICAO)})</span></div></div>
+    <div class="r-row"><div class="r-label">Прибытие</div><div class="r-val">${esc(route.toCity)} <span class="small r-icao">(${esc(route.toICAO)})</span></div></div>
+    <div class="r-row"><div class="r-label">Время в полёте</div><div class="r-val">${time}</div></div>
+    <div class="r-row"><div class="r-label">Источник времени</div><div class="r-val">${Number.isFinite(route.durationMinutes) ? (route.source || 'durationMinutes в DATA') : 'Сгенерировано (интервал)'}</div></div>
   `;
   resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-  console.log('Generated:', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'route.durationMinutes=', route.durationMinutes);
+  console.log('Generated route', route.fromICAO, '->', route.toICAO, 'minutes=', minutes, 'route.durationMinutes=', route.durationMinutes);
 }
 
-/* ======================
-   Export + validation features
-   ====================== */
-function exportRoutes(){
-  const dataStr = JSON.stringify(ROUTES, null, 2);
-  const blob = new Blob([dataStr], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'routes_export.json';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+/* Utility buttons */
+function doDemo(){
+  selectAir(0); // Lufthansa
+  selectDur(3); // 7-8ч (index 3)
+  // optionally auto-generate immediately
+  generateFlight();
 }
-
-function validateDurations(){
-  const missing = ROUTES.filter(r => !Number.isFinite(r.durationMinutes));
-  if(missing.length===0){
-    validateLog.textContent = 'Все маршруты имеют числовое durationMinutes.';
-  } else {
-    validateLog.textContent = `Найдено ${missing.length} маршрутов без корректного durationMinutes (пример в консоли).`;
-    console.warn('Missing durationMinutes sample:', missing.slice(0,10));
-  }
-}
-
-/* ======================
-   Events & init
-   ====================== */
-openBtn.addEventListener('click', async () => {
-  openBtn.disabled = true;
-  await tryAutoLoadRoot();
-  renderAirlines(); renderDurations();
-  document.getElementById('hero').style.display = 'none';
-  mainCard.style.display = 'block';
-  openBtn.disabled = false;
-});
-demoBtn.addEventListener('click', async () => {
-  await tryAutoLoadRoot();
-  renderAirlines(); renderDurations();
-  selectAir(0);
-  selectDur(3);
-  document.getElementById('hero').style.display = 'none';
-  mainCard.style.display = 'block';
-});
-genBtn.addEventListener('click', generateFlight);
-backBtn.addEventListener('click', ()=>{
-  mainCard.style.display = 'none';
-  document.getElementById('hero').style.display = 'flex';
-  chosenAir = null; chosenDur = null; hideResult();
+function doReset(){
+  chosenAir = null; chosenDur = null;
   Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected'));
   Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected'));
-});
-exportBtn.addEventListener('click', exportRoutes);
-validateBtn.addEventListener('click', validateDurations);
+  hideResult();
+}
+function inspectRoutes(){
+  console.log('ROUTES sample (first 10):', ROUTES.slice(0,10));
+  alert('10 маршрутов выведено в консоль (DevTools).');
+}
 
-/* init: try autoload and render UI controls */
-(async function init(){
-  await tryAutoLoadRoot();
+/* Init */
+function init(){
   renderAirlines();
   renderDurations();
-})();
+  countEl.textContent = ROUTES.length;
+  genBtn.addEventListener('click', generateFlight);
+  demoBtn.addEventListener('click', doDemo);
+  resetBtn.addEventListener('click', doReset);
+  inspectBtn.addEventListener('click', inspectRoutes);
+}
+init();
 </script>
 </body>
 </html>
