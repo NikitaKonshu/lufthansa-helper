@@ -69,6 +69,14 @@
       .controls{gap:8px}
       .btn{padding:8px 10px}
     }
+    /* prettier airlines list */
+.airline-group{margin-top:8px}
+.airline-group h4{margin:8px 0 6px;color:var(--lufthansa-yellow);font-size:13px;font-weight:800}
+.airline-list{display:flex;flex-direction:column;gap:8px}
+.airline-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg,rgba(255,255,255,0.006),transparent);cursor:pointer;transition:transform .14s}
+.airline-item:hover{transform:translateY(-4px)}
+.airline-badge{width:44px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--lufthansa-yellow)}
+.airline-meta{font-size:13px;color:var(--muted);line-height:1.1}
   </style>
 </head>
 <body>
@@ -435,16 +443,61 @@ function renderAssignLog(){
 
 /* rest of UI rendering (airlines/durations etc.) */
 function renderAirlines(){
+  // produce a cleaned copy sorted by name
+  const copy = AIRLINES.slice().sort((a,b)=>{
+    const na = a.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
+    const nb = b.name.replace(/\b(Lufthansa|Air|The)\b/gi,'').trim().toLowerCase();
+    return na.localeCompare(nb, 'ru') || a.name.localeCompare(b.name, 'ru');
+  });
+
+  // group by primary hub (first hub) — fallback '—'
+  const groups = {};
+  copy.forEach(a=>{
+    const hub = (Array.isArray(a.hubs) && a.hubs[0]) ? a.hubs[0] : '—';
+    if(!groups[hub]) groups[hub] = [];
+    groups[hub].push(a);
+  });
+
   airlinesWrap.innerHTML = '';
-  AIRLINES.forEach((a,i)=>{
-    const el = document.createElement('div');
-    el.className = 'opt';
-    el.tabIndex = 0;
-    el.innerHTML = `<div class="icon">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
-                    <div style="min-width:0"><div style="font-weight:900">${esc(a.name)}</div><div class="small" style="margin-top:6px;color:var(--muted)">Хабы: ${a.hubs.join(', ')}</div></div>`;
-    el.addEventListener('click', ()=> selectAir(i));
-    el.addEventListener('keypress', e=>{ if(e.key==='Enter') selectAir(i); });
-    airlinesWrap.appendChild(el);
+
+  // optional: keys in deterministic order (EDDF first, EDDM second, then alphabetic)
+  const preferred = ['EDDF','EDDM'];
+  const hubs = Object.keys(groups).sort((x,y)=>{
+    const xi = preferred.indexOf(x), yi = preferred.indexOf(y);
+    if(xi !== -1 || yi !== -1) return (xi===-1?99:xi) - (yi===-1?99:yi);
+    return x.localeCompare(y, 'ru');
+  });
+
+  hubs.forEach(hub=>{
+    const groupEl = document.createElement('div');
+    groupEl.className = 'airline-group';
+    const title = document.createElement('h4');
+    title.textContent = `Хаб ${hub}`;
+    groupEl.appendChild(title);
+
+    const list = document.createElement('div');
+    list.className = 'airline-list';
+
+    groups[hub].forEach((a,i)=>{
+      const item = document.createElement('div');
+      item.className = 'airline-item';
+      item.tabIndex = 0;
+      item.setAttribute('role','button');
+      // badge: initials
+      const initials = (a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')).toUpperCase();
+      item.innerHTML = `<div class="airline-badge" aria-hidden="true">${esc(initials)}</div>
+        <div style="min-width:0">
+          <div style="font-weight:900">${esc(a.name)}</div>
+          <div class="airline-meta">Хабы: ${a.hubs.join(', ')}</div>
+        </div>`;
+
+      item.addEventListener('click', ()=> selectAir(AIRLINES.indexOf(a)));
+      item.addEventListener('keypress', e=>{ if(e.key==='Enter') selectAir(AIRLINES.indexOf(a)); });
+      list.appendChild(item);
+    });
+
+    groupEl.appendChild(list);
+    airlinesWrap.appendChild(groupEl);
   });
 }
 function renderDurations(){
