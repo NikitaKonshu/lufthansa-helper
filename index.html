@@ -11,6 +11,9 @@
       --text:#ffffff;
       --card: rgba(255,255,255,0.03);
       --btn-bg: rgba(255,212,0,0.12);
+      --result-bg: rgba(0,0,0,0.25);
+      --result-border: rgba(255,212,0,0.12);
+      --muted: rgba(255,255,255,0.72);
     }
     html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;}
     body{
@@ -31,7 +34,7 @@
     h1{
       color:var(--accent);
       font-size:clamp(28px,4vw,44px);
-      margin:0 0 28px 0;
+      margin:0 0 18px 0;
       font-weight:700;
       letter-spacing:0.6px;
     }
@@ -39,7 +42,7 @@
     .card{
       background:var(--card);
       border-radius:12px;
-      padding:28px;
+      padding:20px;
       box-shadow:0 6px 24px rgba(0,0,0,0.4);
     }
 
@@ -47,7 +50,7 @@
       display:flex;
       flex-direction:column;
       align-items:center;
-      gap:18px;
+      gap:12px;
     }
 
     .btn{
@@ -67,24 +70,36 @@
 
     /* Page layouts */
     .hidden{display:none}
-    .options{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+    .options{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:12px}
     .option{
       background:rgba(255,255,255,0.02);
       border-radius:10px;padding:10px 14px;
       min-width:120px;text-align:center;cursor:pointer;border:1px solid transparent;
+      transition:all .12s ease;
     }
-    .option.selected{border-color:rgba(255,212,0,0.3);box-shadow:0 6px 18px rgba(0,0,0,0.45)}
+    .option:hover{transform:translateY(-3px)}
+    .option.selected{border-color:rgba(255,212,0,0.35);box-shadow:0 8px 28px rgba(0,0,0,0.55)}
+
+    /* Улучшенный вид результата */
     .result{
-      margin-top:20px;
+      margin-top:18px;
       text-align:left;
       width:100%;
       max-width:720px;
-      background:rgba(255,255,255,0.02);
-      padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+      background:var(--result-bg);
+      padding:18px;border-radius:12px;border:1px solid var(--result-border);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
     }
+    .result .section{
+      padding:10px 0;
+      border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .result .section:last-child{border-bottom:0}
     .row{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .label{color:rgba(255,255,255,0.75);font-size:14px}
-    .value{font-weight:700;font-size:18px}
+    .label{color:var(--muted);font-size:13px}
+    .value{font-weight:800;font-size:18px;color:#ffffff;letter-spacing:0.2px}
+    .icao{font-weight:900;color:var(--accent);font-size:20px}
+    .flight-time{font-weight:900;color:var(--accent);font-size:20px}
     @media(max-width:520px){
       .row{flex-direction:column;align-items:flex-start}
     }
@@ -92,7 +107,7 @@
     /* small footer controls */
     .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:14px}
     .link{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;color:var(--text);cursor:pointer;font-size:13px}
-    footer{margin-top:18px;color:rgba(255,255,255,0.5);font-size:13px}
+    footer{margin-top:14px;color:rgba(255,255,255,0.5);font-size:13px}
   </style>
 </head>
 <body>
@@ -111,13 +126,11 @@
       <h1>Lufthansa Group Virtual</h1>
       <div class="center">
         <div style="width:100%;max-width:720px">
-          <div style="text-align:left;margin-bottom:8px;color:rgba(255,255,255,0.8)">Выбери авиакомпанию</div>
+          <div style="text-align:left;margin-bottom:8px;color:rgba(255,255,255,0.85);font-weight:600">Выбери авиакомпанию</div>
           <div id="airlines" class="options" role="list"></div>
 
-          <div style="text-align:left;margin-top:18px;margin-bottom:8px;color:rgba(255,255,255,0.8)">Выбери длительность рейса</div>
-          <div id="durations" class="options" role="list">
-            <!-- options inserted by JS -->
-          </div>
+          <div style="text-align:left;margin-top:14px;margin-bottom:8px;color:rgba(255,255,255,0.85);font-weight:600">Выбери длительность рейса</div>
+          <div id="durations" class="options" role="list"></div>
 
           <div class="controls">
             <button id="btn-gen" class="btn" aria-label="Сгенерировать рейс">Сгенерировать рейс</button>
@@ -136,41 +149,37 @@
     /*****************************************************************************
      * DATASET
      *
-     * Сюда добавляй свои записи — легко дублировать 800-900 строк вручную.
-     * Каждый объект: {fromCity, fromCountry, fromICAO, toCity, toCountry, toICAO}
-     *
-     * Пример строки:
-     * {fromCity: "Frankfurt am Main", fromCountry: "Germany", fromICAO: "EDDF",
-     *  toCity: "New York", toCountry: "United States", toICAO: "KJFK"},
-     *
-     * Для массового добавления: скопируй одну строку, поменяй тексты и вставляй.
+     * Lufthansa — только из Frankfurt (EDDF) и Munich (EDDM).
+     * Добавляй новые маршруты в массив ROUTES.
      *****************************************************************************/
     const ROUTES = [
+      // Lufthansa — Frankfurt
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Washington", toCountry:"United States", toICAO:"KDCA"},
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"New York", toCountry:"United States", toICAO:"KJFK"},
-      {fromCity:"Berlin", fromCountry:"Germany", fromICAO:"EDDB", toCity:"Moscow", toCountry:"Russia", toICAO:"UUEE"},
-      {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"London", toCountry:"United Kingdom", toICAO:"EGLL"},
       {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Tokyo", toCountry:"Japan", toICAO:"RJAA"},
-      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Dubai", toCountry:"UAE", toICAO:"OMDB"}
+      // Lufthansa — Munich
+      {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"London", toCountry:"United Kingdom", toICAO:"EGLL"},
+      {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"Zurich", toCountry:"Switzerland", toICAO:"LSZH"},
+      {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"Dubai", toCountry:"UAE", toICAO:"OMDB"},
+      // Примеры других операторов (если нужно)
+      {fromCity:"Berlin", fromCountry:"Germany", fromICAO:"EDDB", toCity:"Moscow", toCountry:"Russia", toICAO:"UUEE"},
+      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Frankfurt am Main", toCountry:"Germany", toICAO:"EDDF"}
       // Добавляй и дублируй строки сюда до 800-900 записей
     ];
 
     /*****************************************************************************
      * AIRLINES
-     * Набор авиакомпаний, редактируется так же просто.
      *****************************************************************************/
     const AIRLINES = [
       "Lufthansa",
       "Swiss",
       "Austrian",
-      "Brussels Airlines",
-      "Eurowings"
+      "Eurowings",
+      "Brussels Airlines"
     ];
 
     /*****************************************************************************
      * DURATIONS
-     * Метки и примерные интервалы минут для генерации времени полёта.
-     * Формат: {label, minMinutes, maxMinutes}
      *****************************************************************************/
     const DURATIONS = [
       {label:"1-2 часа", min:60, max:120},
@@ -195,7 +204,6 @@
     let chosenAirline = null;
     let chosenDuration = null;
 
-    // build airline buttons
     function renderAirlines(){
       airlinesWrap.innerHTML = '';
       AIRLINES.forEach((a, i) => {
@@ -215,7 +223,6 @@
       Array.from(airlinesWrap.children).forEach((n,i)=> n.classList.toggle('selected', i===idx));
     }
 
-    // build duration buttons
     function renderDurations(){
       durationsWrap.innerHTML = '';
       DURATIONS.forEach((d, i) => {
@@ -235,11 +242,9 @@
       Array.from(durationsWrap.children).forEach((n,i)=> n.classList.toggle('selected', i===idx));
     }
 
-    // helpers
     function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
     function pad(n){ return n.toString().padStart(2,'0'); }
 
-    // generate flight
     function generateFlight(){
       if(!chosenAirline || !chosenDuration){
         alert('Выберите авиакомпанию и длительность рейса');
@@ -247,34 +252,52 @@
       }
       // pick random route
       const route = ROUTES[randInt(0, ROUTES.length-1)];
+      // Ensure Lufthansa only from EDDF or EDDM when Lufthansa selected
+      if(chosenAirline === 'Lufthansa'){
+        const filtered = ROUTES.filter(r => r.fromICAO === 'EDDF' || r.fromICAO === 'EDDM');
+        if(filtered.length) route = filtered[randInt(0, filtered.length-1)];
+      }
       // pick random flight minutes within chosenDuration
       const minutes = randInt(chosenDuration.min, chosenDuration.max);
       const hours = Math.floor(minutes/60);
       const mins = minutes % 60;
       const flightTime = pad(hours) + ':' + pad(mins);
 
-      // build result HTML
+      // build result HTML with clearer sections
       const html = `
-        <div class="row"><div class="label">Авиакомпания</div><div class="value">${escapeHtml(chosenAirline)}</div></div>
-        <div class="row" style="margin-top:8px"><div class="label">Отправление</div><div class="value">${escapeHtml(route.fromCity)} — ${escapeHtml(route.fromCountry)}</div></div>
-        <div class="row"><div class="label">ICAO отправления</div><div class="value">${escapeHtml(route.fromICAO)}</div></div>
-        <div class="row" style="margin-top:8px"><div class="label">Прибытие</div><div class="value">${escapeHtml(route.toCity)} — ${escapeHtml(route.toCountry)}</div></div>
-        <div class="row"><div class="label">ICAO прибытия</div><div class="value">${escapeHtml(route.toICAO)}</div></div>
-        <div class="row" style="margin-top:8px"><div class="label">Время в полёте</div><div class="value">${flightTime}</div></div>
-        <div class="row" style="margin-top:12px"><div class="label">Примечание</div><div class="small">Данные случайно сгенерированы — редактируй ROUTES в скрипте</div></div>
+        <div class="section">
+          <div class="row"><div class="label">Авиакомпания</div><div class="value">${escapeHtml(chosenAirline)}</div></div>
+        </div>
+
+        <div class="section">
+          <div class="row"><div class="label">Отправление</div><div class="value">${escapeHtml(route.fromCity)}</div></div>
+          <div style="margin-top:8px" class="row"><div class="label">Страна отправления</div><div class="value">${escapeHtml(route.fromCountry)}</div></div>
+          <div style="margin-top:8px" class="row"><div class="label">ICAO отправления</div><div class="icao">${escapeHtml(route.fromICAO)}</div></div>
+        </div>
+
+        <div class="section">
+          <div class="row"><div class="label">Прибытие</div><div class="value">${escapeHtml(route.toCity)}</div></div>
+          <div style="margin-top:8px" class="row"><div class="label">Страна прибытия</div><div class="value">${escapeHtml(route.toCountry)}</div></div>
+          <div style="margin-top:8px" class="row"><div class="label">ICAO прибытия</div><div class="icao">${escapeHtml(route.toICAO)}</div></div>
+        </div>
+
+        <div class="section">
+          <div class="row"><div class="label">Время в полёте</div><div class="flight-time">${flightTime}</div></div>
+        </div>
+
+        <div style="margin-top:10px" class="section">
+          <div class="small">Данные случайно сгенерированы — редактируй ROUTES в скрипте</div>
+        </div>
       `;
       resultBox.innerHTML = html;
       resultBox.classList.remove('hidden');
-      // scroll into view on small screens
       resultBox.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
 
-    // basic XSS-safe escape for text fields
     function escapeHtml(s){
       return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     }
 
-    // navigation
     btnStart.addEventListener('click', () => {
       elStart.classList.add('hidden');
       elSelect.classList.remove('hidden');
@@ -284,20 +307,13 @@
     btnBack.addEventListener('click', () => {
       elSelect.classList.add('hidden');
       elStart.classList.remove('hidden');
-      // reset selections optionally
       chosenAirline = null; chosenDuration = null;
       resultBox.classList.add('hidden');
     });
     btnGen.addEventListener('click', generateFlight);
-
-    // accessibility: allow Enter to trigger start
     btnStart.addEventListener('keypress', (e)=> { if(e.key==='Enter') btnStart.click(); });
 
-    // initial render for standalone preview
-    (function initPreview(){
-      renderAirlines();
-      renderDurations();
-    })();
+    (function initPreview(){ renderAirlines(); renderDurations(); })();
   </script>
 </body>
 </html>
