@@ -3,224 +3,124 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — Улучшенный дизайн</title>
-  <meta name="description" content="Генератор тестовых рейсов — стильный UI" />
+  <title>Lufthansa Group Virtual — оптимизировано</title>
   <style>
     :root{
-      --bg-1: #031428;
-      --bg-2: #06283b;
-      --card: rgba(255,255,255,0.03);
-      --glass: rgba(255,255,255,0.02);
-      --accent: #ffd24d;
-      --accent-2: #ffb84d;
-      --muted: #9fb6d6;
-      --text: #eaf4ff;
-      --glass-border: rgba(255,255,255,0.04);
-      --radius: 14px;
-      --shadow-lg: 0 20px 50px rgba(2,8,20,0.6);
-      --shadow-sm: 0 8px 20px rgba(2,8,20,0.45);
-      --glass-glow: 0 6px 30px rgba(3,20,40,0.55);
-      --transition: 180ms cubic-bezier(.2,.9,.3,1);
-      --max-width: 1024px;
-      --gap: 16px;
+      --bg-1:#031428;
+      --bg-2:#06283b;
+      --accent:#ffd24d;
+      --muted:#9fb6d6;
+      --text:#eaf4ff;
+      --radius:14px;
+      --shadow-lg:0 20px 50px rgba(2,8,20,0.6);
+      --shadow-sm:0 8px 20px rgba(2,8,20,0.45);
+      --transition:180ms cubic-bezier(.2,.9,.3,1);
     }
-
-    /* Base */
     *{box-sizing:border-box}
-    html,body{height:100%}
     body{
       margin:0;
-      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      background: radial-gradient(600px 300px at 10% 10%, rgba(255,210,77,0.02), transparent),
-                  linear-gradient(180deg,var(--bg-1), var(--bg-2) 80%);
+      font-family:Inter,system-ui,"Segoe UI",Roboto,Arial;
+      background:linear-gradient(180deg,var(--bg-1),var(--bg-2) 80%);
       color:var(--text);
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:36px;
-    }
-
-    .container{
-      width:100%;
-      max-width:var(--max-width);
-      display:flex;
-      flex-direction:column;
-      gap:22px;
-      align-items:stretch;
-    }
-
-    /* HERO / START PAGE */
-    .hero{
-      display:flex;
-      gap:20px;
-      align-items:center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:var(--radius);
-      padding:26px;
-      box-shadow: var(--shadow-lg);
-      border:1px solid var(--glass-border);
-      overflow:hidden;
-    }
-
-    .hero-left{
-      display:flex;
-      gap:18px;
-      align-items:center;
-      min-width:0;
-    }
-
-    .logo{
-      width:96px;height:96px;border-radius:14px;
-      background: linear-gradient(135deg,#07203a,#0e3a66);
       display:flex;align-items:center;justify-content:center;
-      color:var(--accent);font-weight:900;font-size:26px;
-      box-shadow: var(--glass-glow), inset 0 1px 0 rgba(255,255,255,0.02);
-      border:1px solid rgba(255,210,77,0.06);
-      flex:0 0 96px;
+      padding:20px;
     }
+    .container{width:100%;max-width:1024px;display:flex;flex-direction:column;gap:20px}
 
-    .hero-title{
-      margin:0;font-size:clamp(20px,3.4vw,34px);color:var(--accent);font-weight:900;letter-spacing:0.2px;
+    /* HERO */
+    .hero{
+      display:flex;gap:16px;align-items:center;justify-content:space-between;
+      background:rgba(255,255,255,0.02);
+      border-radius:var(--radius);padding:20px;
+      box-shadow:var(--shadow-lg);
     }
-    .hero-sub{margin:6px 0 0 0;color:var(--muted);font-size:15px}
-    .hero-cta{display:flex;gap:12px;margin-top:14px;align-items:center}
+    .hero-left{display:flex;gap:14px;align-items:center}
+    .logo{width:72px;height:72px;border-radius:12px;background:#0e3a66;
+      display:flex;align-items:center;justify-content:center;
+      color:var(--accent);font-weight:900;font-size:22px}
+    .hero-title{margin:0;color:var(--accent);font-weight:900;font-size:22px}
+    .hero-sub{margin-top:6px;color:var(--muted);font-size:14px}
+    .hero-cta{margin-top:12px;display:flex;gap:10px}
+    .btn{cursor:pointer;border:0;padding:10px 16px;border-radius:10px;font-weight:700;transition:transform var(--transition)}
+    .btn-primary{background:var(--accent);color:#06202a}
+    .btn-ghost{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.06)}
 
-    .btn{
-      display:inline-flex;align-items:center;gap:10px;
-      cursor:pointer;border:0;padding:12px 18px;border-radius:12px;font-weight:800;
-      transition:transform var(--transition), box-shadow var(--transition), opacity var(--transition);
-    }
-    .btn:active{transform:translateY(1px)}
-    .btn-primary{
-      background: linear-gradient(180deg,var(--accent),var(--accent-2));
-      color:#06202a;border: 0;box-shadow: 0 10px 30px rgba(255,180,40,0.12);
-    }
-    .btn-ghost{
-      background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.06);padding:10px 14px;
-    }
-
-    .hero-right{
-      margin-left:auto;text-align:right;min-width:160px;
-      color:var(--muted);font-size:13px;
-    }
-
-    /* MAIN CARD */
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
-      border-radius:var(--radius);padding:18px;border:1px solid var(--glass-border);
-      box-shadow: var(--shadow-sm);
-    }
-
+    /* CARD */
+    .card{background:rgba(255,255,255,0.02);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm)}
     .page-title{margin:0;color:var(--accent);font-weight:900;font-size:18px}
     .lead{color:var(--muted);font-size:13px;margin-top:6px}
 
-    /* Grid: airlines + durations side-by-side */
-    .controls-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:18px;
-      margin-top:16px;
-    }
-    @media(max-width:900px){ .controls-grid{grid-template-columns:1fr} }
+    .controls-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+    @media(max-width:768px){.controls-grid{grid-template-columns:1fr}}
 
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.008));
-      border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.02);
-    }
-    .panel-title{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.6px}
+    .panel{background:rgba(255,255,255,0.01);border-radius:12px;padding:12px}
+    .panel-title{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:8px}
 
-    .options-grid{
-      display:grid;
-      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-      gap:12px;
-    }
+    .options-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+    .option{display:flex;gap:8px;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);cursor:pointer;border:1px solid rgba(255,255,255,0.02);transition:transform var(--transition),box-shadow var(--transition),border-color var(--transition)}
+    .option:hover{transform:translateY(-4px)}
+    .option.selected{border-color:rgba(255,210,77,0.28);box-shadow:0 12px 30px rgba(2,8,20,0.5)}
+    .icon{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800}
+    .meta{min-width:0}
+    .meta .name{font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .meta .sub{font-size:12px;color:var(--muted)}
 
-    .option{
-      display:flex;gap:10px;align-items:center;padding:12px;border-radius:12px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-      cursor:pointer;border:1px solid rgba(255,255,255,0.02);
-      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-    }
-    .option:hover{transform:translateY(-6px);box-shadow: 0 18px 40px rgba(2,8,20,0.5)}
-    .option.selected{border-color: rgba(255,210,77,0.28);box-shadow: 0 24px 60px rgba(2,8,20,0.55);}
-
-    .option .icon{
-      width:44px;height:44px;border-radius:10px;background: rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);
-      border:1px solid rgba(255,210,77,0.04)
-    }
-    .option .meta{min-width:0}
-    .option .name{font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .option .sub{font-size:12px;color:var(--muted);margin-top:6px}
-
-    /* action row */
-    .action-row{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:18px}
-    .action-row .btn{min-width:140px}
-
-    /* result card */
-    .result{
-      margin-top:18px;background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008));
-      border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.02);
-      display:none;
-    }
-    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
-    @media(max-width:680px){ .result-grid{grid-template-columns:1fr} }
-    .r-row{display:flex;flex-direction:column;gap:6px}
+    .action-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+    .result{margin-top:14px;background:rgba(255,255,255,0.01);border-radius:12px;padding:12px;display:none}
+    .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media(max-width:600px){.result-grid{grid-template-columns:1fr}}
+    .r-row{display:flex;flex-direction:column;gap:4px}
     .r-label{font-size:12px;color:var(--muted)}
-    .r-val{font-weight:900;font-size:16px}
-    .r-icao{color:var(--accent);font-weight:900}
-    .r-flight{color:var(--accent);font-weight:900;font-size:20px}
+    .r-val{font-weight:800}
+    .r-icao{color:var(--accent)}
+    .r-flight{color:var(--accent);font-size:18px;font-weight:900}
 
-    /* subtle micro interactions */
-    .fade-in{animation: fadeIn .28s ease both}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-    /* small footer */
-    .footer{margin-top:6px;color:var(--muted);font-size:12px;text-align:center}
+    /* Mobile tweaks */
+    @media(max-width:480px){
+      body{padding:10px}
+      .hero{flex-direction:column;align-items:flex-start}
+      .logo{width:60px;height:60px;font-size:18px}
+      .hero-title{font-size:18px}
+      .hero-sub{font-size:12px}
+      .btn{padding:8px 12px;font-size:13px}
+      .option{padding:8px}
+      .icon{width:30px;height:30px;font-size:12px}
+      .meta .name{font-size:13px}
+      .meta .sub{font-size:11px}
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- HERO -->
-    <div class="hero fade-in">
+    <div class="hero">
       <div class="hero-left">
         <div class="logo">LGV</div>
         <div>
           <h1 class="hero-title">Lufthansa Group Virtual</h1>
-          <div class="hero-sub">Стильный генератор тестовых рейсов — чистый, понятный и быстрый</div>
+          <div class="hero-sub">Генератор рейсов — адаптирован для смартфонов</div>
           <div class="hero-cta">
             <button id="open-btn" class="btn btn-primary">Начать</button>
             <button id="demo-btn" class="btn btn-ghost">Демо</button>
           </div>
         </div>
       </div>
-      <div class="hero-right">
-        <div>Версия демо</div>
-        <div style="margin-top:8px;color:var(--muted)">Данные редактируй в секции DATA внутри index.html</div>
+      <div style="text-align:right;color:var(--muted);font-size:12px">
+        Данные редактируй в секции DATA внутри index.html
       </div>
     </div>
 
-    <!-- MAIN CARD -->
-    <div id="main-card" class="card fade-in" style="display:none">
-      <div style="display:flex;align-items:center;gap:12px;justify-content:space-between">
-        <div>
-          <div class="page-title">Генерация рейса</div>
-          <div class="lead">Выберите авиакомпанию и длительность — оба блока равноправны</div>
-        </div>
-      </div>
+    <div id="main-card" class="card" style="display:none">
+      <div class="page-title">Генерация рейса</div>
+      <div class="lead">Выберите авиакомпанию и длительность</div>
 
       <div class="controls-grid">
-        <!-- Airlines -->
         <div class="panel">
           <div class="panel-title">Авиакомпания</div>
-          <div id="airlines" class="options-grid" role="list"></div>
+          <div id="airlines" class="options-grid"></div>
         </div>
-
-        <!-- Durations -->
         <div class="panel">
           <div class="panel-title">Длительность</div>
-          <div id="durations" class="options-grid" role="list"></div>
+          <div id="durations" class="options-grid"></div>
         </div>
       </div>
 
@@ -229,166 +129,175 @@
         <button id="back-btn" class="btn btn-ghost">Назад</button>
       </div>
 
-      <div id="result" class="result" role="status" aria-live="polite"></div>
-      <div class="footer">Нажмите Генерировать чтобы увидеть результат</div>
+      <div id="result" class="result" aria-live="polite"></div>
     </div>
   </div>
 
-  <script>
-    /*
-      DATA: редактируй эти массивы
-      - AIRLINES: {name, hubs: [ICAO,...]}
-      - ROUTES: {fromCity, fromCountry, fromICAO, toCity, toCountry, toICAO, optional durationMinutes}
-    */
-    const AIRLINES = [
-      {name: "Lufthansa", hubs: ["EDDF","EDDM"]},
-      {name: "Austrian", hubs: ["LOWW"]},
-      {name: "Swiss", hubs: ["LSZH"]},
-      {name: "Eurowings", hubs: ["EDDF","EDDM","EDDH"]},
-      {name: "Brussels Airlines", hubs: ["EBBR"]}
-    ];
-
-    const ROUTES = [
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"New York", toCountry:"United States", toICAO:"KJFK", durationMinutes:450},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Washington", toCountry:"United States", toICAO:"KDCA"},
-      {fromCity:"Munich", fromCountry:"Germany", fromICAO:"EDDM", toCity:"London", toCountry:"United Kingdom", toICAO:"EGLL"},
-      {fromCity:"Vienna", fromCountry:"Austria", fromICAO:"LOWW", toCity:"Berlin", toCountry:"Germany", toICAO:"EDDB", durationMinutes:75},
-      {fromCity:"Zurich", fromCountry:"Switzerland", fromICAO:"LSZH", toCity:"Frankfurt am Main", toCountry:"Germany", toICAO:"EDDF"},
-      {fromCity:"Hamburg", fromCountry:"Germany", fromICAO:"EDDH", toCity:"Barcelona", toCountry:"Spain", toICAO:"LEBL"}
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Amsterdam", toCountry:"Netherlands", toICAO:"EHAM", durationMinutes:70, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Athens", toCountry:"Greece", toICAO:"LGAV", durationMinutes:160, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Barcelona", toCountry:"Spain", toICAO:"LEBL", durationMinutes:150, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Belgrade", toCountry:"Serbia", toICAO:"LYBE", durationMinutes:120, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Berlin", toCountry:"Germany", toICAO:"EDDB", durationMinutes:65, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Brussels", toCountry:"Belgium", toICAO:"EBBR", durationMinutes:75, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Bucharest", toCountry:"Romania", toICAO:"LROP", durationMinutes:150, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Budapest", toCountry:"Hungary", toICAO:"LHBP", durationMinutes:115, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Copenhagen", toCountry:"Denmark", toICAO:"EKCH", durationMinutes:95, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Dublin", toCountry:"Ireland", toICAO:"EIDW", durationMinutes:145, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Edinburgh", toCountry:"United Kingdom", toICAO:"EGPH", durationMinutes:145, notes:"estimated(distance)", source:"calculated"},
-      {fromCity:"Frankfurt am Main", fromCountry:"Germany", fromICAO:"EDDF", toCity:"Florence", toCountry:"Italy", toICAO:"LIRQ", durationMinutes:110, notes:"estimated(distance)", source:"calculated"},
-  
+<script>
+/* DATA */
+const AIRLINES = [
+  {name:"Lufthansa", hubs:["EDDF","EDDM"]},
+  {name:"Austrian", hubs:["LOWW"]},
+  {name:"Swiss", hubs:["LSZH"]},
+  {name:"Eurowings", hubs:["EDDF","EDDM","EDDH"]},
+  {name:"Brussels Airlines", hubs:["EBBR"]}
 ];
-  
 
-    // non-overlapping intervals (minutes)
-    const DURATIONS = [
-      {label:"1-2ч",  min:60,  max:120},
-      {label:"3-4ч",  min:180, max:240},
-      {label:"5-6ч",  min:300, max:360},
-      {label:"7-8ч",  min:420, max:480},
-      {label:"9-10ч", min:540, max:600},
-      {label:"10+ч",  min:601, max:1200}
-    ];
+// Пример ROUTES. Добавь сюда свои (или подключи внешний файл позже).
+const ROUTES = [
+  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"New York",toCountry:"United States",toICAO:"KJFK",durationMinutes:450},
+  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"London",toCountry:"United Kingdom",toICAO:"EGLL",durationMinutes:75},
+  {fromCity:"Frankfurt am Main",fromCountry:"Germany",fromICAO:"EDDF",toCity:"Rome",toCountry:"Italy",toICAO:"LIRF",durationMinutes:120},
+  {fromCity:"Munich",fromCountry:"Germany",fromICAO:"EDDM",toCity:"Zurich",toCountry:"Switzerland",toICAO:"LSZH",durationMinutes:55}
+];
 
-    /* UI refs */
-    const openBtn = document.getElementById('open-btn');
-    const demoBtn = document.getElementById('demo-btn');
-    const mainCard = document.getElementById('main-card');
-    const airlinesWrap = document.getElementById('airlines');
-    const durationsWrap = document.getElementById('durations');
-    const genBtn = document.getElementById('gen-btn');
-    const backBtn = document.getElementById('back-btn');
-    const resultEl = document.getElementById('result');
+const DURATIONS = [
+  {label:"1-2ч",min:60,max:120},
+  {label:"3-4ч",min:180,max:240},
+  {label:"5-6ч",min:300,max:360},
+  {label:"7-8ч",min:420,max:480},
+  {label:"9-10ч",min:540,max:600},
+  {label:"10+ч",min:601,max:1200}
+];
 
-    let chosenAirIdx = null;
-    let chosenDurIdx = null;
+/* REFS */
+const openBtn = document.getElementById('open-btn');
+const demoBtn = document.getElementById('demo-btn');
+const mainCard = document.getElementById('main-card');
+const airlinesWrap = document.getElementById('airlines');
+const durationsWrap = document.getElementById('durations');
+const genBtn = document.getElementById('gen-btn');
+const backBtn = document.getElementById('back-btn');
+const resultEl = document.getElementById('result');
 
-    /* helpers */
-    function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-    function pad(n){ return String(n).padStart(2,'0'); }
-    function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+let chosenAirIdx = null;
+let chosenDurIdx = null;
 
-    /* render functions */
-    function renderAirlines(){
-      airlinesWrap.innerHTML = '';
-      AIRLINES.forEach((a,i) => {
-        const node = document.createElement('div');
-        node.className = 'option';
-        node.tabIndex = 0;
-        node.innerHTML = `<div class="icon">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
-                          <div class="meta"><div class="name">${esc(a.name)}</div><div class="sub">Хабы: ${a.hubs.join(', ')}</div></div>`;
-        node.onclick = () => selectAir(i);
-        node.onkeypress = (e)=>{ if(e.key==='Enter') selectAir(i); };
-        airlinesWrap.appendChild(node);
-      });
-    }
+/* HELPERS */
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pad(n){ return String(n).padStart(2,'0'); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-    function renderDurations(){
-      durationsWrap.innerHTML = '';
-      DURATIONS.forEach((d,i) => {
-        const avg = Math.round(((d.min + d.max) / 2) / 60);
-        const node = document.createElement('div');
-        node.className = 'option';
-        node.tabIndex = 0;
-        node.innerHTML = `<div class="icon">⌛</div><div class="meta"><div class="name">${esc(d.label)}</div><div class="sub">~ ${avg} ч</div></div>`;
-        node.onclick = () => selectDur(i);
-        node.onkeypress = (e)=>{ if(e.key==='Enter') selectDur(i); };
-        durationsWrap.appendChild(node);
-      });
-    }
+/* RENDER */
+function renderAirlines(){
+  airlinesWrap.innerHTML = '';
+  AIRLINES.forEach((a,i) => {
+    const node = document.createElement('div');
+    node.className = 'option';
+    node.tabIndex = 0;
+    node.innerHTML = `<div class="icon">${a.name.split(' ').map(s=>s[0]||'').slice(0,2).join('')}</div>
+                      <div class="meta"><div class="name">${esc(a.name)}</div><div class="sub">Хабы: ${a.hubs.join(', ')}</div></div>`;
+    node.onclick = () => selectAir(i);
+    node.onkeypress = (e)=>{ if(e.key==='Enter') selectAir(i); };
+    airlinesWrap.appendChild(node);
+  });
+}
+function renderDurations(){
+  durationsWrap.innerHTML = '';
+  DURATIONS.forEach((d,i) => {
+    const avg = Math.round(((d.min + d.max) / 2) / 60);
+    const node = document.createElement('div');
+    node.className = 'option';
+    node.tabIndex = 0;
+    node.innerHTML = `<div class="icon">⌛</div>
+                      <div class="meta"><div class="name">${esc(d.label)}</div><div class="sub">~ ${avg} ч</div></div>`;
+    node.onclick = () => selectDur(i);
+    node.onkeypress = (e)=>{ if(e.key==='Enter') selectDur(i); };
+    durationsWrap.appendChild(node);
+  });
+}
 
-    function selectAir(i){
-      chosenAirIdx = i;
-      Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-      hideResult();
-    }
-    function selectDur(i){
-      chosenDurIdx = i;
-      Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
-      hideResult();
-    }
+/* SELECT */
+function selectAir(i){
+  chosenAirIdx = i;
+  Array.from(airlinesWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
+  hideResult();
+}
+function selectDur(i){
+  chosenDurIdx = i;
+  Array.from(durationsWrap.children).forEach((n,idx)=> n.classList.toggle('selected', idx===i));
+  hideResult();
+}
+function hideResult(){ resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
 
-    function hideResult(){ resultEl.style.display = 'none'; resultEl.innerHTML = ''; }
+/* CORE */
+function generateFlight(){
+  if(chosenAirIdx === null || chosenDurIdx === null){
+    alert('Выберите авиакомпанию и длительность');
+    return;
+  }
+  const airline = AIRLINES[chosenAirIdx];
+  const duration = DURATIONS[chosenDurIdx];
 
-    function generateFlight(){
-      if(chosenAirIdx === null || chosenDurIdx === null){
-        alert('Выберите авиакомпанию и длительность');
-        return;
-      }
-      const airline = AIRLINES[chosenAirIdx];
-      const duration = DURATIONS[chosenDurIdx];
-      const filtered = ROUTES.filter(r => airline.hubs.includes(r.fromICAO));
-      if(filtered.length === 0){
-        resultEl.style.display = 'block';
-        resultEl.innerHTML = `<div class="r-row"><div class="r-label">Ошибка</div><div class="r-val">Нет маршрутов из хабов ${esc(airline.name)}. Добавьте маршруты в DATA.</div></div>`;
-        return;
-      }
-      const route = filtered[randInt(0, filtered.length-1)];
-      // priority: chosen duration -> durationMinutes only if no chosen duration
-      let minutes = randInt(duration.min, duration.max);
-      // route.durationMinutes is used only if no chosen duration (but chosenDurIdx is never null here).
-      const hh = Math.floor(minutes/60), mm = minutes % 60;
-      const time = pad(hh) + ':' + pad(mm);
+  // маршруты из хабов выбранной авиакомпании
+  const filtered = ROUTES.filter(r => airline.hubs.includes(r.fromICAO));
+  if(filtered.length === 0){
+    resultEl.style.display = 'block';
+    resultEl.innerHTML = `<div class="r-row"><div class="r-label">Ошибка</div><div class="r-val">Нет маршрутов из хабов ${esc(airline.name)}. Добавьте маршруты в DATA.</div></div>`;
+    return;
+  }
 
-      resultEl.style.display = 'block';
-      resultEl.innerHTML = `
-        <div class="result-grid">
-          <div class="r-row"><div class="r-label">Авиакомпания</div><div class="r-val">${esc(airline.name)}</div></div>
-          <div class="r-row"><div class="r-label">Время</div><div class="r-val r-flight">${time}</div></div>
+  // случайный маршрут
+  const route = filtered[randInt(0, filtered.length-1)];
 
-          <div class="r-row"><div class="r-label">Отправление</div><div class="r-val">${esc(route.fromCity)}</div></div>
-          <div class="r-row"><div class="r-label">Прибытие</div><div class="r-val">${esc(route.toCity)}</div></div>
+  // приоритет времени: выбранный интервал -> durationMinutes -> запасной
+  let minutes;
+  if (typeof chosenDurIdx === 'number') {
+    minutes = randInt(duration.min, duration.max);
+  } else if (route.durationMinutes !== undefined && Number.isFinite(route.durationMinutes)) {
+    minutes = Math.round(route.durationMinutes);
+  } else {
+    minutes = randInt(60, 240);
+  }
 
-          <div class="r-row"><div class="r-label">ICAO отправления</div><div class="r-val r-icao">${esc(route.fromICAO)}</div></div>
-          <div class="r-row"><div class="r-label">ICAO прибытия</div><div class="r-val r-icao">${esc(route.toICAO)}</div></div>
+  const hh = Math.floor(minutes/60), mm = minutes % 60;
+  const time = pad(hh) + ':' + pad(mm);
 
-          <div style="grid-column:1 / -1; margin-top:6px;"><div class="r-label">Источник времени</div><div class="r-val">${'Выбранный интервал'}</div></div>
-        </div>
-      `;
-      resultEl.classList.add('fade-in');
-      resultEl.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
+  // результат
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `
+    <div class="result-grid">
+      <div class="r-row"><div class="r-label">Авиакомпания</div><div class="r-val">${esc(airline.name)}</div></div>
+      <div class="r-row"><div class="r-label">Время</div><div class="r-val r-flight">${time}</div></div>
 
-    /* navigation */
-    openBtn.addEventListener('click', () => { document.querySelector('.hero').style.display='none'; mainCard.style.display='block'; renderAirlines(); renderDurations(); window.scrollTo({top:0,behavior:'smooth'}); });
-    demoBtn.addEventListener('click', () => { document.querySelector('.hero').style.display='none'; mainCard.style.display='block'; renderAirlines(); renderDurations(); selectAir(0); selectDur(0); });
-    backBtn.addEventListener('click', () => { mainCard.style.display='none'; document.querySelector('.hero').style.display='flex'; chosenAirIdx=null; chosenDurIdx=null; hideResult(); });
+      <div class="r-row"><div class="r-label">Отправление</div><div class="r-val">${esc(route.fromCity)}</div></div>
+      <div class="r-row"><div class="r-label">Прибытие</div><div class="r-val">${esc(route.toCity)}</div></div>
 
-    genBtn.addEventListener('click', generateFlight);
+      <div class="r-row"><div class="r-label">ICAO отправления</div><div class="r-val r-icao">${esc(route.fromICAO)}</div></div>
+      <div class="r-row"><div class="r-label">ICAO прибытия</div><div class="r-val r-icao">${esc(route.toICAO)}</div></div>
 
-    // init
-    (function init(){ renderAirlines(); renderDurations(); })();
-  </script>
+      <div class="r-row" style="grid-column:1 / -1"><div class="r-label">Источник времени</div><div class="r-val">${typeof chosenDurIdx === 'number' ? 'Выбранный интервал' : (route.durationMinutes ? 'durationMinutes в DATA' : 'случайный диапазон')}</div></div>
+    </div>
+  `;
+}
+
+/* NAV */
+openBtn.addEventListener('click', () => {
+  document.querySelector('.hero').style.display='none';
+  mainCard.style.display='block';
+  renderAirlines(); renderDurations();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+demoBtn.addEventListener('click', () => {
+  document.querySelector('.hero').style.display='none';
+  mainCard.style.display='block';
+  renderAirlines(); renderDurations();
+  selectAir(0); // Lufthansa
+  selectDur(3); // 7-8ч
+});
+backBtn.addEventListener('click', () => {
+  mainCard.style.display='none';
+  document.querySelector('.hero').style.display='flex';
+  chosenAirIdx=null; chosenDurIdx=null; hideResult();
+  Array.from(airlinesWrap.children).forEach(n=>n.classList.remove('selected'));
+  Array.from(durationsWrap.children).forEach(n=>n.classList.remove('selected'));
+});
+
+/* ACTION */
+genBtn.addEventListener('click', generateFlight);
+
+/* INIT (для десктоп предпросмотра без клика можно раскомментировать) */
+// renderAirlines(); renderDurations();
+</script>
 </body>
 </html>
