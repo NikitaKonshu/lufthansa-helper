@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — confirm flight</title>
+  <title>Lufthansa Group Virtual — confirm shows flight</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
@@ -59,6 +59,9 @@
     .res-value{font-weight:800}
     .res-actions{display:flex;gap:8px;margin-top:12px;align-items:center}
     .muted{color:var(--muted)}
+    .confirmed-card{margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(180deg,#062733,#043c45);border:1px solid rgba(255,255,255,0.04)}
+    .confirmed-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .confirmed-title{font-weight:900;color:#bff2be}
     @media(max-width:520px){.res-body{grid-template-columns:1fr}}
   </style>
 </head>
@@ -69,7 +72,7 @@
         <div class="logo">LH</div>
         <div>
           <h1>Lufthansa Group Virtual</h1>
-          <div class="subtitle">Подтверждение полёта и блокировка самолёта</div>
+          <div class="subtitle">Подтверждение полёта — показ данных рейса</div>
         </div>
       </div>
       <div>
@@ -82,7 +85,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">Теперь требуется подтверждение полёта: сначала резерв, потом подтверждение</div>
+          <div class="small" style="margin-top:6px">После подтверждения показываются полные данные рейса</div>
         </div>
         <div class="small">Демо-данные</div>
       </div>
@@ -135,6 +138,9 @@
         </aside>
       </div>
     </section>
+
+    <!-- подтверждённый рейс -->
+    <section id="confirmedSection" style="max-width:1200px;margin-top:12px"></section>
   </div>
 
 <script>
@@ -197,7 +203,7 @@ const FLEET_LOG = [];
 /* ---------------- STATE for reservation UI ---------------- */
 let chosenAirIndex = null;
 let chosenDur = null;
-let lastGenerated = null; // holds { route, aircraftCandidate, reservationToken } or null
+let lastGenerated = null; // { route, aircraftId, token }
 
 /* ---------------- HELPERS ---------------- */
 function esc(s){ return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -206,7 +212,7 @@ function pad(n){ return String(n).padStart(2,'0'); }
 function getAirportInfo(icao){ return AIRPORTS[icao] || null; }
 function nowMs(){ return Date.now(); }
 
-/* ---------------- RENDER basic UI ---------------- */
+/* ---------------- UI refs ---------------- */
 const airlinesWrap = document.getElementById('airlines');
 const durationsWrap = document.getElementById('durations');
 const genBtn = document.getElementById('gen');
@@ -220,6 +226,7 @@ const showFleetLogBtn = document.getElementById('showFleetLog');
 const assignLogEl = document.getElementById('assignLog');
 const clearLogBtn = document.getElementById('clearLog');
 const selectedInfo = document.getElementById('selectedInfo');
+const confirmedSection = document.getElementById('confirmedSection');
 
 /* ---------------- DURATIONS ---------------- */
 const DURATIONS = [
@@ -243,7 +250,7 @@ function renderDurations(){
   });
 }
 
-/* ---------------- AIRLINES ---------------- */
+/* ---------------- AIRLINES render ---------------- */
 function renderAirlines(){
   const copy = AIRLINES.map((a,idx)=> Object.assign({ __origIndex: idx }, a)).sort((a,b)=> a.name.localeCompare(b.name,'ru'));
   const groups = {};
@@ -270,7 +277,6 @@ function renderAirlines(){
       const item = document.createElement('div'); item.className='airline-item';
       item.dataset.origIndex = String(a.__origIndex);
       item.dataset.hubs = a.hubs.map(h=>h.toUpperCase()).join(',');
-      // enable/disable based on routes/hubs
       const hasExplicit = ROUTES.some(r=> String(r.airline||'').toLowerCase() === String(a.name||'').toLowerCase());
       const hasHubRoute = a.hubs.some(h=> ROUTES.some(r=> (r.fromICAO||'').toUpperCase() === String(h).toUpperCase() ));
       if(!hasExplicit && !hasHubRoute) item.classList.add('disabled');
@@ -296,7 +302,7 @@ function renderAirlines(){
   });
 }
 
-/* ---------------- FLEET render (shows reserved/inFlight states) ---------------- */
+/* ---------------- FLEET render ---------------- */
 function renderFleetList(){
   fleetListEl.innerHTML = '';
   const now = nowMs();
@@ -316,7 +322,8 @@ function renderFleetList(){
     const status = document.createElement('div');
 
     if(ac.status === 'inFlight'){
-      status.innerHTML = `<span class="status-badge" style="background:#603f00;color:#fff0b8">inFlight</span>`;
+      const remaining = ac.availableAt ? Math.max(0, Math.ceil((ac.availableAt - now)/1000)) : 'n/a';
+      status.innerHTML = `<span class="status-badge" style="background:#603f00;color:#fff0b8">inFlight • ${remaining}s</span>`;
     } else if(ac.status === 'reserved'){
       const remaining = ac.reservedUntil ? Math.max(0, Math.ceil((ac.reservedUntil - now)/1000)) : 0;
       status.innerHTML = `<span class="reserved-badge">reserved • ${remaining}s</span>`;
@@ -330,17 +337,7 @@ function renderFleetList(){
   });
 }
 
-/* ---------------- Reservation / Confirm flow ---------------- */
-/*
- Flow:
-  - generateFlight chooses route and picks a candidate aircraft (but does not immediately mark inFlight)
-  - reserveAircraft(ac, userToken, ttl) sets ac.status='reserved', ac.reservedBy, ac.reservedUntil
-  - UI shows Confirm and Cancel buttons with countdown
-  - confirmReserved(token) verifies reservation owner and finalizes: ac.status='inFlight', sets availableAt
-  - reservations expire automatically (interval checks)
-*/
-
-// Simple local "user" token (in real app use authenticated user id)
+/* ---------------- Reservation / Confirm flow (same as before) ---------------- */
 const LOCAL_USER_ID = 'user_' + Math.random().toString(36).slice(2,8);
 const RESERVATION_TTL_MS = 120 * 1000; // 2 minutes
 
@@ -358,8 +355,6 @@ function reserveAircraft(ac, ownerId, ttlMs = RESERVATION_TTL_MS){
 function cancelReservationByToken(token){
   const ac = FLEET.find(a => a.reservedToken === token);
   if(!ac) return false;
-  if(ac.reservedBy && !token) return false;
-  // clear
   delete ac.reservedBy; delete ac.reservedToken; delete ac.reservedUntil;
   ac.status = 'idle';
   renderFleetList();
@@ -368,26 +363,24 @@ function cancelReservationByToken(token){
 }
 
 function confirmReservation(token, route){
-  // token must match ac.reservedToken
   const ac = FLEET.find(a => a.reservedToken === token);
   if(!ac) return { ok:false, reason:'no_reservation' };
   if(ac.reservedToken !== token) return { ok:false, reason:'token_mismatch' };
-  // finalize assign
   const now = nowMs();
   const durationMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
   ac.status = 'inFlight';
   ac.availableAt = now + durationMs + ac.turnaround*60*1000;
   ac.nextLocation = route.toICAO;
-  // clear reservation fields
   delete ac.reservedBy; delete ac.reservedToken; delete ac.reservedUntil;
-  // log
   FLEET_LOG.push({ ts: now, event:'assign_confirmed', aircraft: ac.id, route: `${route.fromICAO}->${route.toICAO}`, durationMin: route.durationMinutes });
   renderFleetList();
   renderAssignLog();
+  // show confirmed flight card
+  renderConfirmedFlight(ac, route);
   return { ok:true, aircraft: ac };
 }
 
-/* Cleaner: expire reservations whose reservedUntil < now */
+/* expire reservations and complete inFlight -> idle transitions */
 function expireReservations(){
   const now = nowMs();
   let changed = false;
@@ -398,7 +391,6 @@ function expireReservations(){
       FLEET_LOG.push({ ts: now, event: 'reservation_expired', aircraft: ac.id });
       changed = true;
     }
-    // return inFlight->idle when availableAt passed
     if(ac.status === 'inFlight' && ac.availableAt && ac.availableAt <= now){
       ac.status = 'idle';
       if(ac.nextLocation) ac.locationICAO = ac.nextLocation;
@@ -410,14 +402,12 @@ function expireReservations(){
   if(changed) { renderFleetList(); renderAssignLog(); }
 }
 
-/* ---------------- Generate flight (now reserves candidate) ---------------- */
+/* ---------------- Generate flight (reserves candidate) ---------------- */
 function generateFlight(){
   if(chosenAirIndex===null){ alert('Выберите авиакомпанию'); return; }
   if(chosenDur===null){ alert('Выберите длительность'); return; }
   const airlineName = AIRLINES[chosenAirIndex].name;
-  // priority: explicit airline routes
   let pool = ROUTES.filter(r => String(r.airline||'').toLowerCase() === String(airlineName).toLowerCase());
-  // fallback: by hubs
   if(pool.length === 0){
     const hubs = AIRLINES[chosenAirIndex].hubs.map(h=>String(h).toUpperCase());
     pool = ROUTES.filter(r => hubs.includes((r.fromICAO||'').toUpperCase()));
@@ -427,14 +417,12 @@ function generateFlight(){
     resultEl.innerHTML = `<div class="res-header"><div class="res-title">Нет маршрутов</div></div><div class="res-body"><div class="res-row"><div class="res-label">Авиакомпания</div><div class="res-value">${esc(airlineName)}</div></div><div class="res-row"><div class="res-label">Причина</div><div class="res-value">Нет маршрутов</div></div></div>`;
     return;
   }
-  // apply duration filter
   if(typeof chosenDur === 'number'){
     const interval = DURATIONS[chosenDur];
     const filtered = pool.filter(r => Number.isFinite(r.durationMinutes) && r.durationMinutes >= interval.min && r.durationMinutes <= interval.max);
     if(filtered.length>0) pool = filtered;
   }
   const route = pool[randInt(0, pool.length-1)];
-  // find candidate AC (must be at origin and idle)
   const now = nowMs();
   const candidates = FLEET.filter(ac => (ac.locationICAO||'').toUpperCase() === (route.fromICAO||'').toUpperCase() && ac.status === 'idle');
   if(candidates.length === 0){
@@ -442,30 +430,24 @@ function generateFlight(){
     resultEl.innerHTML = `<div class="res-header"><div class="res-title">Нет свободных самолётов</div></div><div class="res-body"><div class="res-row"><div class="res-label">Отправление</div><div class="res-value">${esc(route.fromCity)} (${esc(route.fromICAO)})</div></div><div class="res-row"><div class="res-label">Причина</div><div class="res-value">Нет доступных idle самолётов в этом хабе</div></div></div>`;
     return;
   }
-  // choose best candidate (by seat closeness to 180)
   candidates.sort((a,b)=> Math.abs(a.seats-180)-Math.abs(b.seats-180));
   const candidate = candidates[0];
-
-  // reserve candidate
   const reserveRes = reserveAircraft(candidate, LOCAL_USER_ID);
   if(!reserveRes.ok){
     resultEl.style.display='block';
     resultEl.innerHTML = `<div class="res-header"><div class="res-title">Ошибка резервирования</div></div><div class="res-body"><div class="res-row"><div class="res-label">Причина</div><div class="res-value">Не удалось зарезервировать самолёт (${reserveRes.reason})</div></div></div>`;
     return;
   }
-
-  // save lastGenerated to let Confirm/Canel operate
-  lastGenerated = { route, aircraftId: candidate.id, token: reserveRes.token };
-
-  // render result with Confirm / Cancel and countdown
+  lastGenerated = { route, aircraftId: candidate.id, token: reserveRes.token, reservedAt: nowMs() };
   renderReservationResult(lastGenerated);
   renderFleetList();
 }
 
-/* ---------------- Render reservation card with actions ---------------- */
+/* ---------------- reservation result card ---------------- */
 function renderReservationResult(gen){
   if(!gen){ resultEl.style.display='none'; resultEl.innerHTML=''; return; }
   const ac = FLEET.find(a => a.id === gen.aircraftId);
+  if(!ac){ resultEl.style.display='none'; resultEl.innerHTML=''; return; }
   const route = gen.route;
   const token = gen.token;
   const remaining = ac.reservedUntil ? Math.max(0, Math.ceil((ac.reservedUntil - nowMs())/1000)) : 0;
@@ -489,7 +471,6 @@ function renderReservationResult(gen){
       <div class="muted">Резерв истечёт через <span id="reserveCountdown">${remaining}</span> с</div>
     </div>
   `;
-  // wire actions
   document.getElementById('confirmBtn').onclick = ()=> {
     const res = confirmReservation(token, route);
     if(!res.ok){ alert('Не удалось подтвердить: ' + (res.reason || 'unknown')); return; }
@@ -503,14 +484,62 @@ function renderReservationResult(gen){
   };
 }
 
-/* ---------------- Utility: format HH:MM ---------------- */
+/* ---------------- render confirmed flight (new) ---------------- */
+function renderConfirmedFlight(ac, route){
+  // clear previous confirmed section for simplicity (could support multiple)
+  confirmedSection.innerHTML = '';
+  const now = nowMs();
+  const departTime = new Date(now).toLocaleString();
+  const flightMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
+  const eta = new Date(now + flightMs).toLocaleString();
+  const expectedArrival = route.toICAO + (getAirportInfo(route.toICAO) ? ' · ' + getAirportInfo(route.toICAO).city : '');
+  const div = document.createElement('div');
+  div.className = 'confirmed-card';
+  div.innerHTML = `
+    <div class="confirmed-header"><div class="confirmed-title">Рейс подтверждён</div><div style="margin-left:auto;color:var(--muted)">Самолёт: ${esc(ac.id)}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Авиакомпания</div>
+        <div style="font-weight:900">${esc(AIRLINES[chosenAirIndex].name)}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Статус</div>
+        <div style="font-weight:900;color:#bff2be">inFlight</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Отправление</div>
+        <div style="font-weight:900">${esc(route.fromCity)} <span style="color:var(--accent)">(${esc(route.fromICAO)})</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Время отправления</div>
+        <div style="font-weight:700">${esc(departTime)}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Прибытие</div>
+        <div style="font-weight:900">${esc(route.toCity)} <span style="color:var(--accent)">(${esc(route.toICAO)})</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Ожидаемое прибытие</div>
+        <div style="font-weight:700">${esc(eta)}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Длительность</div>
+        <div style="font-weight:900">${formatDuration(route.durationMinutes)}</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Местоположение самолёта</div>
+        <div style="font-weight:900">${esc(ac.locationICAO)} → ${esc(ac.nextLocation || route.toICAO)}</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;color:var(--muted);font-size:13px">Лог: запись добавлена в журнал назначений</div>
+  `;
+  confirmedSection.appendChild(div);
+}
+
+/* ---------------- Utility ---------------- */
 function formatDuration(min){
   if(!Number.isFinite(min)) return 'n/a';
   const hh = Math.floor(min/60), mm = min%60;
   return pad(hh) + ':' + pad(mm);
 }
 
-/* ---------------- assignment helpers (previous logic reused) ---------------- */
+/* ---------------- assignment helpers ---------------- */
 function estimateDistanceKm(fromICAO, toICAO){
   const a=getAirportInfo(fromICAO), b=getAirportInfo(toICAO);
   if(!a||!b||!a.lat||!b.lat) return null;
@@ -526,7 +555,7 @@ function findSuitableAircraftSmart(route, nowTs=Date.now()){
   const safety = 0.95;
   const basePool = FLEET.filter(ac=>{
     if(ac.status === 'inFlight' && ac.availableAt > nowTs) return false;
-    if(ac.status === 'reserved') return false; // do not consider reserved AC
+    if(ac.status === 'reserved') return false;
     if((ac.locationICAO||'').toUpperCase() !== (route.fromICAO||'').toUpperCase()) return false;
     if(distanceKm === null) return true;
     return ac.rangeKm * safety >= distanceKm;
@@ -543,7 +572,6 @@ function assignAircraftToRouteSmart(route){
     return { ok:false, reason:'no_suitable', distanceKm };
   }
   const ac = candidates[0];
-  // immediate assign (used only by some flows; generateFlight uses reserve first)
   const durationMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
   ac.status = 'inFlight';
   ac.availableAt = now + durationMs + ac.turnaround*60*1000;
@@ -553,7 +581,6 @@ function assignAircraftToRouteSmart(route){
   renderAssignLog();
   return { ok:true, aircraft: ac, distanceKm };
 }
-
 function renderAssignLog(){
   const items = FLEET_LOG.slice(-20).reverse();
   if(items.length===0){ assignLogEl.textContent='Пока пусто'; return; }
@@ -571,14 +598,12 @@ function renderAssignLog(){
 /* ---------------- housekeeping interval ---------------- */
 setInterval(()=>{
   expireReservations();
-  // refresh reservation countdown in card & fleet display
   if(lastGenerated){
     const ac = FLEET.find(a=>a.id === lastGenerated.aircraftId);
     if(ac && ac.reservedUntil){
       const el = document.getElementById('reserveCountdown');
       if(el) el.textContent = Math.max(0, Math.ceil((ac.reservedUntil - nowMs())/1000));
     } else {
-      // reservation disappeared (expired or canceled) — clear UI
       lastGenerated = null;
       renderReservationResult(null);
     }
@@ -590,7 +615,6 @@ function selectAir(origIndex){
   chosenAirIndex = origIndex;
   selectedInfo.textContent = AIRLINES[origIndex].name + ' · ' + AIRLINES[origIndex].hubs.join(',');
   document.querySelectorAll('.airline-item').forEach(n=> n.classList.toggle('selected', Number(n.dataset.origIndex)===origIndex) );
-  // expand groups matching airline hubs
   document.querySelectorAll('.airline-group').forEach(group=>{
     const badge = group.querySelector('.airline-badge');
     const hubCode = badge ? badge.textContent.trim().toUpperCase() : '';
@@ -615,7 +639,6 @@ function selectDur(i){
 }
 
 document.getElementById('gen').addEventListener('click', ()=> {
-  // ensure previous reservation by the same user is canceled before creating new one
   if(lastGenerated && lastGenerated.token){
     if(!confirm('У вас уже есть активный резерв. Создать новый резерв отменит старый?')) return;
     cancelReservationByToken(lastGenerated.token);
@@ -625,7 +648,7 @@ document.getElementById('gen').addEventListener('click', ()=> {
   generateFlight();
 });
 document.getElementById('demo').addEventListener('click', ()=>{ const idx=AIRLINES.findIndex(a=>a.name==='SunExpress'); if(idx>=0){ selectAir(idx); selectDur(2); } generateFlight(); });
-document.getElementById('reset').addEventListener('click', ()=>{ chosenAirIndex=null; chosenDur=null; lastGenerated=null; selectedInfo.textContent='—'; document.querySelectorAll('.airline-item').forEach(n=>n.classList.remove('selected')); document.querySelectorAll('#durations .opt').forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; });
+document.getElementById('reset').addEventListener('click', ()=>{ chosenAirIndex=null; chosenDur=null; lastGenerated=null; selectedInfo.textContent='—'; document.querySelectorAll('.airline-item').forEach(n=>n.classList.remove('selected')); document.querySelectorAll('#durations .opt').forEach(n=>n.classList.remove('selected')); resultEl.style.display='none'; resultEl.innerHTML=''; confirmedSection.innerHTML=''; });
 refreshFleetBtn.addEventListener('click', ()=>{ renderFleetList(); renderAssignLog(); });
 showFleetLogBtn.addEventListener('click', ()=>{ console.table(FLEET_LOG.slice(-50)); alert('Лог флота в консоли'); });
 clearLogBtn && clearLogBtn.addEventListener('click', ()=>{ FLEET_LOG.length=0; renderAssignLog(); });
