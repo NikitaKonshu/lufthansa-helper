@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lufthansa Group Virtual — confirm shows flight</title>
+  <title>Lufthansa Group Virtual — expanded fleet</title>
   <meta name="color-scheme" content="dark light">
   <style>
     :root{
@@ -41,7 +41,7 @@
     .opt.selected{border-color:rgba(255,215,0,0.22);box-shadow:0 12px 30px rgba(255,215,0,0.06)}
     .icon{width:36px;height:36;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent)}
     .fleet-panel{padding:12px;border-radius:10px;background:linear-gradient(180deg,#041f2a,#03222a);border:1px solid rgba(255,255,255,0.03)}
-    .fleet-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .fleet-list{display:flex;flex-direction:column;gap:8px;margin-top:8px;max-height:520px;overflow:auto;padding-right:6px}
     .fleet-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
     .plane-type{width:56px;height:44px;border-radius:8px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;color:var(--accent)}
     .fleet-main{display:flex;flex-direction:column;min-width:0}
@@ -50,6 +50,7 @@
     .fleet-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
     .status-badge{padding:6px 8px;border-radius:8px;font-weight:800;font-size:12px}
     .reserved-badge{background:#2c2a6a;color:#dcdcff;padding:6px 8px;border-radius:8px;font-weight:800}
+    .airline-tag{font-size:11px;color:#04202a;background:#ffd700;padding:4px 8px;border-radius:999px;font-weight:700;margin-left:8px}
     .result{margin-top:12px;padding:14px;border-radius:12px;background:linear-gradient(180deg,#021923,#062733);border:1px solid rgba(255,255,255,0.03);display:none}
     .res-header{display:flex;align-items:center;gap:12px;margin-bottom:10px}
     .res-title{font-weight:900;font-size:15px;color:var(--accent)}
@@ -72,7 +73,7 @@
         <div class="logo">LH</div>
         <div>
           <h1>Lufthansa Group Virtual</h1>
-          <div class="subtitle">Подтверждение полёта — показ данных рейса</div>
+          <div class="subtitle">Expanded fleet — aircraft assigned to airlines</div>
         </div>
       </div>
       <div>
@@ -85,7 +86,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <h2 style="margin:0;color:var(--accent)">Генерация рейса</h2>
-          <div class="small" style="margin-top:6px">После подтверждения показываются полные данные рейса</div>
+          <div class="small" style="margin-top:6px">Резерв → Подтверждение. Флот разделён по авиакомпаниям</div>
         </div>
         <div class="small">Демо-данные</div>
       </div>
@@ -116,7 +117,7 @@
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div>
                 <div style="font-weight:900">Флот</div>
-                <div class="small" style="margin-top:4px">Город (ICAO) · дальность · места · статус</div>
+                <div class="small" style="margin-top:4px">Город (ICAO) · авиакомпания · дальность · места · статус</div>
               </div>
               <div style="display:flex;gap:8px">
                 <button id="refreshFleet" class="btn btn-ghost">Обновить</button>
@@ -139,7 +140,6 @@
       </div>
     </section>
 
-    <!-- подтверждённый рейс -->
     <section id="confirmedSection" style="max-width:1200px;margin-top:12px"></section>
   </div>
 
@@ -151,7 +151,9 @@ const ROUTES = [
   { airline: "SunExpress", fromCity:"Frankfurt am Main", fromICAO:"EDDF", toCity:"Antalya", toICAO:"LTAI", durationMinutes:180 },
   { airline: "Lufthansa Technik", fromCity:"Frankfurt am Main", fromICAO:"EDDF", toCity:"Milan", toICAO:"LIMC", durationMinutes:95 },
   { airline: "Lufthansa Cargo", fromCity:"Frankfurt am Main", fromICAO:"EDDF", toCity:"Dubai", toICAO:"OMDB", durationMinutes:420 },
-  { airline: "Eurowings", fromCity:"Munich", fromICAO:"EDDM", toCity:"Zurich", toICAO:"LSZH", durationMinutes:60 }
+  { airline: "Eurowings", fromCity:"Munich", fromICAO:"EDDM", toCity:"Zurich", toICAO:"LSZH", durationMinutes:60 },
+  { airline: "Brussels Airlines", fromCity:"Frankfurt am Main", fromICAO:"EDDF", toCity:"Brussels", toICAO:"EBBR", durationMinutes:75 },
+  { airline: "ITA Airways", fromCity:"Frankfurt am Main", fromICAO:"EDDF", toCity:"Rome", toICAO:"LIRF", durationMinutes:120 }
 ];
 ROUTES.forEach(r=>{ r.durationMinutes = Number.isFinite(Number(r.durationMinutes)) ? Number(r.durationMinutes) : NaN; });
 
@@ -188,19 +190,51 @@ const AIRPORTS = {
   "LTAI": { city:"Antalya", lat:36.8969, lon:30.8001 },
   "LIMC": { city:"Milan", lat:45.6301, lon:8.7231 },
   "OMDB": { city:"Dubai", lat:25.2532, lon:55.3657 },
-  "LSZH": { city:"Zurich", lat:47.4581, lon:8.5610 }
+  "LSZH": { city:"Zurich", lat:47.4581, lon:8.5610 },
+  "EBBR": { city:"Brussels", lat:50.9014, lon:4.4844 },
+  "LIRF": { city:"Rome", lat:41.8003, lon:12.2389 }
 };
 
+/* ---------------- EXPANDED FLEET (each aircraft assigned an airline) ----------------
+   - aircraft objects include .airline and .locationICAO so they visually map to carriers/hubs
+*/
 const FLEET = [
-  { id:'LH-A320-01', type:'A320', rangeKm:6100, seats:180, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
-  { id:'LH-A321-02', type:'A321', rangeKm:6100, seats:200, turnaround:40, status:'idle', locationICAO:'EDDM', availableAt:0 },
-  { id:'LH-E190-01', type:'E190', rangeKm:4000, seats:100, turnaround:30, status:'idle', locationICAO:'EDDF', availableAt:0 },
-  { id:'LH-787-01', type:'B787', rangeKm:14140, seats:270, turnaround:75, status:'idle', locationICAO:'EDDF', availableAt:0 }
+  // Lufthansa narrowbodies @ EDDF
+  { id:'LH-A320-01', airline:'Lufthansa', type:'A320', rangeKm:6100, seats:180, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
+  { id:'LH-A321-02', airline:'Lufthansa', type:'A321', rangeKm:6100, seats:200, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
+  { id:'LH-E190-01', airline:'Lufthansa CityLine', type:'E190', rangeKm:4000, seats:100, turnaround:30, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // Lufthansa longhaul @ EDDF
+  { id:'LH-787-01', airline:'Lufthansa', type:'B787', rangeKm:14140, seats:270, turnaround:75, status:'idle', locationICAO:'EDDF', availableAt:0 },
+  { id:'LH-A350-01', airline:'Lufthansa', type:'A350', rangeKm:15000, seats:300, turnaround:90, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // Lufthansa Technik (special) - based at EDDF, tech operations
+  { id:'LT-CRJ-01', airline:'Lufthansa Technik', type:'CRJ', rangeKm:2500, seats:70, turnaround:25, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // Cargo / widebody
+  { id:'LC-747F-01', airline:'Lufthansa Cargo', type:'B747F', rangeKm:8000, seats:0, turnaround:120, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // Eurowings @ EDDM and EDDF
+  { id:'EW-A320-01', airline:'Eurowings', type:'A320', rangeKm:6100, seats:180, turnaround:40, status:'idle', locationICAO:'EDDM', availableAt:0 },
+  { id:'EW-A321-02', airline:'Eurowings', type:'A321', rangeKm:6100, seats:200, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // SunExpress @ EDDF/EDDM (short/medium-haul)
+  { id:'SX-B737-01', airline:'SunExpress', type:'737-800', rangeKm:5600, seats:189, turnaround:35, status:'idle', locationICAO:'EDDF', availableAt:0 },
+  { id:'SX-B737-02', airline:'SunExpress', type:'737-800', rangeKm:5600, seats:189, turnaround:35, status:'idle', locationICAO:'EDDM', availableAt:0 },
+
+  // Brussels Airlines @ EDDF (operates from FRA too)
+  { id:'SN-A320-01', airline:'Brussels Airlines', type:'A320', rangeKm:6100, seats:180, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // ITA Airways
+  { id:'AZ-A320-01', airline:'ITA Airways', type:'A320', rangeKm:6100, seats:180, turnaround:40, status:'idle', locationICAO:'EDDF', availableAt:0 },
+
+  // Small regional AirDolomiti @ EDDM
+  { id:'AD-CRJ-01', airline:'AirDolomiti', type:'CRJ', rangeKm:2500, seats:90, turnaround:30, status:'idle', locationICAO:'EDDM', availableAt:0 }
 ];
 
 const FLEET_LOG = [];
 
-/* ---------------- STATE for reservation UI ---------------- */
+/* ---------------- STATE ---------------- */
 let chosenAirIndex = null;
 let chosenDur = null;
 let lastGenerated = null; // { route, aircraftId, token }
@@ -302,7 +336,7 @@ function renderAirlines(){
   });
 }
 
-/* ---------------- FLEET render ---------------- */
+/* ---------------- FLEET render (shows airline tag) ---------------- */
 function renderFleetList(){
   fleetListEl.innerHTML = '';
   const now = nowMs();
@@ -315,7 +349,12 @@ function renderFleetList(){
     const sub = document.createElement('div'); sub.className='fleet-sub';
     const info=getAirportInfo(ac.locationICAO);
     sub.textContent = info? `${info.city} (${ac.locationICAO})` : ac.locationICAO;
-    main.appendChild(nm); main.appendChild(sub); left.appendChild(typeBox); left.appendChild(main);
+    main.appendChild(nm);
+    // airline tag
+    const tag = document.createElement('span'); tag.className='airline-tag'; tag.textContent = ac.airline || '—';
+    const subWrap = document.createElement('div'); subWrap.style.display='flex'; subWrap.style.alignItems='center'; subWrap.appendChild(sub); subWrap.appendChild(tag);
+    main.appendChild(subWrap);
+    left.appendChild(typeBox); left.appendChild(main);
 
     const right = document.createElement('div'); right.className='fleet-right';
     const meta = document.createElement('div'); meta.className='fleet-meta'; meta.textContent = `${ac.rangeKm} km · ${ac.seats} seats`;
@@ -337,7 +376,7 @@ function renderFleetList(){
   });
 }
 
-/* ---------------- Reservation / Confirm flow (same as before) ---------------- */
+/* ---------------- Reservation / Confirm flow ---------------- */
 const LOCAL_USER_ID = 'user_' + Math.random().toString(36).slice(2,8);
 const RESERVATION_TTL_MS = 120 * 1000; // 2 minutes
 
@@ -375,12 +414,11 @@ function confirmReservation(token, route){
   FLEET_LOG.push({ ts: now, event:'assign_confirmed', aircraft: ac.id, route: `${route.fromICAO}->${route.toICAO}`, durationMin: route.durationMinutes });
   renderFleetList();
   renderAssignLog();
-  // show confirmed flight card
   renderConfirmedFlight(ac, route);
   return { ok:true, aircraft: ac };
 }
 
-/* expire reservations and complete inFlight -> idle transitions */
+/* ---------------- expire reservations & complete flights ---------------- */
 function expireReservations(){
   const now = nowMs();
   let changed = false;
@@ -407,7 +445,9 @@ function generateFlight(){
   if(chosenAirIndex===null){ alert('Выберите авиакомпанию'); return; }
   if(chosenDur===null){ alert('Выберите длительность'); return; }
   const airlineName = AIRLINES[chosenAirIndex].name;
+  // primary: explicit airline routes
   let pool = ROUTES.filter(r => String(r.airline||'').toLowerCase() === String(airlineName).toLowerCase());
+  // fallback: by hubs
   if(pool.length === 0){
     const hubs = AIRLINES[chosenAirIndex].hubs.map(h=>String(h).toUpperCase());
     pool = ROUTES.filter(r => hubs.includes((r.fromICAO||'').toUpperCase()));
@@ -424,12 +464,17 @@ function generateFlight(){
   }
   const route = pool[randInt(0, pool.length-1)];
   const now = nowMs();
-  const candidates = FLEET.filter(ac => (ac.locationICAO||'').toUpperCase() === (route.fromICAO||'').toUpperCase() && ac.status === 'idle');
+  // prioritise aircraft of same airline at hub, then any idle at hub
+  let candidates = FLEET.filter(ac => (ac.locationICAO||'').toUpperCase() === (route.fromICAO||'').toUpperCase() && ac.status === 'idle' && ac.airline && ac.airline.toLowerCase() === airlineName.toLowerCase());
+  if(candidates.length === 0){
+    candidates = FLEET.filter(ac => (ac.locationICAO||'').toUpperCase() === (route.fromICAO||'').toUpperCase() && ac.status === 'idle');
+  }
   if(candidates.length === 0){
     resultEl.style.display='block';
     resultEl.innerHTML = `<div class="res-header"><div class="res-title">Нет свободных самолётов</div></div><div class="res-body"><div class="res-row"><div class="res-label">Отправление</div><div class="res-value">${esc(route.fromCity)} (${esc(route.fromICAO)})</div></div><div class="res-row"><div class="res-label">Причина</div><div class="res-value">Нет доступных idle самолётов в этом хабе</div></div></div>`;
     return;
   }
+  // choose best candidate (seat closeness)
   candidates.sort((a,b)=> Math.abs(a.seats-180)-Math.abs(b.seats-180));
   const candidate = candidates[0];
   const reserveRes = reserveAircraft(candidate, LOCAL_USER_ID);
@@ -462,7 +507,7 @@ function renderReservationResult(gen){
       <div class="res-row"><div class="res-label">Отправление</div><div class="res-value">${esc(route.fromCity)} <span style="color:var(--accent)">(${esc(route.fromICAO)})</span></div></div>
       <div class="res-row"><div class="res-label">Прибытие</div><div class="res-value">${esc(route.toCity)} <span style="color:var(--accent)">(${esc(route.toICAO)})</span></div></div>
       <div class="res-row"><div class="res-label">Время в полёте</div><div class="res-value">${formatDuration(route.durationMinutes)}</div></div>
-      <div class="res-row"><div class="res-label">Резервированный самолёт</div><div class="res-value">${esc(ac.id)} · ${esc(ac.type)}</div></div>
+      <div class="res-row"><div class="res-label">Резервированный самолёт</div><div class="res-value">${esc(ac.id)} · ${esc(ac.type)} · <span style="font-weight:700">${esc(ac.airline)}</span></div></div>
     </div>
     <div class="res-actions">
       <button id="confirmBtn" class="btn btn-primary">Подтвердить полёт</button>
@@ -484,19 +529,17 @@ function renderReservationResult(gen){
   };
 }
 
-/* ---------------- render confirmed flight (new) ---------------- */
+/* ---------------- render confirmed flight ---------------- */
 function renderConfirmedFlight(ac, route){
-  // clear previous confirmed section for simplicity (could support multiple)
   confirmedSection.innerHTML = '';
   const now = nowMs();
   const departTime = new Date(now).toLocaleString();
   const flightMs = (Number(route.durationMinutes) || 120) * 60 * 1000;
   const eta = new Date(now + flightMs).toLocaleString();
-  const expectedArrival = route.toICAO + (getAirportInfo(route.toICAO) ? ' · ' + getAirportInfo(route.toICAO).city : '');
   const div = document.createElement('div');
   div.className = 'confirmed-card';
   div.innerHTML = `
-    <div class="confirmed-header"><div class="confirmed-title">Рейс подтверждён</div><div style="margin-left:auto;color:var(--muted)">Самолёт: ${esc(ac.id)}</div></div>
+    <div class="confirmed-header"><div class="confirmed-title">Рейс подтверждён</div><div style="margin-left:auto;color:var(--muted)">Самолёт: ${esc(ac.id)} · ${esc(ac.airline)}</div></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <div>
         <div style="font-size:12px;color:var(--muted)">Авиакомпания</div>
@@ -532,7 +575,7 @@ function renderConfirmedFlight(ac, route){
   confirmedSection.appendChild(div);
 }
 
-/* ---------------- Utility ---------------- */
+/* ---------------- Utilities ---------------- */
 function formatDuration(min){
   if(!Number.isFinite(min)) return 'n/a';
   const hh = Math.floor(min/60), mm = min%60;
@@ -550,6 +593,7 @@ function estimateDistanceKm(fromICAO, toICAO){
   const c=2*Math.asin(Math.sqrt(sinDlat*sinDlat + Math.cos(la)*Math.cos(lb)*sinDlon*sinDlon));
   return Math.round(R*c);
 }
+
 function findSuitableAircraftSmart(route, nowTs=Date.now()){
   const distanceKm = estimateDistanceKm(route.fromICAO, route.toICAO);
   const safety = 0.95;
@@ -563,6 +607,7 @@ function findSuitableAircraftSmart(route, nowTs=Date.now()){
   basePool.sort((a,b)=>Math.abs(a.seats-180)-Math.abs(b.seats-180));
   return { distanceKm, candidates: basePool };
 }
+
 function assignAircraftToRouteSmart(route){
   const now = Date.now();
   const { distanceKm, candidates } = findSuitableAircraftSmart(route, now);
@@ -581,8 +626,9 @@ function assignAircraftToRouteSmart(route){
   renderAssignLog();
   return { ok:true, aircraft: ac, distanceKm };
 }
+
 function renderAssignLog(){
-  const items = FLEET_LOG.slice(-20).reverse();
+  const items = FLEET_LOG.slice(-40).reverse();
   if(items.length===0){ assignLogEl.textContent='Пока пусто'; return; }
   assignLogEl.innerHTML = items.map(it=>{
     const t = new Date(it.ts).toLocaleTimeString();
