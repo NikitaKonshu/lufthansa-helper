@@ -1,225 +1,125 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Lufthansa Helper — restored</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lufthansa Helper</title>
 <style>
-:root{ --bg-1:#041026; --bg-2:#06263a; --text:#eaf4ff; --muted:rgba(234,244,255,0.68); --accent-yellow:#ffd54a; --accent-yellow-2:#ffbf3a; --glass-border: rgba(255,255,255,0.06); --primary-dark:#072022; font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; font-size:15px; }
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{min-height:100vh;background:linear-gradient(160deg,var(--bg-1),var(--bg-2));color:var(--text);-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;overflow-y:auto;}
-.app-root{display:flex;justify-content:center;align-items:flex-start;padding:20px;min-height:100vh}
-.container{width:100%;max-width:1280px}
-.hero{ margin-top:28px;border-radius:16px;padding:18px;position:relative;overflow:visible;background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)), linear-gradient(180deg, rgba(0,6,18,0.55), rgba(0,6,18,0.7)); border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 28px 100px rgba(2,8,18,0.6); backdrop-filter: blur(10px) saturate(140%); }
-.header{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.logo{ width:64px;height:64px;border-radius:14px; background: linear-gradient(180deg,#062b34,#032029); display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--accent-yellow);font-size:18px; box-shadow: 0 10px 36px rgba(0,0,0,0.54), inset 0 1px 0 rgba(255,255,255,0.02); }
-.subtitle{font-size:13px;color:var(--muted)}
-.tabs{display:flex;gap:10px;margin-top:14px;position:relative;flex-wrap:wrap}
-.tab{padding:10px 16px;border-radius:12px;font-weight:800;color:var(--text);background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));border:1px solid rgba(255,255,255,0.02);cursor:pointer;transition:transform .18s,box-shadow .18s}
-.tab.active{ transform: translateY(-6px) scale(1.02); box-shadow: 0 20px 60px rgba(0,0,0,0.45)}
-.liquid-underline{ position:absolute; height:9px; bottom:-12px; border-radius:8px; background: linear-gradient(90deg,var(--accent-yellow),var(--accent-yellow-2)); transition:left 220ms,width 220ms,opacity 220ms; box-shadow:0 12px 36px rgba(255,160,60,0.14); opacity:0; }
-.controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px}
-.search{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:var(--text);min-width:240px}
-.panel{ padding:14px;border-radius:12px;margin-top:12px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));border:1px solid rgba(255,255,255,0.04);box-shadow:0 24px 80px rgba(2,8,18,0.45);backdrop-filter: blur(6px) saturate(130%); position:relative; }
-.airline-grid{ margin-top:14px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:14px; width:100%; max-height:520px; overflow:auto; padding:14px; border-radius:16px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02)); border:1px solid rgba(255,255,255,0.03); }
-.kv{font-size:13px;color:var(--muted)}
-.input{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.01);color:var(--text)}
-.modal-back{ display:flex !important; align-items:center; justify-content:center; position:fixed; inset:0; z-index:17000; background: rgba(0,0,0,0.56); padding:20px; }
-.modal{ width:min(560px,94%); max-width:94%; border-radius:12px; padding:18px; background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(8,12,18,0.94)); border:1px solid rgba(255,255,255,0.06); box-shadow: 0 40px 120px rgba(0,0,0,0.6); }
-.splash-back{ position:fixed; inset:0; z-index:15000; display:flex; align-items:center; justify-content:center; overflow:hidden; background: linear-gradient(180deg, rgba(0,6,18,0.95), rgba(2,14,30,0.98)); transition: opacity .52s, transform .52s; }
-.splash-hidden{ opacity:0; transform: translateY(-8px) scale(.996); pointer-events:none; }
+body {
+  margin:0; font-family:Inter, sans-serif;
+  background:linear-gradient(160deg,#041026,#06263a); color:#eaf4ff;
+}
+.splash {
+  position:fixed; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  background:rgba(0,6,18,0.95); z-index:1000;
+}
+.modal {
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(0,0,0,0.6); z-index:2000;
+}
+.modal-content {
+  background:#072022; padding:20px; border-radius:12px; width:300px;
+}
+.btn {padding:10px 16px; border:none; border-radius:8px; font-weight:800; cursor:pointer;}
+.btn-primary {background:#ffd54a; color:#072022;}
+.btn-neutral {background:#333; color:#fff;}
+#inlineTour {display:none; margin:20px; padding:20px; background:#06263a; border-radius:12px;}
 </style>
 </head>
 <body>
-<div id="appRoot" class="app-root">
-  <div class="container">
-    <div id="appHero" class="hero" role="main">
-      <div class="header">
-        <div style="display:flex;gap:12px;align-items:center">
-          <div class="logo">LH</div>
-          <div>
-            <div style="font-weight:900">Lufthansa Helper</div>
-            <div class="subtitle">демо</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <div id="sessionBadge" class="kv">Неавторизован</div>
-          <button id="openGateBtn">Вход</button>
-          <button id="logoutBtn" style="display:none">Выйти</button>
-        </div>
-      </div>
 
-      <div class="tabs" id="tabsRow" style="margin-top:14px">
-        <div class="tab active" data-target="panelGenerate" id="tabGen">Генерация</div>
-        <div class="tab" data-target="panelRoutes" id="tabRoutes">Направления</div>
-        <div class="tab" data-target="panelFleet" id="tabFleet">Флот</div>
-        <div id="liquidUnderline" class="liquid-underline"></div>
-      </div>
+<!-- Splash -->
+<div id="splash" class="splash">
+  <h2>Welcome to Lufthansa Group</h2>
+  <p>Демо интерфейс</p>
+  <button id="splashContinue" class="btn btn-primary">Дальше</button>
+</div>
 
-      <div class="controls">
-        <input id="airSearch" class="search" placeholder="Поиск авиакомпании или кода" autocomplete="off" />
-        <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
-          <button id="genBtn" style="padding:10px 14px;border-radius:10px;background:#ffd54a;border:none;font-weight:800;color:#072022">СГЕНЕРИРОВАТЬ</button>
-        </div>
-      </div>
-
-      <div id="airGrid" class="airline-grid" aria-live="polite"></div>
-
-      <div style="display:grid;grid-template-columns:1fr 360px;gap:16px;margin-top:16px">
-        <main>
-          <section id="panelGenerate" class="panel">
-            <div style="font-weight:900">Генерация</div>
-            <div id="generatedNote" class="kv" style="margin-top:8px">Выберите авиакомпанию и интервал времени</div>
-          </section>
-          <section id="panelRoutes" class="panel" style="display:none">
-            <div style="font-weight:900">Направления</div>
-            <div id="routesList" style="margin-top:8px"></div>
-          </section>
-          <section id="panelFleet" class="panel" style="display:none">
-            <div style="font-weight:900">Флот</div>
-            <div id="fleetList" style="margin-top:8px"></div>
-          </section>
-        </main>
-        <aside>
-          <div class="panel">
-            <div style="font-weight:900">Пилоты</div>
-            <div id="pilotList" style="margin-top:8px"></div>
-          </div>
-          <div class="panel" style="margin-top:12px">
-            <div style="font-weight:900">Журнал</div>
-            <div id="log" class="kv" style="margin-top:8px">Пусто</div>
-          </div>
-        </aside>
-      </div>
+<!-- Gate Modal -->
+<div id="gateModal" class="modal">
+  <div class="modal-content">
+    <h3>Вход в систему</h3>
+    <p>Введите позывной и пароль. Кодовое слово: <b>quickaccess2025</b></p>
+    <input id="loginCall" placeholder="Позывной" style="width:100%;margin:6px 0;">
+    <input id="loginPass" type="password" placeholder="Пароль" style="width:100%;margin:6px 0;">
+    <div style="margin-top:10px;display:flex;justify-content:space-between;">
+      <button id="btnLogin" class="btn btn-primary">Войти</button>
+      <button id="btnDemoQuick" class="btn btn-neutral">Быстрый вход</button>
     </div>
   </div>
 </div>
 
-<!-- splash -->
-<div id="splash" class="splash-back" role="dialog" aria-modal="true">
-  <div style="text-align:center;color:var(--text)">
-    <h2 style="margin:0 0 8px 0">Welcome to Lufthansa Group</h2>
-    <div class="kv" style="margin-bottom:14px">Демо интерфейс</div>
-    <button id="splashContinue" style="padding:10px 14px;border-radius:10px;background:#ffd54a;border:none;font-weight:800;color:#072022">Дальше</button>
-  </div>
-</div>
-
-<!-- gate modal -->
-<div id="gateModal" class="modal-back" style="display:none" aria-hidden="true">
-  <div class="modal" role="dialog">
-    <div style="font-weight:900">Вход в систему</div>
-    <div class="kv" style="margin-top:6px">Введите позывной и пароль. Кодовое слово: <strong>quickaccess2025</strong></div>
-    <div style="margin-top:10px"><input id="loginCall" class="input" placeholder="Позывной (callSign)"></div>
-    <div style="margin-top:8px"><input id="loginPass" class="input" placeholder="Пароль или кодовое слово" type="password"></div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-      <button id="btnDemoQuick" style="padding:8px 10px">Быстрый вход</button>
-      <button id="btnLogin" style="padding:8px 10px;background:#ffd54a;border:none;font-weight:800;color:#072022">Войти</button>
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h3>Подтвердить рейс</h3>
+    <p id="confirmDetails"></p>
+    <div style="margin-top:10px;display:flex;justify-content:space-between;">
+      <button id="confirmCancel" class="btn btn-neutral">Отменить</button>
+      <button id="confirmAccept" class="btn btn-primary">Подтвердить</button>
     </div>
   </div>
 </div>
 
-<!-- confirm modal -->
-<div id="confirmModal" class="modal-back" style="display:none" aria-hidden="true">
-  <div class="modal" role="dialog">
-    <div style="font-weight:900">Подтвердить рейс</div>
-    <div id="confirmDetails" class="kv" style="margin-top:8px"></div>
-    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-      <button id="confirmCancel" style="padding:8px 10px">Отменить</button>
-      <button id="confirmAccept" style="padding:8px 10px;background:#ffd54a;border:none;font-weight:800;color:#072022">Подтвердить</button>
-    </div>
-  </div>
+<!-- Inline Tour -->
+<div id="inlineTour">
+  <h3>Инструкция</h3>
+  <p>1) Введите позывной и пароль<br>
+     2) Выберите авиакомпанию<br>
+     3) Нажмите «Сгенерировать»<br>
+     4) Подтвердите рейс</p>
+</div>
+
+<!-- Main Interface -->
+<div id="mainApp" style="display:none; padding:20px;">
+  <h2>Lufthansa Helper</h2>
+  <button id="genBtn" class="btn btn-primary">Сгенерировать рейс</button>
 </div>
 
 <script>
-/* простая проверенная логика без дополнительных guard'ов */
-const CODEWORD = 'quickaccess2025';
-const AIRLINES = [{name:"Lufthansa",code:"LH"},{name:"Swiss",code:"LX"},{name:"Condor",code:"DE"}];
-const ROUTES = [{id:'R1',airline:'Lufthansa',fromICAO:'EDDF',toICAO:'EGLL',durationMinutes:90},{id:'R2',airline:'Swiss',fromICAO:'EDDF',toICAO:'LSZH',durationMinutes:85}];
-const FLEET = [{id:"LH-A320-01",airline:"Lufthansa",type:"A320",locationICAO:"EDDF",status:"idle",fuelMinutes:420,turnaround:35,reserveMargin:30}];
-const PILOTS = [{id:"pilot_ivan",name:"Ivan Petrov",callSign:"IPET",verified:true,password:"ivanpass"}];
 let SESSION = {pilotId:null};
-let PENDING_RESERVATION = null;
-let PENDING_RESERVATION_TEMP = null;
+const CODEWORD = "quickaccess2025";
 
-function nowMs(){ return Date.now(); }
-function renderAirGrid(){ const el=document.getElementById('airGrid'); el.innerHTML=''; AIRLINES.forEach(a=>{ const d=document.createElement('div'); d.style.padding='10px'; d.style.borderRadius='8px'; d.style.background='rgba(255,255,255,0.02)'; d.style.marginBottom='8px'; d.innerHTML = `<div style="font-weight:800">${a.name}</div><div class="kv">${a.code}</div>`; el.appendChild(d); }); }
-function renderRoutes(){ const list=document.getElementById('routesList'); list.innerHTML=''; ROUTES.forEach(r=>{ const row=document.createElement('div'); row.style.padding='8px'; row.style.borderRadius='8px'; row.style.marginTop='8px'; row.style.background='rgba(255,255,255,0.01)'; row.innerHTML = `<div style="font-weight:800">${r.fromICAO} → ${r.toICAO} · ${r.airline}</div><div style="margin-top:6px"><button class="selectRoute" data-id="${r.id}">Выбрать</button></div>`; list.appendChild(row); }); Array.from(document.getElementsByClassName('selectRoute')).forEach(b=> b.addEventListener('click', ()=>{ const id=b.dataset.id; const route = ROUTES.find(x=>x.id===id); openConfirmFromRoute(route); })); }
-function renderPilots(){ const el=document.getElementById('pilotList'); el.innerHTML=''; PILOTS.forEach(p=>{ const row=document.createElement('div'); row.style.marginTop='8px'; row.innerHTML = `<div style="font-weight:800">${p.name}</div><div class="kv">${p.callSign}</div><div style="margin-top:6px"><button class="pilotLogin" data-call="${p.callSign}">Войти</button></div>`; el.appendChild(row); }); Array.from(document.getElementsByClassName('pilotLogin')).forEach(b=> b.addEventListener('click', ()=>{ document.getElementById('loginCall').value = b.dataset.call; showGateModal(); })); }
+// Splash → Gate
+document.getElementById('splashContinue').onclick = ()=>{
+  document.getElementById('splash').style.display='none';
+  document.getElementById('gateModal').style.display='flex';
+};
 
-function renderSession(){ const sb=document.getElementById('sessionBadge'); if(SESSION.pilotId){ const p=PILOTS.find(x=>x.id===SESSION.pilotId); sb.textContent = p?`Вошёл ${p.callSign}`:'Вошёл'; document.getElementById('logoutBtn').style.display='inline-block'; } else { sb.textContent='Неавторизован'; document.getElementById('logoutBtn').style.display='none'; } }
-
-function showGateModal(){ const g=document.getElementById('gateModal'); g.style.display='flex'; g.setAttribute('aria-hidden','false'); document.getElementById('loginCall').focus(); }
-function hideGateModal(){ const g=document.getElementById('gateModal'); g.style.display='none'; g.setAttribute('aria-hidden','true'); }
-
-function openConfirmFromRoute(route){
-  const pilot = (SESSION.pilotId? PILOTS.find(x=>x.id===SESSION.pilotId):null);
-  if(!pilot){
-    PENDING_RESERVATION_TEMP = { route };
-    showGateModal();
-    return;
-  }
-  // reserve candidate (simple)
-  const candidate = FLEET[0];
-  candidate.status = 'reserved';
-  candidate.reservedBy = pilot.id;
-  candidate.reservedToken = pilot.id+':'+Date.now();
-  PENDING_RESERVATION = { token: candidate.reservedToken, aircraft: candidate, route, pilotId: pilot.id, expires: nowMs()+120000 };
-  document.getElementById('confirmDetails').textContent = `${candidate.id} · ${candidate.airline} · ${route.fromICAO}→${route.toICAO} · ${route.durationMinutes} мин · Пилот ${pilot.callSign}`;
-  const c = document.getElementById('confirmModal'); c.style.display='flex'; c.setAttribute('aria-hidden','false');
-}
-
-document.getElementById('btnLogin').addEventListener('click', ()=> {
-  const cs = document.getElementById('loginCall').value.trim();
+// Login
+document.getElementById('btnLogin').onclick = ()=>{
+  const call = document.getElementById('loginCall').value.trim();
   const pass = document.getElementById('loginPass').value.trim();
-  if(!cs || !pass){ alert('Введите позывной и пароль'); return; }
-  const p = PILOTS.find(x=> x.callSign.toLowerCase() === cs.toLowerCase());
-  if(pass === CODEWORD || (p && p.password === pass)){
-    SESSION.pilotId = p? p.id : 'guest_'+Date.now();
-    renderSession();
-    hideGateModal();
-    // resume if pending
-    if(PENDING_RESERVATION_TEMP && PENDING_RESERVATION_TEMP.route){
-      const route = PENDING_RESERVATION_TEMP.route;
-      PENDING_RESERVATION_TEMP = null;
-      openConfirmFromRoute(route);
-    }
-  } else { alert('Неверный пароль'); }
-});
+  if(!call || !pass){ alert("Введите данные"); return; }
+  if(pass===CODEWORD){
+    SESSION.pilotId = call;
+    document.getElementById('gateModal').style.display='none';
+    document.getElementById('inlineTour').style.display='block';
+    document.getElementById('mainApp').style.display='block';
+  } else { alert("Неверный пароль"); }
+};
+document.getElementById('btnDemoQuick').onclick = ()=>{
+  document.getElementById('loginCall').value="DEMO";
+  document.getElementById('loginPass').value=CODEWORD;
+  document.getElementById('btnLogin').click();
+};
 
-document.getElementById('btnDemoQuick').addEventListener('click', ()=>{ document.getElementById('loginCall').value = PILOTS[0].callSign; document.getElementById('loginPass').value = CODEWORD; document.getElementById('btnLogin').click(); });
-document.getElementById('logoutBtn').addEventListener('click', ()=>{ SESSION.pilotId = null; renderSession(); showGateModal(); });
+// Generate → Confirm
+document.getElementById('genBtn').onclick = ()=>{
+  document.getElementById('confirmDetails').textContent =
+    "Рейс LH-A320 · EDDF → EGLL · Пилот "+SESSION.pilotId;
+  document.getElementById('confirmModal').style.display='flex';
+};
 
-document.getElementById('confirmAccept').addEventListener('click', ()=> {
-  if(!PENDING_RESERVATION) { document.getElementById('confirmModal').style.display='none'; return; }
-  const ac = FLEET.find(a=> a.reservedToken === PENDING_RESERVATION.token);
-  if(!ac){ alert('Резервация потеряна'); document.getElementById('confirmModal').style.display='none'; return; }
-  const p = PILOTS.find(x=> x.id === PENDING_RESERVATION.pilotId);
-  if(!p || !p.verified){ alert('Пилот не верифицирован'); document.getElementById('confirmModal').style.display='none'; return; }
-  // apply flight
-  ac.fuelMinutes = Math.max(0, (ac.fuelMinutes||0) - Number(PENDING_RESERVATION.route.durationMinutes));
-  ac.status = 'inFlight';
-  PENDING_RESERVATION = null;
-  alert('Рейс подтверждён');
+// Confirm actions
+document.getElementById('confirmAccept').onclick = ()=>{
+  alert("Рейс подтверждён!");
   document.getElementById('confirmModal').style.display='none';
-  renderPilots(); renderRoutes();
-});
-document.getElementById('confirmCancel').addEventListener('click', ()=>{ if(PENDING_RESERVATION){ const token=PENDING_RESERVATION.token; const ac=FLEET.find(a=>a.reservedToken===token); if(ac){ ac.status='idle'; delete ac.reservedToken; delete ac.reservedBy; } PENDING_RESERVATION=null; } document.getElementById('confirmModal').style.display='none'; });
-
-document.getElementById('splashContinue').addEventListener('click', ()=> {
-  document.getElementById('splash').classList.add('splash-hidden');
-  setTimeout(()=>{ document.getElementById('splash').style.display='none'; }, 420);
-});
-
-document.getElementById('genBtn').addEventListener('click', ()=> {
-  // for demo, pick first route and start flow
-  const route = ROUTES[0];
-  openConfirmFromRoute(route);
-});
-
-function init(){ renderAirGrid(); renderRoutes(); renderPilots(); renderSession(); }
-init();
+};
+document.getElementById('confirmCancel').onclick = ()=>{
+  document.getElementById('confirmModal').style.display='none';
+};
 </script>
 </body>
 </html>
