@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v19</title>
+    <title>Lufthansa Crew Portal - v20 (Strict Login)</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -131,51 +131,52 @@
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
         .loader-bar { width: 300px; height: 2px; background: rgba(255,255,255,0.1); margin: 30px auto; overflow: hidden; }
         .loader-progress { height: 100%; background: #fff; width: 0%; animation: loadProgress 5s ease-in-out forwards; }
-        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
         .system-status-text { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; opacity: 0.7; min-height: 1.2em; }
 
-        /* REDESIGNED LOGIN SCREEN V19: HIGH CONTRAST CORPORATE LOOK */
+        /* REDESIGNED LOGIN SCREEN V20: DARK, STRUCTURED/STRICT LOOK */
         #login-screen { 
             height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            background-color: var(--brand-blue); /* Deep Blue LH background */
+            background-color: #05164d; 
+            /* ADD SUBTLE DARK PATTERN */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23061C5B' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M0 0h40v40H0V0zm40 40h40v40H40V40z'/%3E%3C/g%3E%3C/svg%3E");
         }
         .login-box { 
-            background: #ffffff; /* Crisp White Background */
+            background: #000000; /* Pure Black for maximum strictness */
             padding: 50px 40px; 
             width: 100%; 
             max-width: 400px; 
             border-radius: 8px; 
             text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); /* Imposing shadow */
+            border: 1px solid var(--brand-blue); 
             border-top: 5px solid var(--brand-yellow); /* Strong Yellow Accent */
-            color: var(--text-main); /* Dark text on white background */
+            color: white; 
         }
         .login-box h2 {
-            color: var(--brand-blue); /* Use deep blue for title */
+            color: white; 
             font-weight: 600; 
-            border-bottom: 1px solid var(--border-color); /* Light grey separator */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Thin separator */
             padding-bottom: 15px;
             font-size: 1.6rem;
         }
         .login-box input {
-            background: var(--input-bg); /* White input background */
-            border: 1px solid var(--border-color); 
-            color: var(--text-main); /* Dark text */
+            background: #111; /* Darker input background */
+            border: 1px solid rgba(255, 255, 255, 0.3); 
+            color: white; 
             margin-bottom: 25px; 
         }
         .login-box input:focus {
-            border-color: var(--brand-blue); /* Focus blue */
-            background: #f8f8f8;
+            border-color: var(--brand-yellow); /* Focus yellow */
+            background: #222;
         }
         .login-box input::placeholder {
-            color: var(--text-sub); /* Grey placeholder text */
+            color: rgba(255, 255, 255, 0.5); 
         }
-        /* Ensure the logo is the COLORED (non-filtered) version on white background */
         .login-box img {
-            filter: none; 
+            filter: brightness(0) invert(1); /* White Logo on dark background */
             margin-bottom: 5px;
         }
     </style>
