@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v15</title>
+    <title>Lufthansa Crew Portal - v16</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -49,7 +49,7 @@
             border: 1px solid var(--border-color); border-radius: 4px;
             font-size: 1rem; background: var(--input-bg); color: var(--text-main);
         }
-        input:focus { outline: none; border-color: var(--brand-yellow); }
+        input:focus, select:focus { outline: none; border-color: var(--brand-yellow); }
 
         .lh-card {
             background: var(--card-bg); padding: 30px; border-radius: 8px;
@@ -103,7 +103,6 @@
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .aircraft-card { min-height: 200px; display: flex; flex-direction: column; }
         
-        /* New Style for data box */
         .aircraft-data-box { 
             background: var(--bg-color); 
             border-radius: 4px;
@@ -249,6 +248,12 @@
 
             <div id="tab-fleet" class="tab-content hidden fade-in">
                 <h2>Fleet</h2>
+                <div class="lh-card border-brand" style="padding: 15px 30px; margin-bottom: 20px;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">FILTER BY AIRLINE</label>
+                    <select id="fleet-filter-airline" onchange="populateFleet()" style="margin-bottom: 0;">
+                        <option value="ALL">ALL OPERATORS</option>
+                        </select>
+                </div>
                 <div id="fleet-container" class="fleet-grid"></div>
             </div>
 
@@ -336,20 +341,49 @@
             "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"]
         };
 
+        // РАСШИРЕННЫЙ СПИСОК АВИАКОМПАНИЙ И ХАБОВ
         const AIRLINES = {
+            // Lufthansa Group
             "Lufthansa": { hubs: ["EDDF (Frankfurt)", "EDDM (Munich)"], code: "DLH" },
             "SWISS": { hubs: ["LSZH (Zurich)"], code: "SWR" },
-            "Austrian": { hubs: ["LOWW (Vienna)"], code: "AUA" },
-            "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" }
+            "Austrian Airlines": { hubs: ["LOWW (Vienna)"], code: "AUA" },
+            "Brussels Airlines": { hubs: ["EBBR (Brussels)"], code: "BEL" },
+            "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" },
+            "Discover Airlines": { hubs: ["EDDF (Frankfurt)"], code: "OCN" },
+            "Edelweiss Air": { hubs: ["LSZH (Zurich)"], code: "EDW" },
+            "Lufthansa Cargo": { hubs: ["EDDF (Frankfurt)", "EDDP (Leipzig)"], code: "GEC" },
+            "Lufthansa CityLine": { hubs: ["EDDM (Munich)"], code: "CLH" },
+            "Lufthansa City Airlines": { hubs: ["EDDM (Munich)"], code: "MLA" },
+            "Air Dolomiti": { hubs: ["LIPZ (Venice)", "EDDM (Munich)"], code: "DLA" },
+            "AeroLogic": { hubs: ["EDDP (Leipzig)", "EDDF (Frankfurt)"], code: "BOX" }, // Cargo
+            
+            // Other Partners/Airlines
+            "AirBaltic": { hubs: ["EVRA (Riga)", "EYVI (Vilnius)", "EETN (Tallinn)"], code: "BTI" },
+            "Widerøe": { hubs: ["ENZV (Stavanger)", "ENGM (Oslo)"], code: "WIF" },
+            "Norwegian Airlines": { hubs: ["ENGM (Oslo)"], code: "NAX" },
+            "Finnair": { hubs: ["EFHK (Helsinki)"], code: "FIN" },
+            "SAS Scandinavian Airlines": { hubs: ["EKCH (Copenhagen)", "ESSA (Stockholm)", "ENGM (Oslo)"], code: "SAS" },
+            "Condor": { hubs: ["EDDF (Frankfurt)"], code: "CFG" },
+            "SunExpress": { hubs: ["LTBA (Istanbul)", "EDDV (Hannover)"], code: "SXS" },
+            "ITA Airways": { hubs: ["LIRF (Rome)"], code: "ITY" } 
         };
 
-        // ОБНОВЛЕННЫЕ ДАННЫЕ С РУЧНЫМИ ХАРАКТЕРИСТИКАМИ
+        // ФЛОТ С ПРИВЯЗКОЙ К ОПЕРАТОРАМ
         const FLEET = [
-            { type: "Airbus A319", maxHours: 5, seats: 138, fuelReserve: "6,500 KG", layoutImg: "https://i.imgur.com/example_a319_layout.png" },
-            { type: "Airbus A320neo", maxHours: 6, seats: 180, fuelReserve: "7,200 KG", layoutImg: "https://i.imgur.com/example_a320_layout.png" },
-            { type: "Airbus A330-300", maxHours: 11, seats: 255, fuelReserve: "18,000 KG", layoutImg: "https://i.imgur.com/example_a330_layout.png" },
-            { type: "Airbus A350-900", maxHours: 16, seats: 293, fuelReserve: "22,000 KG", layoutImg: "https://i.imgur.com/example_a350_layout.png" },
-            { type: "Boeing 747-8", maxHours: 14, seats: 364, fuelReserve: "30,000 KG", layoutImg: "https://i.imgur.com/example_b748_layout.png" }
+            // Narrowbody
+            { type: "Airbus A319", maxHours: 5, seats: 138, fuelReserve: "6,500 KG", layoutImg: "https://i.imgur.com/example_a319_layout.png", operators: ["Lufthansa", "SWISS", "Austrian Airlines", "Brussels Airlines", "Lufthansa CityLine", "Lufthansa City Airlines"] },
+            { type: "Airbus A320neo", maxHours: 6, seats: 180, fuelReserve: "7,200 KG", layoutImg: "https://i.imgur.com/example_a320_layout.png", operators: ["Lufthansa", "Eurowings", "Air Dolomiti", "SAS Scandinavian Airlines", "ITA Airways"] },
+            { type: "Airbus A220-300", maxHours: 6.5, seats: 145, fuelReserve: "8,000 KG", layoutImg: "https://i.imgur.com/example_a220_layout.png", operators: ["AirBaltic", "SWISS"] },
+            { type: "Boeing 737-800", maxHours: 6, seats: 189, fuelReserve: "7,000 KG", layoutImg: "https://i.imgur.com/example_b738_layout.png", operators: ["Norwegian Airlines", "SunExpress", "Condor"] },
+            { type: "Embraer 190-E2", maxHours: 5.5, seats: 114, fuelReserve: "5,500 KG", layoutImg: "https://i.imgur.com/example_e190_layout.png", operators: ["Widerøe"] },
+            
+            // Widebody & Long Haul
+            { type: "Airbus A330-300", maxHours: 11, seats: 255, fuelReserve: "18,000 KG", layoutImg: "https://i.imgur.com/example_a330_layout.png", operators: ["Lufthansa", "SWISS", "Austrian Airlines", "Edelweiss Air", "Finnair", "ITA Airways"] },
+            { type: "Airbus A350-900", maxHours: 16, seats: 293, fuelReserve: "22,000 KG", layoutImg: "https://i.imgur.com/example_a350_layout.png", operators: ["Lufthansa", "Finnair"] },
+            { type: "Boeing 747-8", maxHours: 14, seats: 364, fuelReserve: "30,000 KG", layoutImg: "https://i.imgur.com/example_b748_layout.png", operators: ["Lufthansa"] },
+
+            // Cargo
+            { type: "Boeing 777F", maxHours: 10, seats: 0, fuelReserve: "25,000 KG", layoutImg: "N/A (Cargo)", operators: ["Lufthansa Cargo", "AeroLogic"] },
         ];
 
         const DESTINATIONS = [
@@ -362,7 +396,8 @@
             { code: "WSSS", city: "Singapore", hours: 12.5, region: "AS", lat: 1.36, lon: 103.98 }
         ];
 
-        const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56] };
+        // ОБНОВЛЕННЫЕ КООРДИНАТЫ ХАБОВ
+        const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56], "EVRA": [56.92, 23.97], "EBBR": [50.9, 4.4], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.99], "LIPZ": [45.5, 12.35], "ENZV": [58.88, 5.63], "ENGM": [60.20, 11.10], "EFHK": [60.32, 24.97], "EKCH": [55.62, 12.65], "ESSA": [59.65, 17.92], "EDDP": [51.42, 12.23], "LTBA": [40.98, 28.82], "LIRF": [41.8, 12.23], "EYVI": [54.64, 25.28], "EETN": [59.41, 24.83], "EDDV": [52.46, 9.68] };
 
         let currentUser = null;
         let generatedFlightTemp = null;
@@ -372,8 +407,9 @@
 
         window.onload = function() {
             simulateBootSequence();
-            populateFleet();
             populateAirlinesSelect();
+            populateFleetFilter(); // NEW: Populate fleet filter
+            populateFleet();
             populateHubsInfo();
             loadStats();
             startClock();
@@ -439,7 +475,6 @@
             document.getElementById('stat-rank').innerText = rank;
         }
 
-        // --- ИЗМЕНЕНИЕ: ФУНКЦИЯ ПРОСМОТРА СХЕМЫ ---
         function openLayout(type, url) {
             if (url.includes('example')) {
                 alert(`Layout for ${type} is not yet available. Please replace the placeholder link with a real image link for ${type} in the FLEET data.`);
@@ -448,10 +483,40 @@
             }
         }
 
+        // NEW: Populate the filter dropdown for the Fleet tab
+        function populateFleetFilter() {
+            const s = document.getElementById('fleet-filter-airline');
+            // Clear existing options, keeping "ALL OPERATORS"
+            while (s.options.length > 1) {
+                s.remove(1);
+            }
+            const sortedAirlines = Object.keys(AIRLINES).sort();
+            sortedAirlines.forEach(a => {
+                let o = document.createElement('option'); 
+                o.value = a; 
+                o.text = a; 
+                s.add(o);
+            });
+        }
+
+        // UPDATED: Filter logic in populateFleet
         function populateFleet() {
             const c = document.getElementById('fleet-container'); 
+            const filterValue = document.getElementById('fleet-filter-airline').value;
             c.innerHTML = '';
-            FLEET.forEach(ac => { 
+
+            const filteredFleet = FLEET.filter(ac => 
+                filterValue === "ALL" || ac.operators.includes(filterValue)
+            );
+
+            if (filteredFleet.length === 0) {
+                c.innerHTML = `<div class="lh-card" style="grid-column: 1 / -1; text-align: center; color: var(--text-sub);">
+                                    Нет типов воздушных судов, используемых ${filterValue}.
+                                </div>`;
+                return;
+            }
+
+            filteredFleet.forEach(ac => { 
                 c.innerHTML += `
                 <div class="lh-card aircraft-card border-brand">
                     <h4 style="color:var(--text-main);">${ac.type}</h4>
@@ -464,17 +529,30 @@
                             onclick="openLayout('${ac.type}', '${ac.layoutImg}')">
                         Seating Layout / Расcадка
                     </button>
+                    <div style="font-size:0.75rem; color:var(--text-sub); margin-top:10px;">
+                        Операторы: ${ac.operators.slice(0, 3).join(', ')}${ac.operators.length > 3 ? '...' : ''}
+                    </div>
                 </div>`; 
             });
         }
         
         function populateAirlinesSelect() { 
             const s = document.getElementById('gen-airline'); 
-            for(let a in AIRLINES){ let o = document.createElement('option'); o.value=a; o.text=a; s.add(o); } 
+            const sortedAirlines = Object.keys(AIRLINES).sort();
+            sortedAirlines.forEach(a => { 
+                let o = document.createElement('option'); 
+                o.value=a; 
+                o.text=a; 
+                s.add(o); 
+            });
         }
         function populateHubsInfo() { 
             const l = document.getElementById('hub-list-display'); 
-            for(let a in AIRLINES) l.innerHTML += `<li><strong style="color:var(--text-main)">${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`; 
+            l.innerHTML = "";
+            const sortedAirlines = Object.keys(AIRLINES).sort();
+            sortedAirlines.forEach(a => { 
+                l.innerHTML += `<li><strong style="color:var(--text-main)">${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`; 
+            });
         }
         function updateHubs() {
             const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); 
@@ -523,8 +601,13 @@
                 if(tp === 'medium'){ minH = 3; maxH = 7; } 
                 if(tp === 'long'){ minH = 8; maxH = 14; }
                 
-                const availAC = FLEET.filter(ac => (tp === 'long' ? ac.maxHours >= 8 : (tp === 'short' ? ac.maxHours < 8 : ac.maxHours >= 3)));
-                if(availAC.length === 0){ alert("No aircraft"); btn.disabled = false; btn.innerText = 'Generate OFP'; return; }
+                // Filter fleet by selected airline and range preference
+                const availAC = FLEET.filter(ac => 
+                    ac.operators.includes(an) &&
+                    (tp === 'long' ? ac.maxHours >= 8 : (tp === 'short' ? ac.maxHours < 8 : ac.maxHours >= 3))
+                );
+
+                if(availAC.length === 0){ alert(`No suitable aircraft found for ${an} in the selected range.`); btn.disabled = false; btn.innerText = 'Generate OFP (Live WX)'; return; }
 
                 const ac = availAC[Math.floor(Math.random() * availAC.length)];
                 const dests = DESTINATIONS.filter(d => d.hours >= minH && d.hours <= maxH);
