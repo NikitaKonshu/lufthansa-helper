@@ -3,752 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Group VA | Crew Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Lufthansa Group VA | Liquid Crew Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* --- LUFTHANSA IMMERSIVE GAME STYLE V2 --- */
+        /* --- LIQUID GLASS THEME V3 --- */
         :root {
-            --lh-blue-deep: #020b26; /* Глубокий фон */
-            --lh-blue-primary: #05164D;
+            --lh-blue-deep: #020617;
+            --lh-blue-accent: #0b247a;
             --lh-yellow: #FFB100;
-            --lh-yellow-glow: rgba(255, 177, 0, 0.6); /* Свечение */
+            --lh-yellow-glow: rgba(255, 177, 0, 0.5);
             
-            --text-primary: #ffffff;
-            --text-secondary: #b8c2d6;
-            
-            /* Glassmorphism Variables */
-            --glass-bg: rgba(5, 22, 77, 0.45); /* Полупрозрачный синий */
+            --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-blur: blur(16px);
+            --glass-border-highlight: rgba(255, 255, 255, 0.2);
+            --glass-blur: blur(25px);
+            
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background: radial-gradient(circle at top center, var(--lh-blue-primary), var(--lh-blue-deep));
-            color: var(--text-primary); 
+            background-color: var(--lh-blue-deep);
+            color: var(--text-main); 
             font-family: 'Montserrat', sans-serif; 
             overflow-x: hidden; 
             min-height: 100vh;
+            position: relative;
         }
 
-        /* --- Utilities & Animations --- */
+        /* --- 1. LIQUID BACKGROUND ANIMATION --- */
+        .liquid-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
+        }
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6;
+            animation: floatOrb 20s infinite ease-in-out;
+        }
+        .orb-1 {
+            width: 600px; height: 600px; background: radial-gradient(circle, var(--lh-blue-accent), transparent);
+            top: -100px; left: -100px; animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 500px; height: 500px; background: radial-gradient(circle, var(--lh-yellow), transparent);
+            bottom: -100px; right: -100px; opacity: 0.2; animation-delay: -5s; animation-duration: 25s;
+        }
+        .orb-3 {
+            width: 300px; height: 300px; background: radial-gradient(circle, #4a90e2, transparent);
+            top: 40%; left: 40%; opacity: 0.3; animation-delay: -10s; animation-duration: 18s;
+        }
+
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(50px, -50px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* --- 2. GLASS UI COMPONENTS --- */
         .hidden { display: none !important; }
-        
-        /* Плавное появление контента снизу вверх */
-        .fade-up { animation: fadeInUp 0.6s ease-out forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        /* Каскадная анимация для сеток (элементы появляются по очереди) */
-        .stagger-load > * { opacity: 0; animation: fadeInUp 0.5s ease-out forwards; }
-        .stagger-load > *:nth-child(1) { animation-delay: 0.1s; }
-        .stagger-load > *:nth-child(2) { animation-delay: 0.2s; }
-        .stagger-load > *:nth-child(3) { animation-delay: 0.3s; }
-        .stagger-load > *:nth-child(4) { animation-delay: 0.4s; }
-        .stagger-load > *:nth-child(5) { animation-delay: 0.5s; }
-        .stagger-load > *:nth-child(n+6) { animation-delay: 0.6s; }
+        /* Smooth Fade Up */
+        .fade-up { animation: fadeUpAnim 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeUpAnim { to { opacity: 1; transform: translateY(0); } }
 
-        /* Buttons с эффектом свечения */
-        .btn {
-            background: linear-gradient(135deg, var(--lh-blue-primary), #0a247a); color: white; border: 1px solid var(--glass-border); 
-            padding: 12px 24px; cursor: pointer; font-weight: 800; border-radius: 6px; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative; overflow: hidden;
-        }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(5, 22, 77, 0.5); border-color: var(--lh-yellow); color: var(--lh-yellow);}
-        
-        .btn-yellow { 
-            background: linear-gradient(135deg, var(--lh-yellow), #e6a300); color: var(--lh-blue-deep); border: none;
-            box-shadow: 0 4px 20px var(--lh-yellow-glow);
-        }
-        .btn-yellow:hover { 
-            background: linear-gradient(135deg, #ffd24d, var(--lh-yellow)); 
-            box-shadow: 0 8px 30px var(--lh-yellow-glow), inset 0 0 10px rgba(255,255,255,0.5); color: black;
-        }
-
-        /* Section Titles */
-        .section-title { 
-            color: var(--text-primary); font-weight: 800; font-size: 2rem;
-            border-bottom: 3px solid var(--lh-yellow); display: inline-block;
-            padding-bottom: 5px; margin-bottom: 30px; text-shadow: 0 0 15px rgba(255, 177, 0, 0.3);
-        }
-
-        /* --- The "Glass" Card Style --- */
+        /* The Liquid Card */
         .card {
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border); color: var(--text-primary);
-            padding: 25px; border-radius: 12px; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); transition: all 0.3s ease;
+            border-top: 1px solid var(--glass-border-highlight);
+            border-left: 1px solid var(--glass-border-highlight);
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+            border-right: 1px solid rgba(0,0,0,0.2);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
         }
-        .card:hover { transform: translateY(-5px); border-color: rgba(255, 177, 0, 0.4); box-shadow: 0 15px 45px rgba(0,0,0,0.5); }
-        .card h3 { color: var(--lh-yellow); margin-bottom: 15px; font-weight: 800; letter-spacing: 1px; }
-        .card p { color: var(--text-secondary); line-height: 1.6; }
+        .card:hover {
+            transform: translateY(-5px) scale(1.005);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.06);
+        }
 
-        /* --- 1. Intro Animation --- */
+        /* Liquid Inputs & Selects */
+        select, input {
+            width: 100%; padding: 16px; 
+            background: rgba(0, 0, 0, 0.2); 
+            border: 1px solid var(--glass-border);
+            border-radius: 12px; color: white; font-family: 'Montserrat'; font-weight: 500;
+            outline: none; transition: 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        select:focus, input:focus {
+            border-color: var(--lh-yellow);
+            background: rgba(0,0,0,0.4);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.4), 0 0 15px rgba(255, 177, 0, 0.1);
+        }
+        select option { background-color: var(--lh-blue-deep); color: white; }
+
+        /* Liquid Buttons */
+        .btn {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border-highlight);
+            color: white; padding: 14px 28px; cursor: pointer; font-weight: 700; border-radius: 12px;
+            text-transform: uppercase; letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .btn-yellow {
+            background: linear-gradient(135deg, rgba(255, 177, 0, 0.8), rgba(255, 140, 0, 0.8));
+            color: #000; border: none;
+            box-shadow: 0 5px 20px rgba(255, 177, 0, 0.3);
+        }
+        .btn-yellow:hover {
+            background: linear-gradient(135deg, #ffcc33, #ffaa00);
+            box-shadow: 0 10px 30px rgba(255, 177, 0, 0.5);
+        }
+
+        /* Layout */
+        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+
+        /* Navigation */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 40px; background: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--glass-border);
+        }
+        .nav-items { display: flex; gap: 30px; }
+        .nav-link { 
+            cursor: pointer; opacity: 0.6; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s; position: relative;
+        }
+        .nav-link:hover, .nav-link.active { opacity: 1; color: var(--lh-yellow); text-shadow: 0 0 10px rgba(255,177,0,0.6); }
+        .nav-link.active::after { content: ''; position: absolute; bottom: -28px; left: 0; width: 100%; height: 3px; background: var(--lh-yellow); box-shadow: 0 -2px 10px var(--lh-yellow); }
+
+        /* Sections specific */
+        .section-header { margin-bottom: 40px; border-left: 5px solid var(--lh-yellow); padding-left: 20px; }
+        .section-header h2 { font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; }
+        .section-header p { color: var(--text-muted); margin-top: 5px; }
+
+        /* Status Bar */
+        .status-bar {
+            background: linear-gradient(90deg, rgba(255,177,0,0.1), transparent);
+            border: 1px solid rgba(255,177,0,0.3);
+            border-radius: 15px; padding: 20px 30px; margin-bottom: 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            animation: pulseGlow 4s infinite;
+        }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 0 rgba(255,177,0,0); } 50% { box-shadow: 0 0 20px rgba(255,177,0,0.1); } 100% { box-shadow: 0 0 0 rgba(255,177,0,0); } }
+
+        /* Intro & Login */
         #intro-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at center, var(--lh-blue-primary), #000000); z-index: 2000;
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
-            color: white; animation: fadeOutOverlay 1s ease-in-out 3.5s forwards; pointer-events: none;
+            background: black; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .intro-content { text-align: center; animation: scaleUp 3s ease-out; }
-        .crane-logo { font-size: 5rem; color: var(--lh-yellow); text-shadow: 0 0 30px var(--lh-yellow-glow); display: inline-block; animation: flyIn 2s cubic-bezier(0.19, 1, 0.22, 1); }
-        @keyframes flyIn { from { transform: translateY(100px) scale(0.5); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-        @keyframes scaleUp { from { transform: scale(0.9); } to { transform: scale(1); } }
-        @keyframes fadeOutOverlay { to { opacity: 0; visibility: hidden; } }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); }
+        .login-card { width: 400px; text-align: center; border-top: 4px solid var(--lh-yellow); }
 
-        /* --- 2. Login Screen --- */
-        #login-screen {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            /* Замените URL на свою красивую картинку из кабины */
-            background: url('https://images.unsplash.com/photo-1520532197832-60599f6c29c7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
-        }
-        .login-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(2, 11, 38, 0.7); backdrop-filter: blur(5px); }
-        .login-box {
-            position: relative; z-index: 2;
-            background: rgba(5, 22, 77, 0.85); backdrop-filter: blur(20px);
-            padding: 50px 40px; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.7);
-            width: 400px; text-align: center; border-top: 6px solid var(--lh-yellow);
-        }
-        .login-input {
-            width: 100%; padding: 15px; margin: 15px 0; 
-            background: rgba(255,255,255,0.1); border: 1px solid var(--glass-border);
-            border-radius: 8px; color: white; font-family: 'Montserrat'; transition: 0.3s;
-        }
-        .login-input::placeholder { color: rgba(255,255,255,0.5); }
-        .login-input:focus { outline: none; border-color: var(--lh-yellow); background: rgba(255,255,255,0.15); box-shadow: 0 0 15px rgba(255, 177, 0, 0.2); }
-
-        /* --- 3. Main Interface --- */
-        header {
-            background: rgba(5, 22, 77, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border);
-            padding: 0 30px; height: 70px;
-            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-        .logo-text { font-weight: 800; font-size: 1.4rem; letter-spacing: 1px; text-shadow: 0 0 10px var(--lh-blue-primary); }
-        .nav-link { 
-            margin-left: 25px; cursor: pointer; opacity: 0.7; transition: all 0.3s; 
-            font-weight: 600; font-size: 0.9rem; text-transform: uppercase; position: relative;
-        }
-        .nav-link::after { content: ''; position: absolute; width: 0%; height: 2px; bottom: -5px; left: 0; background-color: var(--lh-yellow); transition: 0.3s ease-in-out; }
-        .nav-link:hover, .nav-link.active { opacity: 1; color: var(--lh-yellow); text-shadow: 0 0 8px var(--lh-yellow-glow); }
-        .nav-link:hover::after, .nav-link.active::after { width: 100%; }
-        
-        .container { max-width: 1250px; margin: 40px auto; padding: 0 25px; }
-        
-        /* Grid Layouts */
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
-
-        /* Specific Modules */
-        /* Active Flight Banner (STATUS BAR STYLE) */
-        .flight-status-bar {
-            background: linear-gradient(90deg, rgba(255, 177, 0, 0.15), transparent);
-            border: 1px solid var(--lh-yellow); border-left: 8px solid var(--lh-yellow);
-            backdrop-filter: blur(10px); padding: 20px 30px;
-            margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;
-            border-radius: 8px; box-shadow: 0 5px 25px rgba(255, 177, 0, 0.15);
-            animation: pulseBorder 3s infinite ease-in-out;
-        }
-        @keyframes pulseBorder { 0% { box-shadow: 0 5px 25px rgba(255, 177, 0, 0.15); } 50% { box-shadow: 0 5px 35px rgba(255, 177, 0, 0.4); } 100% { box-shadow: 0 5px 25px rgba(255, 177, 0, 0.15); } }
-        
-        /* Generator & Inputs */
-        .generator-form { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        .full-width { grid-column: span 2; }
-        select, input.gen-input { 
-            width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;
-            border-radius: 8px; font-family: 'Montserrat'; -webkit-appearance: none; cursor: pointer; transition: 0.3s;
-        }
-        select:hover, select:focus { border-color: var(--lh-yellow); background: rgba(255,255,255,0.1); box-shadow: 0 0 15px rgba(255,177,0,0.2); }
-        select option { background-color: var(--lh-blue-deep); color: white; padding: 10px; }
-
-        /* Rules List */
-        .rules-list { list-style: none; counter-reset: lh-counter; }
-        .rules-list li { counter-increment: lh-counter; margin-bottom: 20px; position: relative; padding-left: 50px; color: var(--text-secondary); font-size: 1.05rem; }
-        .rules-list li::before {
-            content: counter(lh-counter); position: absolute; left: 0; top: -2px;
-            width: 35px; height: 35px; background: linear-gradient(135deg, var(--lh-yellow), #e6a300); color: var(--lh-blue-deep);
-            border-radius: 50%; text-align: center; line-height: 35px; font-weight: 800; box-shadow: 0 0 10px var(--lh-yellow-glow);
-        }
-        .rules-list li strong { color: var(--text-primary); }
-
-        /* Pilot Roster */
-        .pilot-item { padding: 12px 0; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; }
-        .pilot-item .icon { color: var(--lh-yellow); margin-right: 15px; filter: drop-shadow(0 0 5px var(--lh-yellow)); }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen">
-        <div class="intro-content">
-            <div class="crane-logo">✈</div>
-            <h1 style="font-size: 3rem; font-weight: 800; letter-spacing: 2px; margin: 20px 0;">LUFTHANSA GROUP <span style="color:var(--lh-yellow)">VA</span></h1>
-            <p style="font-size: 1.2rem; color: var(--text-secondary);">Captain's Interface v2.0 Loading...</p>
-        </div>
+    <div class="liquid-wrapper">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
-    <div id="login-screen">
-        <div class="login-overlay"></div>
-        <div class="login-box fade-up">
-            <div style="font-size: 3rem; color: var(--lh-yellow); margin-bottom: 10px;">✈</div>
-            <h2 style="color: white; margin-bottom: 30px; font-weight: 800; letter-spacing: 1px;">CREW ACCESS</h2>
-            <input type="text" id="callsign" class="login-input" placeholder="Callsign (e.g. DLH001)" autocomplete="off">
-            <input type="password" id="password" class="login-input" placeholder="Password">
-            <button class="btn btn-yellow" style="width: 100%; margin-top: 20px; font-size: 1.1rem;" onclick="attemptLogin()">INITIALIZE SESSION</button>
-            <p id="login-error" style="color: #ff4d4d; margin-top: 20px; font-weight: 600; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);" class="hidden">ACCESS DENIED: Invalid credentials</p>
+    <div id="intro-screen">
+        <h1 style="font-size: 4rem; color: var(--lh-yellow); text-shadow: 0 0 40px var(--lh-yellow);">LH GROUP</h1>
+        <p style="letter-spacing: 5px; margin-top: 10px; color: white;">VIRTUAL COCKPIT v3.0</p>
+    </div>
+
+    <div id="login-screen" class="hidden">
+        <div class="card login-card fade-up">
+            <h2 style="margin-bottom: 20px;">CREW LOGIN</h2>
+            <input type="text" id="callsign" placeholder="CALLSIGN (DLH001)" autocomplete="off" style="margin-bottom: 15px;">
+            <input type="password" id="password" placeholder="PASSWORD" style="margin-bottom: 25px;">
+            <button class="btn btn-yellow" style="width: 100%;" onclick="attemptLogin()">CONNECT</button>
+            <p id="login-error" style="color: #ff5555; margin-top: 15px;" class="hidden">INVALID CREDENTIALS</p>
         </div>
     </div>
 
     <div id="dashboard" class="hidden">
+        
         <header>
-            <div class="logo-text">LUFTHANSA GROUP <span style="color:var(--lh-yellow)">VA</span></div>
-            <nav>
-                <span class="nav-link nav-btn active" onclick="showSection('about', this)">О Нас</span>
-                <span class="nav-link nav-btn" onclick="showSection('rules', this)">Правила</span>
-                <span class="nav-link nav-btn" onclick="showSection('fleet', this)">Флот</span>
-                <span class="nav-link nav-btn" onclick="showSection('destinations', this)">Направления</span>
-                <span class="nav-link nav-btn" onclick="showSection('generator', this)">Генератор</span>
-                <span class="nav-link nav-btn" onclick="showSection('my-flight', this)">Мой Рейс</span>
+            <div style="font-weight: 900; font-size: 1.5rem; letter-spacing: 1px;">LH GROUP <span style="color: var(--lh-yellow)">VA</span></div>
+            <nav class="nav-items">
+                <span class="nav-link active" onclick="navTo('about', this)">О Нас</span>
+                <span class="nav-link" onclick="navTo('fleet', this)">Ангар</span>
+                <span class="nav-link" onclick="navTo('destinations', this)">Направления</span>
+                <span class="nav-link" onclick="navTo('generator', this)">Планировщик</span>
+                <span class="nav-link" onclick="navTo('my-flight', this)">Кокпит</span>
             </nav>
-            <div id="pilot-name" style="font-weight: 700; font-size: 0.9rem; border: 2px solid var(--lh-yellow); padding: 8px 15px; border-radius: 30px; background: rgba(255,177,0,0.1); box-shadow: 0 0 15px var(--lh-yellow-glow);">Pilot</div>
+            <div id="pilot-badge" style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2);">Guest</div>
         </header>
 
         <div class="container">
-            
-            <div id="active-flight-banner" class="flight-status-bar hidden fade-up">
+
+            <div id="status-bar" class="status-bar hidden fade-up">
                 <div>
-                    <h3 style="margin: 0; color: var(--lh-yellow); font-size: 1.5rem;">ACTIVE MISSION: <span id="banner-flight-num" style="color:white;">---</span></h3>
-                    <p style="color: var(--text-secondary); margin-top: 5px;">Aircraft: <span id="banner-ac" style="color:white; font-weight: 600;">---</span></p>
+                    <div style="font-size: 0.8rem; color: var(--lh-yellow); font-weight: 700; text-transform: uppercase;">Current Mission</div>
+                    <div style="font-size: 1.5rem; font-weight: 700;"><span id="sb-call">---</span> <span style="margin: 0 10px; opacity: 0.5;">|</span> <span id="sb-route" style="font-weight: 400;">---</span></div>
                 </div>
-                <button class="btn" onclick="showSection('my-flight', document.querySelector('[onclick*=my-flight]'))">MISSION DETAILS ➔</button>
+                <button class="btn" onclick="navTo('my-flight', document.querySelectorAll('.nav-link')[4])">Open Cockpit</button>
             </div>
 
-            <div id="main-content-area">
-
-                <section id="sec-about" class="fade-up">
-                    <h2 class="section-title">Добро пожаловать на борт</h2>
+            <section id="sec-about" class="fade-up">
+                <div class="section-header">
+                    <h2>Welcome Board</h2>
+                    <p>Центральный хаб пилотов Lufthansa Group</p>
+                </div>
+                <div class="grid-cards">
                     <div class="card">
-                        <p style="font-size: 1.1rem;">Мы — виртуальное пространство Lufthansa Group. Здесь профессионализм встречается с иммерсивным опытом симуляции. Наша цель — создать максимально реалистичную и атмосферную среду для пилотов любого уровня.</p>
-                        <br>
-                        <div style="display: flex; gap: 25px; text-align: center; margin-top: 20px;">
-                            <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                                <h1 style="color: var(--lh-yellow); font-size: 3rem; text-shadow: 0 0 20px var(--lh-yellow-glow);">5+</h1>
-                                <p style="font-weight: 600;">Авиакомпаний Группы</p>
-                            </div>
-                            <div style="flex: 1; background: rgba(255,255,255,0.05); padding: 25px; border-radius: 12px; border: 1px solid var(--glass-border);">
-                                <h1 style="color: white; font-size: 3rem; text-shadow: 0 0 20px rgba(255,255,255,0.3);">Global</h1>
-                                <p style="font-weight: 600;">Покрытие сети</p>
-                            </div>
-                        </div>
+                        <h3 style="color: var(--lh-yellow); margin-bottom: 10px;">Профессионализм</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6;">Мы создаем атмосферу, максимально приближенную к реальным операциям. Строгое соблюдение процедур и SOP.</p>
                     </div>
-                </section>
-
-                <section id="sec-rules" class="hidden fade-up">
-                    <h2 class="section-title">Протокол Пилота</h2>
                     <div class="card">
-                        <ul class="rules-list">
-                            <li><strong>Субординация:</strong> Пилот обязан соблюдать уважение ко всем участникам группы и диспетчерам.</li>
-                            <li><strong>Реализм времени:</strong> Выполнение рейса строго в реальном времени (ускорение x2/x4 запрещено).</li>
-                            <li><strong>Подготовка:</strong> Обязательное заполнение и следование полетного плана (OFP) перед вылетом.</li>
-                            <li><strong>Цикл рейса:</strong> Пилот обязан завершить текущий активный рейс в системе перед генерацией нового.</li>
-                            <li><strong>Автопилот:</strong> Использование автопилота разрешено только после набора высоты 1000ft AGL.</li>
+                        <h3 style="color: var(--lh-yellow); margin-bottom: 10px;">Единая сеть</h3>
+                        <p style="color: var(--text-muted); line-height: 1.6;">Lufthansa, Swiss, Austrian, Eurowings — все под одной крышей. Выбирайте, где летать сегодня.</p>
+                    </div>
+                    <div class="card">
+                        <h3 style="color: var(--lh-yellow); margin-bottom: 10px;">Правила</h3>
+                        <ul style="margin-top: 10px; padding-left: 20px; color: var(--text-muted); line-height: 1.8;">
+                            <li>Соблюдайте субординацию.</li>
+                            <li>Полеты только в Real Time.</li>
+                            <li>Заполнение OFP обязательно.</li>
                         </ul>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section id="sec-fleet" class="hidden fade-up">
-                    <h2 class="section-title">Наш Флот</h2>
-                    <div id="fleet-container" class="grid-cards stagger-load">
-                        </div>
-                </section>
-
-                <section id="sec-destinations" class="hidden fade-up">
-                    <h2 class="section-title">Сетка Направлений</h2>
-                    <div style="margin-bottom: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
-                        <button class="btn" onclick="filterDestinations('all')">Все Маршруты</button>
-                        <button class="btn" onclick="filterDestinations('EDDF')">HUB: Франкфурт</button>
-                        <button class="btn" onclick="filterDestinations('EDDM')">HUB: Мюнхен</button>
-                        <button class="btn" onclick="filterDestinations('LSZH')">HUB: Цюрих</button>
+            <section id="sec-fleet" class="hidden">
+                <div class="section-header">
+                    <h2>Наш Флот</h2>
+                    <p>Техническое состояние: Идеальное</p>
+                </div>
+                <div id="fleet-grid" class="grid-cards">
                     </div>
-                    <div id="dest-container" class="grid-cards stagger-load">
-                        </div>
-                </section>
+            </section>
 
-                <section id="sec-generator" class="hidden fade-up">
-                    <h2 class="section-title">Центр Планирования Полетов</h2>
-                    
-                    <div id="generator-locked-msg" class="card hidden" style="text-align: center; border: 2px solid #ff4d4d; box-shadow: 0 0 30px rgba(255, 77, 77, 0.3); background: rgba(255, 77, 77, 0.1);">
-                        <h3 style="color: #ff4d4d; font-size: 1.8rem;">⚠️ СИСТЕМА ЗАБЛОКИРОВАНА</h3>
-                        <p style="color: white; font-size: 1.2rem;">У вас есть незавершенный активный рейс. Завершите его в разделе "Мой Рейс", чтобы получить новое задание.</p>
+            <section id="sec-destinations" class="hidden">
+                <div class="section-header">
+                    <h2>Сетка Полетов</h2>
+                    <p>Фильтр маршрутов по хабам авиакомпаний</p>
+                </div>
+
+                <div class="card" style="margin-bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">1. Выберите Авиакомпанию</label>
+                        <select id="dest-airline" onchange="updateDestHubs()">
+                            <option value="">-- Operator --</option>
+                        </select>
                     </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 10px; color: var(--text-muted); font-size: 0.9rem;">2. Выберите Хаб</label>
+                        <select id="dest-hub" disabled onchange="filterDestinationsBySelect()">
+                            <option value="">-- Hub --</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div id="generator-interface" class="card generator-form">
-                        <div class="full-width">
-                            <label style="font-weight: 700; margin-bottom: 10px; display: block;">Оператор (Авиакомпания)</label>
-                            <select id="gen-airline" onchange="updateHubs()">
-                                <option value="">Выберите оператора...</option>
-                                </select>
-                        </div>
+                <div id="dest-grid" class="grid-cards">
+                    </div>
+            </section>
 
+            <section id="sec-generator" class="hidden">
+                <div class="section-header">
+                    <h2>Планировщик</h2>
+                    <p>Генерация полетного задания</p>
+                </div>
+
+                <div id="gen-lock-msg" class="card hidden" style="border-color: #ff5555; background: rgba(255, 85, 85, 0.1); text-align: center;">
+                    <h3 style="color: #ff5555;">Система заблокирована</h3>
+                    <p>У вас активный рейс. Завершите его перед созданием нового.</p>
+                </div>
+
+                <div id="gen-form" class="card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div style="grid-column: span 2;">
+                        <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; display: block;">Оператор</label>
+                        <select id="gen-airline" onchange="updateGenHubs()">
+                            <option value="">Выберите а/к...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; display: block;">Хаб вылета</label>
+                        <select id="gen-hub" disabled>
+                            <option>Ожидание...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px; display: block;">Длительность (Блоковое время)</label>
+                        <select id="gen-time">
+                            <option value="1-2">1 - 2 часа</option>
+                            <option value="3-4">3 - 4 часа</option>
+                            <option value="5-6">5 - 6 часов</option>
+                            <option value="7-8">7 - 8 часов</option>
+                            <option value="9-10">9 - 10 часов</option>
+                            <option value="10+">10+ часов (Ultra Long)</option>
+                        </select>
+                    </div>
+                    <div style="grid-column: span 2; margin-top: 10px;">
+                        <button class="btn btn-yellow" style="width: 100%;" onclick="generateFlight()">Сгенерировать</button>
+                    </div>
+                </div>
+
+                <div id="gen-result" class="card hidden" style="margin-top: 30px; border-color: var(--lh-yellow);">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">✈</div>
+                        <h3 style="font-size: 2rem;">Маршрут Построен</h3>
+                    </div>
+                    <div id="gen-data" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;"></div>
+                    <button class="btn btn-yellow" style="width: 100%;" onclick="acceptFlight()">Принять Задание</button>
+                </div>
+            </section>
+
+            <section id="sec-my-flight" class="hidden">
+                <div class="section-header">
+                    <h2>Кокпит</h2>
+                    <p>Активные данные полета</p>
+                </div>
+                
+                <div id="no-flight" class="card" style="text-align: center; padding: 50px;">
+                    <h3 style="color: var(--text-muted);">Нет активного задания</h3>
+                </div>
+
+                <div id="flight-card" class="card hidden">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid var(--glass-border); padding-bottom: 20px; margin-bottom: 20px;">
                         <div>
-                            <label style="font-weight: 700; margin-bottom: 10px; display: block;">Базовый Хаб</label>
-                            <select id="gen-hub" disabled>
-                                <option>Ожидание выбора оператора...</option>
-                            </select>
+                            <div style="font-size: 4rem; font-weight: 900; line-height: 1; color: var(--lh-yellow); text-shadow: 0 0 30px rgba(255,177,0,0.4);" id="mf-call">DLH000</div>
+                            <div style="font-size: 1.5rem; margin-top: 10px;" id="mf-route">EDDF -> KJFK</div>
                         </div>
+                        <div style="text-align: right;">
+                            <div style="color: var(--text-muted);">BLOCK TIME</div>
+                            <div style="font-size: 1.5rem; font-weight: 700;" id="mf-time">00h 00m</div>
+                        </div>
+                    </div>
 
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
                         <div>
-                            <label style="font-weight: 700; margin-bottom: 10px; display: block;">Тип Задания</label>
-                            <select id="gen-time">
-                                <option value="short">Short Haul (< 3ч)</option>
-                                <option value="medium">Medium Haul (3 - 7ч)</option>
-                                <option value="long">Long Haul (> 7ч)</option>
-                            </select>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">AIRCRAFT</div>
+                            <div style="font-size: 1.2rem; font-weight: 600;" id="mf-ac">---</div>
                         </div>
-
-                        <div class="full-width" style="margin-top: 20px;">
-                            <button class="btn btn-yellow" style="width: 100%; font-size: 1.2rem; padding: 18px;" onclick="generateFlight()">СГЕНЕРИРОВАТЬ ПОЛЕТНОЕ ЗАДАНИЕ</button>
+                        <div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">DEPARTURE (UTC)</div>
+                            <div style="font-size: 1.2rem; font-weight: 600;" id="mf-dep-time">---</div>
+                        </div>
+                        <div>
+                            <div style="color: var(--text-muted); font-size: 0.8rem;">ARRIVAL (Est)</div>
+                            <div style="font-size: 1.2rem; font-weight: 600;" id="mf-arr-time">---</div>
                         </div>
                     </div>
 
-                    <div id="generated-result" class="card hidden fade-up" style="margin-top: 30px; border: 2px solid var(--lh-yellow); box-shadow: 0 0 40px rgba(255,177,0,0.2);">
-                        <h3 style="text-align: center; font-size: 1.8rem;">ПРЕДЛОЖЕННЫЙ МАРШРУТ</h3>
-                        <hr style="border-color: var(--glass-border); margin: 20px 0;">
-                        <div id="gen-info" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 1.1rem;">
-                            </div>
-                        <button class="btn btn-yellow" style="margin-top: 30px; width: 100%; font-size: 1.2rem;" onclick="acceptFlight()">ПРИНЯТЬ ЗАДАНИЕ К ВЫПОЛНЕНИЮ</button>
-                    </div>
-                </section>
+                    <button class="btn" style="width: 100%; margin-top: 30px; background: rgba(255, 80, 80, 0.2); border-color: rgba(255, 80, 80, 0.5); color: #ffaaaa;" onclick="endFlight()">Завершить Рейс</button>
+                </div>
+            </section>
 
-                <section id="sec-my-flight" class="hidden fade-up">
-                    <h2 class="section-title">Активный Рейс</h2>
-                    <div id="no-flight-msg" class="card" style="text-align: center; padding: 50px;">
-                        <h3 style="color: var(--text-secondary);">НЕТ АКТИВНЫХ ЗАДАНИЙ</h3>
-                        <p>Перейдите в <b style="cursor: pointer; color: var(--lh-yellow); text-decoration: underline;" onclick="showSection('generator', document.querySelector('[onclick*=generator]'))">Генератор Рейсов</b> для получения нового маршрута.</p>
-                    </div>
-                    
-                    <div id="flight-data-card" class="card hidden" style="border-top: 5px solid var(--lh-yellow);">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
-                            <div>
-                                <h1 id="mf-callsign" style="color: var(--lh-yellow); font-size: 3.5rem; line-height: 1; text-shadow: 0 0 25px var(--lh-yellow-glow);">DLH456</h1>
-                                <p id="mf-route" style="font-size: 1.5rem; font-weight: 800; color: white; margin-top: 10px;">EDDF <span style="color:var(--lh-yellow)">➔</span> KJFK</p>
-                            </div>
-                            <div style="text-align: right;">
-                                <span style="background: var(--lh-yellow); color: var(--lh-blue-deep); padding: 8px 15px; border-radius: 4px; font-weight: 800; box-shadow: 0 0 15px var(--lh-yellow-glow);">STATUS: ACTIVE</span>
-                            </div>
-                        </div>
-                        
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; background: rgba(0,0,0,0.2); padding: 25px; border-radius: 12px;">
-                            <div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">САМОЛЕТ</p>
-                                <p id="mf-aircraft" style="font-size: 1.3rem; font-weight: 700; color: white;">-</p>
-                            </div>
-                             <div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">РАСЧЕТНОЕ ВРЕМЯ</p>
-                                <p id="mf-time" style="font-size: 1.3rem; font-weight: 700; color: white;">-</p>
-                            </div>
-                            <div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">ОПЕРАТОР</p>
-                                <p id="mf-airline" style="font-size: 1.3rem; font-weight: 700; color: white;">-</p>
-                            </div>
-                            <div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">ВРЕМЯ СТАРТА (UTC)</p>
-                                <p id="mf-start" style="font-size: 1.1rem; font-weight: 600; color: var(--lh-yellow);">-</p>
-                            </div>
-                            <div>
-                                <p style="color: var(--text-secondary); font-size: 0.9rem;">РАСЧ. ПРИБЫТИЕ (Local)</p>
-                                <p id="mf-end" style="font-size: 1.1rem; font-weight: 600;">-</p>
-                            </div>
-                        </div>
-
-                        <button class="btn" style="background: linear-gradient(135deg, #d9534f, #c9302c); border: none; margin-top: 30px; width: 100%; padding: 18px; font-size: 1.2rem; box-shadow: 0 5px 20px rgba(217, 83, 79, 0.4);" onclick="finishFlight()">ЗАВЕРШИТЬ РЕЙС И ОТПРАВИТЬ ОТЧЕТ</button>
-                    </div>
-                </section>
-            
-                <section id="sec-roster" style="margin-top: 60px;" class="fade-up">
-                    <h4 style="color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Активный Пилотский Состав</h4>
-                    <div class="card" id="pilot-roster-list" style="padding: 10px 25px;">
-                        </div>
-                 </section>
-
-            </div> </div>
+        </div>
     </div>
 
     <script>
-        // --- DATA DATABASE (EDIT HERE) ---
-        
-        // 1. ПИЛОТЫ (Добавляй сюда своих друзей)
+        /* --- CONFIG & DATA --- */
         const pilots = [
-            { callsign: "DLH001", pass: "admin123", name: "Captain Hans" },
-            { callsign: "SWR102", pass: "swiss2024", name: "F/O Markus" },
-            { callsign: "AUA555", pass: "vienna", name: "Capt. Julia" }
+            { id: "DLH001", pass: "admin", name: "Capt. Mueller" },
+            { id: "SWR999", pass: "swiss", name: "F/O Weber" }
         ];
 
-        // 2. АВИАКОМПАНИИ И ХАБЫ
         const airlines = [
             { code: "DLH", name: "Lufthansa", hubs: ["EDDF", "EDDM"] },
-            { code: "SWR", name: "Swiss", hubs: ["LSZH"] },
-            { code: "AUA", name: "Austrian", hubs: ["LOWW"] },
-            { code: "EWG", name: "Eurowings", hubs: ["EDDL", "EDDH"] }
+            { code: "SWR", name: "Swiss Int. Air Lines", hubs: ["LSZH", "LSGG"] },
+            { code: "AUA", name: "Austrian Airlines", hubs: ["LOWW"] },
+            { code: "EWG", name: "Eurowings", hubs: ["EDDL", "EDDH", "EDDS"] }
         ];
 
-        // 3. ФЛОТ (MaxHours = макс длительность полета для этого типа)
         const fleet = [
-            { type: "Airbus A319", reg: "D-AIBA", maxHours: 5, info: "Short haul narrow body. Ideal for European hops." },
-            { type: "Airbus A320neo", reg: "D-AINA", maxHours: 6, info: "The modern backbone of our short-medium haul fleet." },
-            { type: "Airbus A321", reg: "D-AISP", maxHours: 7, info: "High capacity narrow body for high-demand routes." },
-            { type: "Boeing 747-8", reg: "D-ABYA", maxHours: 16, info: "Queen of the Skies. The ultimate long-haul experience." },
-            { type: "Airbus A350-900", reg: "D-AIXA", maxHours: 18, info: "State-of-the-art efficiency for ultra-long missions." },
-            { type: "Bombardier CRJ900", reg: "D-ACNW", maxHours: 4, info: "Agile regional jet connecting smaller airports." }
+            { type: "A319-100", range: 5, desc: "Short Haul" },
+            { type: "A320neo", range: 6, desc: "Medium Haul" },
+            { type: "A321-200", range: 7, desc: "High Density" },
+            { type: "B747-8i", range: 15, desc: "Heavy / Flagship" },
+            { type: "A330-300", range: 11, desc: "Long Haul" },
+            { type: "A350-900", range: 17, desc: "Ultra Long Haul" },
+            { type: "CRJ-900", range: 4, desc: "Regional" }
         ];
 
-        // 4. НАПРАВЛЕНИЯ (Примеры)
+        // ADDED MORE ROUTES FOR BETTER TIME COVERAGE
         const routes = [
-            { dep: "EDDF", arr: "KJFK", time: 8.5, type: "long" },
-            { dep: "EDDF", arr: "EGLL", time: 1.5, type: "short" },
-            { dep: "EDDM", arr: "OMDB", time: 6.0, type: "medium" },
-            { dep: "LSZH", arr: "KLAX", time: 11.5, type: "long" },
-            { dep: "LSZH", arr: "LFPG", time: 1.0, type: "short" },
-            { dep: "LOWW", arr: "VTBS", time: 10.0, type: "long" },
-            { dep: "EDDL", arr: "LEPA", time: 2.5, type: "short" },
-            { dep: "EDDF", arr: "UUEE", time: 3.5, type: "medium" }
+            // EDDF (Frankfurt)
+            { d: "EDDF", a: "EGLL", t: 1.5 }, { d: "EDDF", a: "LFPG", t: 1.2 }, 
+            { d: "EDDF", a: "UUEE", t: 3.2 }, { d: "EDDF", a: "GCLP", t: 4.5 },
+            { d: "EDDF", a: "KJFK", t: 8.5 }, { d: "EDDF", a: "FACT", t: 11.5 },
+            { d: "EDDF", a: "RJTT", t: 12.0 }, { d: "EDDF", a: "OMDB", t: 6.2 },
+            
+            // EDDM (Munich)
+            { d: "EDDM", a: "LIRF", t: 1.5 }, { d: "EDDM", a: "ESSA", t: 2.1 },
+            { d: "EDDM", a: "OLBA", t: 3.5 }, { d: "EDDM", a: "KLAX", t: 11.8 },
+            
+            // LSZH (Zurich)
+            { d: "LSZH", a: "EDDF", t: 0.8 }, { d: "LSZH", a: "EGLL", t: 1.8 },
+            { d: "LSZH", a: "LLBG", t: 3.8 }, { d: "LSZH", a: "WSSS", t: 12.2 },
+            { d: "LSZH", a: "KJFK", t: 8.8 },
+            
+            // LOWW (Vienna)
+            { d: "LOWW", a: "LGAV", t: 2.0 }, { d: "LOWW", a: "VTBS", t: 10.5 },
+            
+            // EDDL (Dusseldorf)
+            { d: "EDDL", a: "LEPA", t: 2.5 }, { d: "EDDL", a: "EGLL", t: 1.2 }
         ];
 
-        // --- SYSTEM STATE ---
-        let currentUser = null;
-        let tempGeneratedFlight = null;
+        /* --- STATE --- */
+        let tempFlight = null;
 
-        // --- INIT ---
-        window.onload = function() {
-            setTimeout(() => {
-                 document.getElementById('intro-screen').style.display = 'none';
-            }, 4500); // Убираем интро из DOM после анимации
-
-            loadFleetUI();
-            loadDestinationsUI();
-            loadAirlineSelect();
-            checkLocalStorage();
-            renderPilotRoster();
+        /* --- INIT --- */
+        window.onload = () => {
+            setTimeout(() => { document.getElementById('intro-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }, 2500);
             
-            // Pre-select About section in nav visually
-            const firstNavBtn = document.querySelector('.nav-btn');
-            if(firstNavBtn) firstNavBtn.classList.add('active');
+            // Init Dropdowns
+            const genSel = document.getElementById('gen-airline');
+            const destSel = document.getElementById('dest-airline');
+            
+            airlines.forEach(a => {
+                const opt1 = new Option(a.name, a.code);
+                const opt2 = new Option(a.name, a.code);
+                genSel.add(opt1);
+                destSel.add(opt2);
+            });
+
+            checkState();
+            renderFleet();
         };
 
-        // --- AUTH ---
+        /* --- LOGIC: AUTH --- */
         function attemptLogin() {
-            const callInput = document.getElementById('callsign');
-            const passInput = document.getElementById('password');
-            const call = callInput.value.toUpperCase(); // Force uppercase callsign
-            const pass = passInput.value;
-            
-            const user = pilots.find(p => p.callsign === call && p.pass === pass);
-            
-            if (user) {
-                currentUser = user;
-                // Плавное исчезновение логина
-                const loginBox = document.querySelector('.login-box');
-                loginBox.style.opacity = '0';
-                loginBox.style.transform = 'translateY(-20px)';
-                loginBox.style.transition = 'all 0.5s ease';
+            const c = document.getElementById('callsign').value.toUpperCase();
+            const p = document.getElementById('password').value;
+            const user = pilots.find(u => u.id === c && u.pass === p);
 
-                setTimeout(() => {
-                    document.getElementById('login-screen').classList.add('hidden');
-                    document.getElementById('dashboard').classList.remove('hidden');
-                    // Анимация появления дашборда
-                    document.getElementById('dashboard').classList.add('fade-up');
-                    
-                    document.getElementById('pilot-name').innerHTML = `<span style="color:var(--lh-yellow)">✈</span> ${user.callsign}`;
-                    
-                    checkLocalStorage(); // Check flight status on login
-                }, 500);
-
+            if(user) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.getElementById('dashboard').classList.add('fade-up');
+                document.getElementById('pilot-badge').innerText = `${user.name} (${user.id})`;
             } else {
-                const errorMsg = document.getElementById('login-error');
-                errorMsg.classList.remove('hidden');
-                // Shake animation for error
-                callInput.style.borderColor = '#ff4d4d';
-                passInput.style.borderColor = '#ff4d4d';
-                setTimeout(() => {
-                     callInput.style.borderColor = 'var(--glass-border)';
-                     passInput.style.borderColor = 'var(--glass-border)';
-                }, 2000);
+                document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
-        // --- NAVIGATION (UPDATED WITH ANIMATION) ---
-        function showSection(id, btnElement) {
-            // 1. Handle Nav Active State
-            document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
+        /* --- LOGIC: NAVIGATION --- */
+        function navTo(id, el) {
+            // UI Active State
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            el.classList.add('active');
 
-            // 2. Fade out current section quickly
-            const currentSection = document.querySelector('section:not(.hidden)');
-            if(currentSection) {
-                currentSection.style.opacity = 0;
-                currentSection.style.transform = 'translateY(10px)';
-                currentSection.style.transition = 'all 0.2s ease-out';
-            }
+            // Hide all sections
+            const sections = document.querySelectorAll('section');
+            sections.forEach(s => { s.classList.add('hidden'); s.classList.remove('fade-up'); });
 
-            // 3. Wait for fade out, then swap and fade in new
-            setTimeout(() => {
-                document.querySelectorAll('section').forEach(s => {
-                    s.classList.add('hidden');
-                    s.classList.remove('fade-up'); // reset animation class
-                    s.style.opacity = ''; // reset inline styles
-                    s.style.transform = '';
-                });
-                
-                const target = document.getElementById(`sec-${id}`);
-                target.classList.remove('hidden');
-                // Force reflow to restart animation
-                void target.offsetWidth; 
-                target.classList.add('fade-up');
-
-            }, 200); // Wait 200ms for fade out
+            // Show target
+            const target = document.getElementById(`sec-${id}`);
+            target.classList.remove('hidden');
+            void target.offsetWidth; 
+            target.classList.add('fade-up');
         }
 
-        // --- UI POPULATION ---
-        function loadFleetUI() {
-            const container = document.getElementById('fleet-container');
+        /* --- LOGIC: FLEET RENDER --- */
+        function renderFleet() {
+            const g = document.getElementById('fleet-grid');
             fleet.forEach(ac => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                    <div style="font-size: 2.5rem; color: var(--lh-yellow); margin-bottom:10px;">✈</div>
-                    <h3>${ac.type}</h3>
-                    <p style="font-weight:700; color:white; margin-bottom: 10px;">Range: ${ac.maxHours}h</p>
-                    <p>${ac.info}</p>
-                `;
-                container.appendChild(card);
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `<h3>${ac.type}</h3><p style="color:var(--lh-yellow); font-weight:bold;">Max Range: ${ac.range}h</p><p style="color:var(--text-muted);">${ac.desc}</p>`;
+                g.appendChild(div);
             });
         }
 
-        function loadDestinationsUI() {
-            renderDestinations(routes);
+        /* --- LOGIC: DESTINATIONS (LINKED DROPDOWNS) --- */
+        function updateDestHubs() {
+            const code = document.getElementById('dest-airline').value;
+            const hubSel = document.getElementById('dest-hub');
+            hubSel.innerHTML = '<option value="">-- Hub --</option>';
+            document.getElementById('dest-grid').innerHTML = ''; // Clear results
+
+            if(!code) { hubSel.disabled = true; return; }
+
+            const al = airlines.find(a => a.code === code);
+            al.hubs.forEach(h => hubSel.add(new Option(h, h)));
+            hubSel.disabled = false;
         }
 
-        function renderDestinations(data) {
-            const container = document.getElementById('dest-container');
-            container.innerHTML = '';
-            // Reset animation trigger
-            container.classList.remove('stagger-load');
-            void container.offsetWidth; 
-            container.classList.add('stagger-load');
+        function filterDestinationsBySelect() {
+            const hub = document.getElementById('dest-hub').value;
+            const grid = document.getElementById('dest-grid');
+            grid.innerHTML = '';
 
-            data.forEach(r => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                card.innerHTML = `
-                     <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <h3 style="margin:0; font-size: 1.4rem;">${r.dep} <span style="color:var(--lh-yellow)">➔</span> ${r.arr}</h3>
-                        <span style="font-size: 1.5rem;">🗺️</span>
-                    </div>
-                    <hr style="border-color: var(--glass-border); margin: 15px 0;">
-                    <p><strong>ETE:</strong> ${r.time} ч.</p>
-                    <p><strong>Type:</strong> <span style="color:var(--lh-yellow); font-weight:700; text-transform:uppercase;">${r.type} Haul</span></p>
-                `;
-                container.appendChild(card);
-            });
-        }
+            if(!hub) return;
 
-        function filterDestinations(hub) {
-            if(hub === 'all') {
-                renderDestinations(routes);
-            } else {
-                const filtered = routes.filter(r => r.dep === hub);
-                renderDestinations(filtered);
+            const matches = routes.filter(r => r.d === hub);
+            
+            if(matches.length === 0) {
+                grid.innerHTML = '<p style="color:white; padding:20px;">Нет маршрутов в базе для этого хаба.</p>';
+                return;
             }
-        }
 
-        function renderPilotRoster() {
-            const list = document.getElementById('pilot-roster-list');
-            let html = '<div style="display:flex; flex-direction:column; gap: 10px;">';
-            pilots.forEach(p => {
-                html += `<div class="pilot-item">
-                            <span class="icon">👨‍✈️</span> 
-                            <div><strong style="color:white; font-size: 1.1rem;">${p.callsign}</strong> <br> <span style="color:var(--text-secondary);">${p.name}</span></div>
-                         </div>`;
-            });
-            html += '</div>';
-            list.innerHTML = html;
-        }
-
-        // --- GENERATOR LOGIC ---
-        function loadAirlineSelect() {
-            const sel = document.getElementById('gen-airline');
-            airlines.forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.code;
-                opt.innerText = `${a.name} (${a.code})`;
-                sel.appendChild(opt);
+            matches.forEach(r => {
+                const d = document.createElement('div');
+                d.className = 'card';
+                d.innerHTML = `
+                    <div style="font-size:1.5rem; font-weight:bold;">${r.d} <span style="color:var(--lh-yellow)">➔</span> ${r.a}</div>
+                    <div style="margin-top:10px; color:var(--text-muted);">Время в пути: <span style="color:white;">${r.t} ч.</span></div>
+                `;
+                grid.appendChild(d);
             });
         }
 
-        function updateHubs() {
+        /* --- LOGIC: GENERATOR --- */
+        function updateGenHubs() {
             const code = document.getElementById('gen-airline').value;
             const hubSel = document.getElementById('gen-hub');
             hubSel.innerHTML = '';
             
-            const airline = airlines.find(a => a.code === code);
-            
-            if (airline) {
+            const al = airlines.find(a => a.code === code);
+            if(al) {
                 hubSel.disabled = false;
-                if (airline.hubs.length === 1) {
-                    const opt = document.createElement('option');
-                    opt.value = airline.hubs[0];
-                    opt.innerText = airline.hubs[0] + " (Fixed Base)";
-                    hubSel.appendChild(opt);
-                    hubSel.disabled = true;
-                } else {
-                    airline.hubs.forEach(h => {
-                        const opt = document.createElement('option');
-                        opt.value = h;
-                        opt.innerText = h;
-                        hubSel.appendChild(opt);
-                    });
-                }
+                al.hubs.forEach(h => hubSel.add(new Option(h, h)));
             } else {
                 hubSel.disabled = true;
-                hubSel.innerHTML = '<option>Ожидание выбора оператора...</option>';
+                hubSel.innerHTML = '<option>Ожидание...</option>';
             }
         }
 
         function generateFlight() {
-            if(localStorage.getItem('myFlight')) return; // Should be blocked by UI anyway
+            if(localStorage.getItem('lh_active_flight')) return;
 
-            const airlineCode = document.getElementById('gen-airline').value;
+            const acCode = document.getElementById('gen-airline').value;
             const hub = document.getElementById('gen-hub').value;
-            const timeType = document.getElementById('gen-time').value;
+            const rangeVal = document.getElementById('gen-time').value; // "1-2", "3-4"...
 
-            if (!airlineCode || !hub) { 
-                alert("SYSTEM ERROR: Не выбран оператор или хаб."); return; 
+            if(!acCode || !hub) { alert("Выберите Авиакомпанию и Хаб"); return; }
+
+            // Filter Routes by Range
+            let min, max;
+            if(rangeVal === "10+") { min=10; max=99; }
+            else {
+                const parts = rangeVal.split('-');
+                min = parseFloat(parts[0]);
+                max = parseFloat(parts[1]);
             }
 
-            let suitableRoutes = routes.filter(r => r.dep === hub && r.type === timeType);
-            if (suitableRoutes.length === 0) {
-                 alert("ROUTE ERROR: Маршруты с заданными параметрами не найдены."); return;
+            const suitableRoutes = routes.filter(r => r.d === hub && r.t >= min && r.t <= max);
+
+            if(suitableRoutes.length === 0) {
+                alert("Нет маршрутов для выбранного времени и хаба."); return;
             }
+
             const route = suitableRoutes[Math.floor(Math.random() * suitableRoutes.length)];
+            
+            // Find Plane
+            const plane = fleet.find(f => f.range >= route.t && (route.t > 8 ? f.range > 10 : true)); // Simple logic: if long flight, take widebody
 
-            let suitablePlanes = fleet.filter(ac => ac.maxHours >= route.time);
-            if (route.type === 'short') {
-                const narrowBodies = suitablePlanes.filter(ac => ac.maxHours < 10);
-                if(narrowBodies.length > 0) suitablePlanes = narrowBodies;
-            }
+            if(!plane) { alert("Нет подходящего самолета."); return; }
 
-            if (suitablePlanes.length === 0) { alert("FLEET ERROR: Нет подходящего борта."); return; }
-            const plane = suitablePlanes[Math.floor(Math.random() * suitablePlanes.length)];
-
-            // Generate Call sign with random number
-            const randomNum = Math.floor(Math.random() * 899 + 100);
-
-            tempGeneratedFlight = {
-                airline: airlines.find(a=>a.code === airlineCode).name,
-                callsign: airlineCode + randomNum,
-                dep: route.dep,
-                arr: route.arr,
-                time: route.time,
-                aircraft: plane.type,
-                regDate: new Date().toUTCString() // Use UTC for aviation look
+            // Show result
+            tempFlight = {
+                call: acCode + Math.floor(Math.random()*900+100),
+                route: `${route.d} -> ${route.a}`,
+                time: route.t,
+                ac: plane.type,
+                dep: new Date().toISOString().slice(11,16) + ' Z'
             };
 
-            const infoDiv = document.getElementById('gen-info');
-            infoDiv.innerHTML = `
-                <div>
-                    <p style="color:var(--text-secondary);">Позывной</p>
-                    <p style="font-weight:700; color:var(--lh-yellow); font-size:1.2rem;">${tempGeneratedFlight.callsign}</p>
-                </div>
-                <div>
-                    <p style="color:var(--text-secondary);">Маршрут</p>
-                    <p style="font-weight:700; color:white; font-size:1.2rem;">${tempGeneratedFlight.dep} ➝ ${tempGeneratedFlight.arr}</p>
-                </div>
-                <div>
-                    <p style="color:var(--text-secondary);">Тип ВС</p>
-                    <p style="font-weight:700; color:white;">${tempGeneratedFlight.aircraft}</p>
-                </div>
-                <div>
-                    <p style="color:var(--text-secondary);">Расч. время</p>
-                    <p style="font-weight:700; color:white;">${tempGeneratedFlight.time} ч.</p>
-                </div>
+            const html = `
+                <div><div style="color:gray;">Позывной</div><div style="font-size:1.2rem; font-weight:bold; color:var(--lh-yellow);">${tempFlight.call}</div></div>
+                <div><div style="color:gray;">Маршрут</div><div style="font-size:1.2rem; font-weight:bold;">${tempFlight.route}</div></div>
+                <div><div style="color:gray;">Самолет</div><div>${tempFlight.ac}</div></div>
+                <div><div style="color:gray;">Время</div><div>${tempFlight.time} ч.</div></div>
             `;
+            document.getElementById('gen-data').innerHTML = html;
             
-            const resDiv = document.getElementById('generated-result');
-            resDiv.classList.remove('hidden');
-            void resDiv.offsetWidth; resDiv.classList.add('fade-up'); // trigger animation
+            const res = document.getElementById('gen-result');
+            res.classList.remove('hidden');
+            res.classList.add('fade-up');
         }
 
         function acceptFlight() {
-            if(!tempGeneratedFlight) return;
-            
-            const now = new Date();
-            const arrival = new Date(now.getTime() + (tempGeneratedFlight.time * 60 * 60 * 1000));
-            // Format to simpler local time string for arrival
-            tempGeneratedFlight.arrivalDate = arrival.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " (Local)";
-
-            localStorage.setItem('myFlight', JSON.stringify(tempGeneratedFlight));
-            
-            tempGeneratedFlight = null;
-            document.getElementById('generated-result').classList.add('hidden');
-            checkLocalStorage();
-            // Auto navigate to My Flight section
-            showSection('my-flight', document.querySelector('[onclick*=my-flight]'));
+            localStorage.setItem('lh_active_flight', JSON.stringify(tempFlight));
+            tempFlight = null;
+            document.getElementById('gen-result').classList.add('hidden');
+            checkState();
+            navTo('my-flight', document.querySelectorAll('.nav-link')[4]);
         }
 
-        // --- FLIGHT MANAGEMENT ---
-        function checkLocalStorage() {
-            const savedData = localStorage.getItem('myFlight');
-            const noFlightMsg = document.getElementById('no-flight-msg');
-            const flightCard = document.getElementById('flight-data-card');
-            const banner = document.getElementById('active-flight-banner');
-            const genLock = document.getElementById('generator-locked-msg');
-            const genForm = document.getElementById('generator-interface');
+        function endFlight() {
+            if(confirm("Завершить полет?")) {
+                localStorage.removeItem('lh_active_flight');
+                checkState();
+            }
+        }
 
-            if (savedData) {
-                const flight = JSON.parse(savedData);
+        function checkState() {
+            const data = localStorage.getItem('lh_active_flight');
+            const noF = document.getElementById('no-flight');
+            const yesF = document.getElementById('flight-card');
+            const sb = document.getElementById('status-bar');
+            const lock = document.getElementById('gen-lock-msg');
+            const form = document.getElementById('gen-form');
+
+            if(data) {
+                const f = JSON.parse(data);
+                noF.classList.add('hidden');
+                yesF.classList.remove('hidden'); yesF.classList.add('fade-up');
+                sb.classList.remove('hidden');
+                lock.classList.remove('hidden');
+                form.classList.add('hidden');
+
+                // Fill UI
+                document.getElementById('mf-call').innerText = f.call;
+                document.getElementById('mf-route').innerText = f.route;
+                document.getElementById('mf-time').innerText = f.time + ' hours';
+                document.getElementById('mf-ac').innerText = f.ac;
+                document.getElementById('mf-dep-time').innerText = f.dep;
                 
-                noFlightMsg.classList.add('hidden');
-                flightCard.classList.remove('hidden');
-                banner.classList.remove('hidden');
-                genLock.classList.remove('hidden');
-                genForm.classList.add('hidden');
+                // Calc Arrival
+                const now = new Date();
+                const arr = new Date(now.getTime() + f.time*3600000);
+                document.getElementById('mf-arr-time').innerText = arr.getHours() + ':' + (arr.getMinutes()<10?'0':'') + arr.getMinutes();
 
-                document.getElementById('mf-callsign').innerText = flight.callsign;
-                document.getElementById('mf-route').innerHTML = `${flight.dep} <span style="color:var(--lh-yellow)">➔</span> ${flight.arr}`;
-                document.getElementById('mf-aircraft').innerText = flight.aircraft;
-                document.getElementById('mf-time').innerText = flight.time + ' ч.';
-                document.getElementById('mf-airline').innerText = flight.airline;
-                // Slice UTC string to make it shorter and cleaner
-                document.getElementById('mf-start').innerText = flight.regDate.slice(17, 22) + " Z"; 
-                document.getElementById('mf-end').innerText = flight.arrivalDate;
-
-                document.getElementById('banner-flight-num').innerText = flight.callsign;
-                document.getElementById('banner-ac').innerText = flight.aircraft;
+                // Status Bar
+                document.getElementById('sb-call').innerText = f.call;
+                document.getElementById('sb-route').innerText = f.route;
 
             } else {
-                noFlightMsg.classList.remove('hidden');
-                flightCard.classList.add('hidden');
-                banner.classList.add('hidden');
-                genLock.classList.add('hidden');
-                genForm.classList.remove('hidden');
+                noF.classList.remove('hidden');
+                yesF.classList.add('hidden');
+                sb.classList.add('hidden');
+                lock.classList.add('hidden');
+                form.classList.remove('hidden');
             }
         }
 
-        function finishFlight() {
-            // Use a slightly nicer confirm dialog look (standard browser alert is fine for now, but custom would be better later)
-            if(confirm("ПОДТВЕРЖДЕНИЕ: Вы действительно хотите завершить текущий рейс и отправить полетный рапорт?")) {
-                localStorage.removeItem('myFlight');
-                checkLocalStorage();
-                // Show success message briefly
-                const noFlightMsg = document.getElementById('no-flight-msg');
-                noFlightMsg.innerHTML = '<h3 style="color:var(--lh-yellow);">РЕЙС УСПЕШНО ЗАВЕРШЕН</h3><p>Рапорт отправлен. Система готова к новому заданию.</p>';
-                setTimeout(() => {
-                    // Reset msg back to default
-                     noFlightMsg.innerHTML = '<h3 style="color: var(--text-secondary);">НЕТ АКТИВНЫХ ЗАДАНИЙ</h3><p>Перейдите в <b style="cursor: pointer; color: var(--lh-yellow); text-decoration: underline;" onclick="showSection(\'generator\', document.querySelector(\'[onclick*=generator]\'))">Генератор Рейсов</b> для получения нового маршрута.</p>';
-                }, 3000);
-            }
-        }
     </script>
 </body>
 </html>
