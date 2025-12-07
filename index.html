@@ -9,20 +9,26 @@
     <style>
         /* --- 1. CORPORATE STYLE CONFIG --- */
         :root {
-            /* Lufthansa Official Colors Simulation */
+            /* Colors */
             --lh-blue: #05164d;
-            --lh-blue-hover: #0a2166;
+            --lh-blue-hover: #0a247a;
             --lh-yellow: #ffb600;
+            --lh-yellow-glow: rgba(255, 182, 0, 0.5);
+            --lh-blue-glow: rgba(5, 22, 77, 0.2);
             --lh-grey-bg: #f2f4f7;
             --white: #ffffff;
             --text-main: #333333;
             --text-light: #666666;
             
-            /* Game UI Vars */
-            --card-radius: 8px; /* Скругления меньше, строже */
-            --btn-radius: 4px;
-            --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
-            --shadow-hover: 0 10px 20px rgba(5, 22, 77, 0.15);
+            /* UI Vars */
+            --card-radius: 12px; /* Чуть мягче скругления */
+            --btn-radius: 6px;
+            /* Базовая тень */
+            --shadow-card: 0 4px 12px rgba(0,0,0,0.05);
+            /* Тень-свечение при наведении (Синее) */
+            --shadow-hover-glow: 0 12px 25px var(--lh-blue-glow), 0 4px 10px rgba(0,0,0,0.05);
+            /* Плавный переход для всех элементов */
+            --smooth-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
@@ -35,18 +41,28 @@
             flex-direction: column;
         }
 
+        /* SVG Logo Styling */
+        .lh-svg-logo {
+            fill: currentColor;
+            display: block;
+        }
+
         /* --- 2. ANIMATIONS --- */
         .hidden { display: none !important; }
         
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
 
-        .slide-up { animation: slideUp 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+
+        /* Анимация для элементов списка (каскад) */
+        .stagger-item { opacity: 0; transform: translateY(20px); transition: --smooth-transition; }
+        .stagger-item.show { opacity: 1; transform: translateY(0); }
 
         /* --- 3. UI COMPONENTS --- */
         
-        /* Кнопки - строгие, но отзывчивые */
+        /* Кнопки с эффектом свечения */
         .btn {
             background-color: var(--lh-blue);
             color: var(--white);
@@ -54,60 +70,69 @@
             padding: 12px 24px;
             font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: var(--smooth-transition);
             border-radius: var(--btn-radius);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: relative; overflow: hidden;
         }
         .btn:hover { 
             background-color: var(--lh-blue-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(5, 22, 77, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--lh-blue-glow);
         }
+        .btn:active { transform: translateY(0); }
+
         .btn-yellow { 
             background-color: var(--lh-yellow); 
             color: var(--lh-blue); 
         }
-        .btn-yellow:hover { background-color: #ffc400; }
+        .btn-yellow:hover { 
+            background-color: #ffc400;
+            /* Желтое свечение при наведении */
+            box-shadow: 0 5px 20px var(--lh-yellow-glow);
+        }
         
-        /* Поля ввода - чистый стиль */
+        /* Поля ввода со свечением при фокусе */
         input, select {
             width: 100%;
             padding: 12px 15px;
             margin: 5px 0 20px 0;
-            border: 1px solid #ccc;
+            border: 2px solid #e0e0e0; /* Чуть толще рамка */
             border-radius: var(--btn-radius);
             font-size: 1rem;
             background: #fff;
-            transition: 0.2s;
+            transition: var(--smooth-transition);
         }
         input:focus, select:focus {
             outline: none;
-            border-color: var(--lh-blue);
-            box-shadow: 0 0 0 3px rgba(5, 22, 77, 0.1);
+            border-color: var(--lh-yellow);
+            /* Мягкое желтое свечение вокруг поля */
+            box-shadow: 0 0 0 4px rgba(255, 182, 0, 0.15);
         }
 
-        /* Карточки - как блоки контента на сайте */
+        /* Карточки с "парящим" эффектом */
         .lh-card {
             background: var(--white);
             padding: 25px;
             border-radius: var(--card-radius);
             box-shadow: var(--shadow-card);
             margin-bottom: 25px;
-            border-top: 4px solid transparent; /* Для акцента */
-            transition: 0.3s;
+            border-top: 4px solid transparent;
+            transition: var(--smooth-transition);
         }
         .lh-card:hover {
-            box-shadow: var(--shadow-hover);
-            transform: translateY(-2px);
+            /* Карточка поднимается и начинает светиться снизу */
+            box-shadow: var(--shadow-hover-glow);
+            transform: translateY(-3px);
         }
         .border-blue { border-top-color: var(--lh-blue); }
         .border-yellow { border-top-color: var(--lh-yellow); }
 
         h2 {
             color: var(--lh-blue);
-            font-weight: 300; /* Тонкий шрифт заголовка как у LH */
+            font-weight: 300;
             font-size: 1.8rem;
             margin-bottom: 20px;
             border-bottom: 1px solid #e0e0e0;
@@ -116,149 +141,149 @@
 
         /* --- 4. SECTIONS --- */
         
-        /* WELCOME SCREEN - "Cinematic" */
+        /* WELCOME SCREEN */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://images.unsplash.com/photo-1542296332-2e44a996aa0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
             z-index: 2000;
             display: flex; align-items: center; justify-content: center;
         }
-        .welcome-overlay {
-            background: rgba(5, 22, 77, 0.85);
-            width: 100%; height: 100%; position: absolute;
-        }
-        .welcome-content {
-            position: relative; z-index: 2001; text-align: center; color: white;
-        }
+        .welcome-overlay { background: rgba(5, 22, 77, 0.85); width: 100%; height: 100%; position: absolute; }
+        .welcome-content { position: relative; z-index: 2001; text-align: center; color: white; }
+        
         .logo-circle {
-            width: 100px; height: 100px;
-            border: 2px solid var(--lh-yellow); border-radius: 50%;
+            width: 110px; height: 110px;
+            border: 3px solid var(--lh-yellow); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 25px auto;
+            color: var(--lh-yellow);
+            box-shadow: 0 0 20px var(--lh-yellow-glow); /* Свечение логотипа */
         }
-        .crane { font-size: 3.5rem; color: var(--lh-yellow); }
-        .loader-bar {
-            width: 200px; height: 4px; background: rgba(255,255,255,0.2);
-            margin: 20px auto; border-radius: 2px; overflow: hidden;
-        }
-        .loader-progress {
-            height: 100%; background: var(--lh-yellow); width: 0%;
-            animation: loadProgress 4s ease-in-out forwards;
-        }
+        
+        .loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.2); margin: 25px auto; border-radius: 2px; overflow: hidden; }
+        .loader-progress { height: 100%; background: var(--lh-yellow); width: 0%; animation: loadProgress 4s ease-in-out forwards; box-shadow: 0 0 10px var(--lh-yellow-glow); }
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
-        /* LOGIN SCREEN - Clean Corporate */
+        /* LOGIN SCREEN */
         #login-screen {
             height: 100vh;
             display: flex; align-items: center; justify-content: center;
             background-color: var(--lh-blue);
-            background-image: linear-gradient(135deg, #05164d 0%, #0a247a 100%);
+            background-image: radial-gradient(circle at center, #0a247a 0%, #05164d 100%);
         }
         .login-box {
-            background: white; padding: 40px; width: 100%; max-width: 380px;
-            border-radius: var(--card-radius); box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            background: white; padding: 45px 40px; width: 100%; max-width: 380px;
+            border-radius: var(--card-radius); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             text-align: center;
         }
 
-        /* DASHBOARD - Real Site Layout */
+        /* DASHBOARD Header */
         header {
-            background-color: var(--lh-blue);
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background-color: var(--lh-blue); color: white; padding: 18px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative; z-index: 200;
         }
         .header-content {
             max-width: 1100px; margin: 0 auto; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .logo-text { font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .logo-text { font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; letter-spacing: 0.5px; }
         
         /* Navigation Bar */
         .nav-bar {
-            background: white; border-bottom: 1px solid #ddd;
+            background: white; border-bottom: 1px solid #e0e0e0;
             position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
         .nav-content {
             max-width: 1100px; margin: 0 auto; padding: 0 20px;
             display: flex; overflow-x: auto;
         }
         .nav-item {
-            padding: 15px 20px;
-            background: none; border: none;
-            color: var(--text-light); font-weight: 600; font-size: 0.9rem;
+            padding: 18px 20px; background: none; border: none;
+            color: var(--text-light); font-weight: 600; font-size: 0.95rem;
             cursor: pointer; position: relative;
-            transition: 0.2s; white-space: nowrap;
+            transition: var(--smooth-transition); white-space: nowrap;
         }
         .nav-item:hover { color: var(--lh-blue); }
         .nav-item.active { color: var(--lh-blue); }
-        .nav-item.active::after {
+        .nav-item::after {
             content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-            background: var(--lh-yellow);
+            background: var(--lh-yellow); transform: scaleX(0); transition: var(--smooth-transition);
         }
+        .nav-item.active::after { transform: scaleX(1); box-shadow: 0 0 8px var(--lh-yellow-glow); }
 
-        .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; flex: 1; }
+        .container { max-width: 1100px; margin: 35px auto; padding: 0 20px; flex: 1; }
 
-        /* Fleet Grid */
-        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .aircraft-card img { width: 100%; height: 140px; object-fit: cover; border-radius: 4px; margin-bottom: 10px; }
+        /* Fleet Grid & Cards */
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+        .aircraft-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
         
-        /* Flight Banner (Boarding Pass style) */
+        /* Active Flight Banner */
         #active-flight-banner {
-            background: linear-gradient(to right, #ffffff 70%, #f9f9f9 100%);
-            border: 1px solid #ddd;
-            border-left: 5px solid var(--lh-yellow);
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 15px;
+            background: linear-gradient(to right, #ffffff 70%, #fdfbf7 100%);
+            border: 1px solid #e0e0e0; border-left: 5px solid var(--lh-yellow);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
         .flight-route { font-size: 1.5rem; font-weight: 700; color: var(--lh-blue); }
-        .flight-status { font-size: 0.75rem; text-transform: uppercase; color: #888; letter-spacing: 1px; }
+        .flight-status { font-size: 0.75rem; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 5px;}
 
         /* Ticket Result */
-        .ticket-result {
-            background: #fff; border: 1px solid #ddd;
-            position: relative;
-        }
+        .ticket-result { background: #fff; border: 1px solid #e0e0e0; position: relative; border-radius: var(--card-radius); overflow: hidden;}
         .ticket-header {
-            background: var(--lh-blue); color: white; padding: 10px 20px;
-            display: flex; justify-content: space-between; border-radius: 4px 4px 0 0;
+            background: var(--lh-blue); color: white; padding: 12px 25px;
+            display: flex; justify-content: space-between;
         }
 
     </style>
 </head>
 <body>
 
+    <svg style="display:none;">
+        <symbol id="lh-crane" viewBox="0 0 24 24">
+             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h6v2h-6v6h-2v-6H5v-2h6V7z"/> 
+             <path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/>
+        </symbol>
+    </svg>
+
     <div id="welcome-screen">
         <div class="welcome-overlay"></div>
         <div class="welcome-content fade-in">
             <div class="logo-circle">
-                <span class="crane">✈</span>
+                 <svg class="lh-svg-logo" width="60" height="60">
+                    <use href="#lh-crane"></use>
+                </svg>
             </div>
-            <h1 style="font-weight: 300; font-size: 2.5rem; margin-bottom: 10px;">Lufthansa Group</h1>
-            <p style="opacity: 0.8; letter-spacing: 1px;">CREW PORTAL</p>
+            <h1 style="font-weight: 300; font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 2px;">Lufthansa Group</h1>
+            <p style="opacity: 0.9; letter-spacing: 1px; font-weight: 600;">CREW PORTAL ACCESS</p>
             
             <div class="loader-bar">
                 <div class="loader-progress"></div>
             </div>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Connecting to Crew Services...</p>
+            <p style="font-size: 0.85rem; margin-top: 15px; opacity: 0.7;">Establishing secure connection...</p>
         </div>
     </div>
 
     <div id="login-screen" class="hidden">
         <div class="login-box slide-up">
-            <div style="font-size: 3rem; color: var(--lh-blue); margin-bottom: 10px;">✈</div>
-            <h2 style="border:none; text-align:center; font-size:1.5rem; font-weight:700;">Crew Login</h2>
-            <p style="color:#666; margin-bottom:25px; font-size:0.9rem;">Please identify yourself</p>
+            <div style="color: var(--lh-blue); margin-bottom: 20px; display: flex; justify-content: center;">
+                <svg class="lh-svg-logo" width="70" height="70">
+                    <use href="#lh-crane"></use>
+                </svg>
+            </div>
+            <h2 style="border:none; text-align:center; font-size:1.6rem; font-weight:700; margin-bottom: 10px;">Crew Identification</h2>
+            <p style="color:#666; margin-bottom:30px; font-size:0.95rem;">Enter credentials to proceed.</p>
             
             <div style="text-align: left;">
-                <label style="font-size:0.8rem; font-weight:bold; color:#444;">CALLSIGN</label>
-                <input type="text" id="callsign" placeholder="e.g. DLH001">
+                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing: 0.5px;">CALLSIGN</label>
+                <input type="text" id="callsign" placeholder="e.g., DLH001">
                 
-                <label style="font-size:0.8rem; font-weight:bold; color:#444;">PASSWORD</label>
+                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing: 0.5px;">PASSCODE</label>
                 <input type="password" id="password" placeholder="••••••">
             </div>
 
-            <button class="btn btn-yellow" style="width:100%; margin-top: 10px;" onclick="login()">Log In</button>
-            <p id="login-error" style="color:red; margin-top:15px; font-size:0.85rem;"></p>
+            <button class="btn btn-yellow" style="width:100%; margin-top: 15px; padding: 15px;" onclick="login()">AUTHENTICATE</button>
+            <p id="login-error" style="color:#d9534f; margin-top:20px; font-size:0.9rem; font-weight: 600;"></p>
         </div>
     </div>
 
@@ -267,10 +292,12 @@
         <header>
             <div class="header-content">
                 <div class="logo-text">
-                    <span style="font-size:1.5rem; color:var(--lh-yellow)">✈</span>
+                    <svg class="lh-svg-logo" width="28" height="28" style="color:var(--lh-yellow)">
+                        <use href="#lh-crane"></use>
+                    </svg>
                     LUFTHANSA GROUP
                 </div>
-                <div id="user-display" style="font-size:0.9rem; opacity:0.9;">Not Logged In</div>
+                <div id="user-display" style="font-size:0.9rem; opacity:0.9; font-weight: 600;">Not Logged In</div>
             </div>
         </header>
 
@@ -278,48 +305,47 @@
             <div class="nav-content">
                 <button class="nav-item active" onclick="showTab('about', this)">Dashboard</button>
                 <button class="nav-item" onclick="showTab('rules', this)">Regulations</button>
-                <button class="nav-item" onclick="showTab('fleet', this)">Fleet Overview</button>
+                <button class="nav-item" onclick="showTab('fleet', this)">Fleet</button>
                 <button class="nav-item" onclick="showTab('routes', this)">Hubs</button>
-                <button class="nav-item" onclick="showTab('generator', this)">Flight Dispatch</button>
+                <button class="nav-item" onclick="showTab('generator', this)">Dispatch</button>
             </div>
         </div>
 
         <div class="container">
             
-            <div id="active-flight-banner" class="lh-card hidden slide-up" style="padding: 15px 25px;">
-                <div style="display:flex; align-items:center; gap:20px;">
+            <div id="active-flight-banner" class="lh-card hidden slide-up" style="padding: 20px 30px;">
+                <div style="display:flex; align-items:center; gap:25px;">
                     <div>
                         <div class="flight-status">Active Mission</div>
                         <div class="flight-route"><span id="af-info">FRA - JFK</span></div>
                     </div>
-                    <div style="border-left: 1px solid #ddd; padding-left: 20px;">
-                        <div class="flight-status">Aircraft</div>
-                        <div style="font-weight:bold; color:var(--text-main);" id="af-ac">A350-900</div>
+                    <div style="border-left: 2px solid #e0e0e0; padding-left: 25px;">
+                        <div class="flight-status">Aircraft Type</div>
+                        <div style="font-weight:bold; color:var(--text-main); font-size: 1.1rem;" id="af-ac">A350-900</div>
                     </div>
                 </div>
-                <button class="btn" style="font-size:0.8rem;" onclick="completeFlight()">Report Arrival</button>
+                <button class="btn" style="font-size:0.85rem; padding: 10px 20px;" onclick="completeFlight()">Report Arrival</button>
             </div>
 
             <div id="tab-about" class="tab-content fade-in">
                 <h2 style="margin-top:0;">Captain's Briefing</h2>
                 
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:25px;">
                     <div class="lh-card border-blue">
-                        <h3 style="color:var(--lh-blue); margin-bottom:10px;">Welcome Aboard</h3>
-                        <p style="line-height:1.6; color:#555;">
-                            Добро пожаловать в систему Lufthansa Virtual. Этот портал разработан для управления вашими полетными операциями. 
-                            Здесь вы можете планировать рейсы, изучать флот и получать назначения.
+                        <h3 style="color:var(--lh-blue); margin-bottom:15px;">Welcome Aboard</h3>
+                        <p style="line-height:1.7; color:#555;">
+                            Добро пожаловать в систему Lufthansa Virtual. Этот портал разработан для управления вашими полетными операциями с максимальным комфортом и эффективностью.
                         </p>
                         <br>
                         <button class="btn btn-yellow" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">Start New Flight</button>
                     </div>
                     
                     <div class="lh-card border-yellow">
-                        <h4 style="margin-bottom:15px;">Quick Stats</h4>
-                        <ul style="list-style:none; line-height:2;">
-                            <li>✈ <strong>Status:</strong> Active</li>
-                            <li>📍 <strong>Base:</strong> Frankfurt</li>
-                            <li>⭐ <strong>Rating:</strong> Senior Captain</li>
+                        <h4 style="margin-bottom:15px; color:var(--lh-blue);">Quick Stats</h4>
+                        <ul style="list-style:none; line-height:2.2; font-weight: 600; color: #555;">
+                            <li><span style="color:var(--lh-yellow)">✈</span> Status: <span style="color:var(--lh-blue)">Active</span></li>
+                            <li><span style="color:var(--lh-yellow)">📍</span> Base: Frankfurt (EDDF)</li>
+                            <li><span style="color:var(--lh-yellow)">⭐</span> Rank: Senior Captain</li>
                         </ul>
                     </div>
                 </div>
@@ -328,11 +354,11 @@
             <div id="tab-rules" class="tab-content hidden fade-in">
                 <h2>Operational Regulations</h2>
                 <div class="lh-card border-blue">
-                    <ul style="margin-left:20px; line-height:1.8; color:#444;">
-                        <li><strong>Professionalism:</strong> Respect all ATC and other pilots.</li>
-                        <li><strong>Callsign:</strong> Use only your assigned identification.</li>
-                        <li><strong>Hub Operations:</strong> Departures must originate from your airline's hub.</li>
-                        <li><strong>Aircraft Usage:</strong> Select aircraft appropriate for route distance.</li>
+                    <ul style="margin-left:25px; line-height:1.9; color:#444;">
+                        <li><strong>Professionalism:</strong> Maintain professional conduct with ATC and fellow pilots at all times.</li>
+                        <li><strong>Callsign Usage:</strong> Utilize only your officially assigned group callsign.</li>
+                        <li><strong>Hub Operations:</strong> All flights must originate from a designated airline hub.</li>
+                        <li><strong>Fleet Policy:</strong> Select aircraft appropriate for the route's distance and demand.</li>
                     </ul>
                 </div>
             </div>
@@ -346,8 +372,8 @@
             <div id="tab-routes" class="tab-content hidden fade-in">
                 <h2>Network Hubs</h2>
                 <div class="lh-card border-blue">
-                    <p style="margin-bottom:15px; color:#666;">Primary operating bases for group airlines:</p>
-                    <ul id="hub-list-display" style="margin-left:20px; line-height:1.8;">
+                    <p style="margin-bottom:20px; color:#666;">Primary operating bases for group airlines:</p>
+                    <ul id="hub-list-display" style="margin-left:25px; line-height:2;">
                         </ul>
                 </div>
             </div>
@@ -355,58 +381,58 @@
             <div id="tab-generator" class="tab-content hidden fade-in">
                 <h2>Flight Dispatch</h2>
                 
-                <div id="generator-locked" class="lh-card hidden" style="text-align:center; background-color: #fdf8e4; border-color: var(--lh-yellow);">
-                    <h3 style="color: #9c6f00;">Flight in Progress</h3>
-                    <p>Please complete your current active flight before dispatching a new one.</p>
+                <div id="generator-locked" class="lh-card hidden" style="text-align:center; background-color: #fffcf2; border-color: var(--lh-yellow);">
+                    <h3 style="color: #b38600; margin-bottom: 10px;">Flight in Progress</h3>
+                    <p style="color: #666;">Please complete your current active flight before dispatching a new route.</p>
                 </div>
 
                 <div id="generator-form" class="lh-card border-blue">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
                         <div>
-                            <label style="font-size:0.8rem; font-weight:bold; color:#555;">OPERATOR</label>
+                            <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">OPERATOR</label>
                             <select id="gen-airline" onchange="updateHubs()">
                                 <option value="">-- Select Airline --</option>
                             </select>
                         </div>
                         <div>
-                            <label style="font-size:0.8rem; font-weight:bold; color:#555;">DEPARTURE HUB</label>
+                            <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">DEPARTURE HUB</label>
                             <select id="gen-hub" disabled>
                                 <option value="">Select Airline First</option>
                             </select>
                         </div>
                     </div>
 
-                    <label style="font-size:0.8rem; font-weight:bold; color:#555;">FLIGHT DURATION PREFERENCE</label>
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">FLIGHT DURATION PREFERENCE</label>
                     <select id="gen-time">
                         <option value="short">Short Haul (1-3 hrs)</option>
                         <option value="medium">Medium Haul (3-7 hrs)</option>
                         <option value="long">Long Haul (8-14 hrs)</option>
                     </select>
 
-                    <button class="btn" style="width:100%; margin-top:10px;" onclick="generateFlight()">Generate Route</button>
+                    <button class="btn" style="width:100%; margin-top:15px; padding: 15px;" onclick="generateFlight()">Generate Route</button>
                 </div>
 
-                <div id="gen-result" class="lh-card hidden slide-up" style="padding:0; overflow:hidden; border:none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                <div id="gen-result" class="lh-card ticket-result hidden slide-up" style="padding:0; border:none; box-shadow: var(--shadow-hover-glow);">
                     <div class="ticket-header">
-                        <span>FLIGHT TICKET</span>
-                        <span style="font-weight:bold;">Lufthansa Group</span>
+                        <span style="font-weight: 600; letter-spacing: 1px;">FLIGHT TICKET</span>
+                        <span style="font-weight:bold; color: var(--lh-yellow);">Lufthansa Group</span>
                     </div>
-                    <div style="padding: 25px;">
+                    <div style="padding: 30px;">
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
                             <div>
-                                <div style="font-size:0.8rem; color:#888;">ROUTE</div>
-                                <div style="font-size:2rem; font-weight:bold; color:var(--lh-blue);">
-                                    <span id="res-dep">FRA</span> <span style="color:var(--lh-yellow)">➝</span> <span id="res-arr">JFK</span>
+                                <div style="font-size:0.85rem; color:#888; font-weight: 600;">ROUTE</div>
+                                <div style="font-size:2.2rem; font-weight:800; color:var(--lh-blue); margin: 5px 0;">
+                                    <span id="res-dep">FRA</span> <span style="color:var(--lh-yellow); font-size: 1.5rem; vertical-align: middle;">➝</span> <span id="res-arr">JFK</span>
                                 </div>
-                                <div style="font-size:0.9rem; margin-top:5px;">Est. Time: <strong id="res-time">8.5h</strong></div>
+                                <div style="font-size:0.95rem; margin-top:10px; color: #555;">Est. Time: <strong style="color:var(--lh-blue);" id="res-time">8.5h</strong></div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:0.8rem; color:#888;">AIRCRAFT</div>
-                                <div style="font-size:1.2rem; font-weight:bold;" id="res-ac">Airbus A350</div>
-                                <div style="background:#eee; display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.8rem; margin-top:5px;" id="res-reg">D-AIXP</div>
+                                <div style="font-size:0.85rem; color:#888; font-weight: 600;">AIRCRAFT</div>
+                                <div style="font-size:1.3rem; font-weight:bold; color:var(--lh-blue); margin: 5px 0;" id="res-ac">Airbus A350</div>
+                                <div style="background:var(--lh-grey-bg); display:inline-block; padding:4px 10px; border-radius:4px; font-size:0.9rem; margin-top:10px; font-weight: 600; color: #555;" id="res-reg">D-AIXP</div>
                             </div>
                         </div>
-                        <button class="btn btn-yellow" style="width:100%; margin-top:25px;" onclick="acceptFlight()">Confirm & Book Flight</button>
+                        <button class="btn btn-yellow" style="width:100%; margin-top:30px; padding: 15px;" onclick="acceptFlight()">Confirm & Book Flight</button>
                     </div>
                 </div>
             </div>
@@ -453,7 +479,6 @@
         let generatedFlightTemp = null;
 
         window.onload = function() {
-            // Auto-redirect from welcome screen
             setTimeout(() => {
                goToLogin();
             }, 4000);
@@ -487,7 +512,15 @@
                 document.getElementById('dashboard').classList.remove('hidden');
                 checkActiveFlight();
             } else {
-                errorMsg.innerText = "Invalid credentials. Please try again.";
+                errorMsg.innerText = "Authentication failed. Verify callsign and passcode.";
+                 // Анимация тряски при ошибке
+                 const box = document.querySelector('.login-box');
+                 box.animate([
+                    { transform: 'translateX(0)' },
+                    { transform: 'translateX(-5px)' },
+                    { transform: 'translateX(5px)' },
+                    { transform: 'translateX(0)' }
+                 ], { duration: 300 });
             }
         }
 
@@ -495,25 +528,48 @@
             const tabs = document.getElementsByClassName('tab-content');
             for (let t of tabs) t.classList.add('hidden');
             
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+            selectedTab.classList.remove('hidden');
+
+            // Перезапуск анимации появления для таба
+            selectedTab.style.animation = 'none';
+            selectedTab.offsetHeight; /* trigger reflow */
+            selectedTab.style.animation = null;
 
             const navBtns = document.querySelectorAll('.nav-item');
             navBtns.forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
+
+             // Если открыли флот, запускаем каскадную анимацию
+            if(tabName === 'fleet') {
+                animateFleetItems();
+            }
         }
 
         function populateFleet() {
             const container = document.getElementById('fleet-container');
-            FLEET.forEach(ac => {
+            container.innerHTML = ''; // Очистка перед заполнением
+            FLEET.forEach((ac, index) => {
                 container.innerHTML += `
-                    <div class="lh-card aircraft-card border-blue" style="padding:15px; margin-bottom:0;">
+                    <div class="lh-card aircraft-card border-blue stagger-item" style="padding:20px; margin-bottom:0;">
                         <img src="${ac.img}" alt="${ac.type}">
-                        <h4 style="color:var(--lh-blue); font-size:1rem;">${ac.type}</h4>
-                        <div style="font-size:0.8rem; color:#666; margin-top:5px;">Range: ${ac.maxHours} hrs</div>
+                        <h4 style="color:var(--lh-blue); font-size:1.1rem; margin-bottom: 5px;">${ac.type}</h4>
+                        <div style="font-size:0.9rem; color:#666;">Max Range: <strong>${ac.maxHours} hrs</strong></div>
                     </div>
                 `;
             });
         }
+        
+        // Функция для каскадной анимации флота
+        function animateFleetItems() {
+            const items = document.querySelectorAll('.stagger-item');
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('show');
+                }, index * 100); // Задержка для каждого следующего элемента
+            });
+        }
+
 
         function populateAirlinesSelect() {
             const sel = document.getElementById('gen-airline');
@@ -570,7 +626,7 @@
             const timePref = document.getElementById('gen-time').value;
 
             if (!airline || !hub) {
-                alert("Please complete the flight dispatch form.");
+                alert("Please complete flight dispatch parameters.");
                 return;
             }
 
@@ -586,7 +642,7 @@
             });
 
             if (availableAC.length === 0) {
-                alert("No aircraft available for this duration.");
+                alert("No suitable aircraft available for this duration.");
                 return;
             }
 
@@ -614,7 +670,12 @@
             document.getElementById('res-ac').innerText = generatedFlightTemp.ac;
             document.getElementById('res-reg').innerText = generatedFlightTemp.reg;
 
-            document.getElementById('gen-result').classList.remove('hidden');
+            const resultBox = document.getElementById('gen-result');
+            resultBox.classList.remove('hidden');
+            // Перезапуск анимации появления билета
+            resultBox.style.animation = 'none';
+            resultBox.offsetHeight;
+            resultBox.style.animation = null;
         }
 
         function acceptFlight() {
@@ -622,7 +683,6 @@
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp));
             document.getElementById('gen-result').classList.add('hidden');
             checkActiveFlight();
-            alert("Flight booked and dispatched!");
         }
 
         function checkActiveFlight() {
@@ -645,10 +705,9 @@
         }
 
         function completeFlight() {
-            if(confirm("Are you at the gate with engines off?")) {
+            if(confirm("Confirm engine shutdown at the gate?")) {
                 localStorage.removeItem('activeFlight');
                 checkActiveFlight();
-                alert("Flight closed. Welcome home, Captain.");
             }
         }
     </script>
