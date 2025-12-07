@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - Live Ops</title>
+    <title>Lufthansa Crew Portal - Fast Ops</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -101,8 +101,6 @@
 
         .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; display: flex; align-items: center; }
         #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid var(--border-color); z-index: 1; }
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* Screens */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
@@ -254,7 +252,7 @@
                         <option value="medium">Medium Haul (3-7 hrs)</option>
                         <option value="long">Long Haul (8-14 hrs)</option>
                     </select>
-                    <button id="generate-btn" class="btn" style="width:100%; margin-top:20px;" onclick="generateFlight()">Generate OFP (Live WX)</button>
+                    <button id="generate-btn" class="btn" style="width:100%; margin-top:20px;" onclick="generateFlight()">Generate OFP</button>
                 </div>
             </div>
         </div>
@@ -265,7 +263,7 @@
             <div class="briefing-header">
                 <div>
                     <h2 style="margin:0; font-size:1.5rem; border:none; padding:0;">OPERATIONAL FLIGHT PLAN</h2>
-                    <div style="font-size:0.9rem; opacity:0.7;">Lufthansa Systems | Live Data</div>
+                    <div style="font-size:0.9rem; opacity:0.7;">Lufthansa Systems | Ops Data</div>
                 </div>
                 <div style="text-align:right;">
                     <div style="font-weight:bold; font-size:1.2rem;" id="br-flight-num"></div>
@@ -308,9 +306,9 @@
             <div id="map"></div>
 
             <div style="margin-bottom:20px;">
-                <h4 style="margin-bottom:5px;">LIVE METAR REPORT (AVWX API)</h4>
-                <div class="metar-box" id="br-metar-dep"><div class="spinner"></div> Fetching live weather...</div>
-                <div class="metar-box" id="br-metar-arr"><div class="spinner"></div> Fetching live weather...</div>
+                <h4 style="margin-bottom:5px;">METAR REPORT (SIMULATED)</h4>
+                <div class="metar-box" id="br-metar-dep"></div>
+                <div class="metar-box" id="br-metar-arr"></div>
             </div>
 
             <button class="btn btn-yellow" style="width:100%;" onclick="confirmBriefing()">ACCEPT & FILE FLIGHT PLAN</button>
@@ -318,10 +316,8 @@
     </div>
 
     <script>
-        // --- DATA ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // --- CUSTOM GATES ---
         const REAL_GATES = {
             "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
@@ -418,8 +414,6 @@
             AIRLINES[a].hubs.forEach(x=>{ let o=document.createElement('option'); o.value=x; o.text=x; h.add(o); });
         }
 
-        // --- УМНАЯ ПОГОДА (С ЗАЩИТОЙ ОТ ЗАВИСАНИЯ) ---
-        
         function generateSimulatedMETAR(icao) {
             const wind = Math.floor(Math.random()*36)*10;
             const spd = Math.floor(Math.random()*15)+3;
@@ -431,28 +425,12 @@
             return `${icao} ${time} ${wind.toString().padStart(3,'0')}${spd.toString().padStart(2,'0')}KT ${vis} ${cld} ${tmp}/${tmp-4} Q${qnh} NOSIG`;
         }
 
-        async function fetchSmartMETAR(icao) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); // Тайм-аут 2 секунды
-
-            try {
-                const response = await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error("API Error");
-                const data = await response.json();
-                return data.raw;
-            } catch (error) {
-                console.log("Weather fallback used for " + icao);
-                return generateSimulatedMETAR(icao); 
-            }
-        }
-
         function generateGate(icao) {
             if (REAL_GATES[icao]) return REAL_GATES[icao][Math.floor(Math.random() * REAL_GATES[icao].length)];
             const zones = ['A','B','C','Z']; return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
         }
 
-        // --- ГЕНЕРАЦИЯ ---
+        // --- MAIN GENERATOR (SYNCHRONOUS = FAST) ---
         function generateFlight() {
             const an = document.getElementById('gen-airline').value;
             const h = document.getElementById('gen-hub').value;
@@ -485,25 +463,13 @@
                 depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
                 arrLat: dest.lat, arrLon: dest.lon,
                 pax: pax, cargo: cargo, zfw: zfw, gateDep: generateGate(depIcao), gateArr: generateGate(dest.code),
-                metarDep: "Loading...", metarArr: "Loading..."
+                metarDep: generateSimulatedMETAR(depIcao), metarArr: generateSimulatedMETAR(dest.code)
             };
 
-            // 1. Открываем окно МГНОВЕННО (чтобы не висло)
-            showBriefingModal(true);
-
-            // 2. Грузим погоду в фоне
-            Promise.all([fetchSmartMETAR(generatedFlightTemp.dep), fetchSmartMETAR(generatedFlightTemp.arr)])
-                .then(([m1, m2]) => {
-                    generatedFlightTemp.metarDep = m1;
-                    generatedFlightTemp.metarArr = m2;
-                    if(document.getElementById('br-metar-dep')) {
-                        document.getElementById('br-metar-dep').innerText = m1;
-                        document.getElementById('br-metar-arr').innerText = m2;
-                    }
-                });
+            showBriefingModal();
         }
 
-        function showBriefingModal(loading) {
+        function showBriefingModal() {
             if(!generatedFlightTemp)return;
             const g = generatedFlightTemp;
             
@@ -515,8 +481,8 @@
             document.getElementById('br-pax').innerText = `${g.pax} PAX`; document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
             document.getElementById('br-zfw').innerText = `${(g.zfw/1000).toFixed(1)} T`;
 
-            document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Connecting...';
-            document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Connecting...';
+            document.getElementById('br-metar-dep').innerText = g.metarDep;
+            document.getElementById('br-metar-arr').innerText = g.metarArr;
 
             document.getElementById('briefing-modal').classList.remove('hidden');
 
