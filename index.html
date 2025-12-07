@@ -7,28 +7,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. CORPORATE STYLE CONFIG --- */
+        /* --- 1. CONFIG & COLORS --- */
         :root {
-            /* Colors */
-            --lh-blue: #05164d;
+            --lh-blue: #05164d;       /* Официальный темно-синий */
             --lh-blue-hover: #0a247a;
-            --lh-yellow: #ffb600;
-            --lh-yellow-glow: rgba(255, 182, 0, 0.5);
-            --lh-blue-glow: rgba(5, 22, 77, 0.2);
+            --lh-yellow: #ffb600;     /* Официальный желтый */
+            --lh-yellow-glow: rgba(255, 182, 0, 0.4);
+            --lh-blue-glow: rgba(5, 22, 77, 0.15);
             --lh-grey-bg: #f2f4f7;
             --white: #ffffff;
             --text-main: #333333;
             --text-light: #666666;
             
-            /* UI Vars */
-            --card-radius: 12px; /* Чуть мягче скругления */
-            --btn-radius: 6px;
-            /* Базовая тень */
-            --shadow-card: 0 4px 12px rgba(0,0,0,0.05);
-            /* Тень-свечение при наведении (Синее) */
-            --shadow-hover-glow: 0 12px 25px var(--lh-blue-glow), 0 4px 10px rgba(0,0,0,0.05);
-            /* Плавный переход для всех элементов */
-            --smooth-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --card-radius: 12px;
+            --btn-radius: 4px;
+            
+            /* Анимации и тени */
+            --shadow-card: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-hover: 0 12px 24px rgba(5, 22, 77, 0.12);
+            --smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
@@ -41,12 +38,6 @@
             flex-direction: column;
         }
 
-        /* SVG Logo Styling */
-        .lh-svg-logo {
-            fill: currentColor;
-            display: block;
-        }
-
         /* --- 2. ANIMATIONS --- */
         .hidden { display: none !important; }
         
@@ -56,76 +47,70 @@
         .slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; opacity: 0; transform: translateY(30px); }
         @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
 
-        /* Анимация для элементов списка (каскад) */
-        .stagger-item { opacity: 0; transform: translateY(20px); transition: --smooth-transition; }
+        /* Каскадное появление карточек */
+        .stagger-item { opacity: 0; transform: translateY(20px); transition: var(--smooth); }
         .stagger-item.show { opacity: 1; transform: translateY(0); }
 
-        /* --- 3. UI COMPONENTS --- */
+        /* --- 3. UI ELEMENTS --- */
         
-        /* Кнопки с эффектом свечения */
+        /* Кнопки */
         .btn {
             background-color: var(--lh-blue);
             color: var(--white);
             border: none;
-            padding: 12px 24px;
-            font-size: 0.95rem;
+            padding: 12px 28px;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: var(--smooth-transition);
+            transition: var(--smooth);
             border-radius: var(--btn-radius);
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            position: relative; overflow: hidden;
         }
         .btn:hover { 
             background-color: var(--lh-blue-hover);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px var(--lh-blue-glow);
+            box-shadow: 0 6px 15px var(--lh-blue-glow);
         }
-        .btn:active { transform: translateY(0); }
-
         .btn-yellow { 
             background-color: var(--lh-yellow); 
             color: var(--lh-blue); 
         }
         .btn-yellow:hover { 
             background-color: #ffc400;
-            /* Желтое свечение при наведении */
-            box-shadow: 0 5px 20px var(--lh-yellow-glow);
+            box-shadow: 0 6px 15px var(--lh-yellow-glow);
         }
         
-        /* Поля ввода со свечением при фокусе */
+        /* Поля ввода */
         input, select {
             width: 100%;
-            padding: 12px 15px;
-            margin: 5px 0 20px 0;
-            border: 2px solid #e0e0e0; /* Чуть толще рамка */
+            padding: 14px 15px;
+            margin: 8px 0 20px 0;
+            border: 1px solid #d1d5db;
             border-radius: var(--btn-radius);
             font-size: 1rem;
             background: #fff;
-            transition: var(--smooth-transition);
+            transition: var(--smooth);
         }
         input:focus, select:focus {
             outline: none;
-            border-color: var(--lh-yellow);
-            /* Мягкое желтое свечение вокруг поля */
-            box-shadow: 0 0 0 4px rgba(255, 182, 0, 0.15);
+            border-color: var(--lh-blue);
+            box-shadow: 0 0 0 3px var(--lh-blue-glow);
         }
 
-        /* Карточки с "парящим" эффектом */
+        /* Карточки */
         .lh-card {
             background: var(--white);
-            padding: 25px;
+            padding: 30px;
             border-radius: var(--card-radius);
             box-shadow: var(--shadow-card);
             margin-bottom: 25px;
             border-top: 4px solid transparent;
-            transition: var(--smooth-transition);
+            transition: var(--smooth);
         }
         .lh-card:hover {
-            /* Карточка поднимается и начинает светиться снизу */
-            box-shadow: var(--shadow-hover-glow);
-            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-4px);
         }
         .border-blue { border-top-color: var(--lh-blue); }
         .border-yellow { border-top-color: var(--lh-yellow); }
@@ -134,10 +119,14 @@
             color: var(--lh-blue);
             font-weight: 300;
             font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #e0e0e0;
-            padding-bottom: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 15px;
         }
+
+        /* Фильтр для превращения синего логотипа в желтый/белый */
+        .logo-filter-yellow { filter: brightness(0) saturate(100%) invert(78%) sepia(70%) saturate(1007%) hue-rotate(359deg) brightness(103%) contrast(104%); }
+        .logo-filter-white { filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%); }
 
         /* --- 4. SECTIONS --- */
         
@@ -145,23 +134,23 @@
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://images.unsplash.com/photo-1542296332-2e44a996aa0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-            z-index: 2000;
+            z-index: 9999;
             display: flex; align-items: center; justify-content: center;
         }
-        .welcome-overlay { background: rgba(5, 22, 77, 0.85); width: 100%; height: 100%; position: absolute; }
-        .welcome-content { position: relative; z-index: 2001; text-align: center; color: white; }
+        .welcome-overlay { background: rgba(5, 22, 77, 0.9); width: 100%; height: 100%; position: absolute; }
+        .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px;}
         
         .logo-circle {
-            width: 110px; height: 110px;
+            width: 120px; height: 120px;
             border: 3px solid var(--lh-yellow); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 25px auto;
-            color: var(--lh-yellow);
-            box-shadow: 0 0 20px var(--lh-yellow-glow); /* Свечение логотипа */
+            margin: 0 auto 30px auto;
+            background: rgba(255,255,255,0.05);
+            box-shadow: 0 0 40px var(--lh-yellow-glow);
         }
         
-        .loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.2); margin: 25px auto; border-radius: 2px; overflow: hidden; }
-        .loader-progress { height: 100%; background: var(--lh-yellow); width: 0%; animation: loadProgress 4s ease-in-out forwards; box-shadow: 0 0 10px var(--lh-yellow-glow); }
+        .loader-bar { width: 220px; height: 4px; background: rgba(255,255,255,0.2); margin: 30px auto; border-radius: 2px; overflow: hidden; }
+        .loader-progress { height: 100%; background: var(--lh-yellow); width: 0%; animation: loadProgress 4s ease-in-out forwards; }
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
         /* LOGIN SCREEN */
@@ -169,121 +158,111 @@
             height: 100vh;
             display: flex; align-items: center; justify-content: center;
             background-color: var(--lh-blue);
-            background-image: radial-gradient(circle at center, #0a247a 0%, #05164d 100%);
+            background-image: radial-gradient(circle at 50% 100%, #0d2a80 0%, #05164d 100%);
         }
         .login-box {
-            background: white; padding: 45px 40px; width: 100%; max-width: 380px;
-            border-radius: var(--card-radius); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            background: white; padding: 50px 40px; width: 100%; max-width: 400px;
+            border-radius: var(--card-radius); box-shadow: 0 25px 80px rgba(0,0,0,0.4);
             text-align: center;
         }
 
         /* DASHBOARD Header */
         header {
-            background-color: var(--lh-blue); color: white; padding: 18px 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative; z-index: 200;
+            background-color: var(--lh-blue); color: white; padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative; z-index: 100;
         }
         .header-content {
-            max-width: 1100px; margin: 0 auto; padding: 0 20px;
+            max-width: 1200px; margin: 0 auto; padding: 0 25px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .logo-text { font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; gap: 12px; letter-spacing: 0.5px; }
+        /* Фикс наложения: flex и gap */
+        .logo-block { display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px;}
         
-        /* Navigation Bar */
+        /* Nav Bar */
         .nav-bar {
-            background: white; border-bottom: 1px solid #e0e0e0;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            background: white; border-bottom: 1px solid #e5e7eb;
+            position: sticky; top: 0; z-index: 50;
         }
         .nav-content {
-            max-width: 1100px; margin: 0 auto; padding: 0 20px;
+            max-width: 1200px; margin: 0 auto; padding: 0 25px;
             display: flex; overflow-x: auto;
         }
         .nav-item {
-            padding: 18px 20px; background: none; border: none;
-            color: var(--text-light); font-weight: 600; font-size: 0.95rem;
+            padding: 20px 25px; background: none; border: none;
+            color: var(--text-light); font-weight: 600; font-size: 0.9rem;
             cursor: pointer; position: relative;
-            transition: var(--smooth-transition); white-space: nowrap;
+            transition: var(--smooth); white-space: nowrap;
         }
         .nav-item:hover { color: var(--lh-blue); }
         .nav-item.active { color: var(--lh-blue); }
-        .nav-item::after {
-            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px;
-            background: var(--lh-yellow); transform: scaleX(0); transition: var(--smooth-transition);
+        .nav-item.active::after {
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px;
+            background: var(--lh-yellow);
         }
-        .nav-item.active::after { transform: scaleX(1); box-shadow: 0 0 8px var(--lh-yellow-glow); }
 
-        .container { max-width: 1100px; margin: 35px auto; padding: 0 20px; flex: 1; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; width: 100%;}
 
-        /* Fleet Grid & Cards */
-        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
-        .aircraft-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
+        /* Fleet Grid */
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        .aircraft-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
         
         /* Active Flight Banner */
         #active-flight-banner {
-            background: linear-gradient(to right, #ffffff 70%, #fdfbf7 100%);
-            border: 1px solid #e0e0e0; border-left: 5px solid var(--lh-yellow);
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            background: linear-gradient(90deg, #ffffff 0%, #fcfcfc 100%);
+            border: 1px solid #e5e7eb; border-left: 6px solid var(--lh-yellow);
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 20px;
         }
-        .flight-route { font-size: 1.5rem; font-weight: 700; color: var(--lh-blue); }
-        .flight-status { font-size: 0.75rem; text-transform: uppercase; color: #888; letter-spacing: 1px; margin-bottom: 5px;}
-
-        /* Ticket Result */
-        .ticket-result { background: #fff; border: 1px solid #e0e0e0; position: relative; border-radius: var(--card-radius); overflow: hidden;}
+        
+        /* Ticket Style */
+        .ticket-result {
+            background: white; border: 1px solid #e5e7eb; border-radius: var(--card-radius);
+            overflow: hidden;
+        }
         .ticket-header {
-            background: var(--lh-blue); color: white; padding: 12px 25px;
-            display: flex; justify-content: space-between;
+            background: var(--lh-blue); color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
     </style>
 </head>
 <body>
 
-    <svg style="display:none;">
-        <symbol id="lh-crane" viewBox="0 0 24 24">
-             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h6v2h-6v6h-2v-6H5v-2h6V7z"/> 
-             <path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/>
-        </symbol>
-    </svg>
-
     <div id="welcome-screen">
         <div class="welcome-overlay"></div>
         <div class="welcome-content fade-in">
             <div class="logo-circle">
-                 <svg class="lh-svg-logo" width="60" height="60">
-                    <use href="#lh-crane"></use>
-                </svg>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-yellow" alt="LH Logo" width="70">
             </div>
-            <h1 style="font-weight: 300; font-size: 2.5rem; margin-bottom: 10px; letter-spacing: 2px;">Lufthansa Group</h1>
-            <p style="opacity: 0.9; letter-spacing: 1px; font-weight: 600;">CREW PORTAL ACCESS</p>
+            <h1 style="font-weight: 300; font-size: 3rem; margin-bottom: 10px; letter-spacing: 2px;">Lufthansa Group</h1>
+            <p style="opacity: 0.8; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;">Virtual Crew Center</p>
             
             <div class="loader-bar">
                 <div class="loader-progress"></div>
             </div>
-            <p style="font-size: 0.85rem; margin-top: 15px; opacity: 0.7;">Establishing secure connection...</p>
+            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.7;">System Initialization...</p>
         </div>
     </div>
 
     <div id="login-screen" class="hidden">
         <div class="login-box slide-up">
-            <div style="color: var(--lh-blue); margin-bottom: 20px; display: flex; justify-content: center;">
-                <svg class="lh-svg-logo" width="70" height="70">
-                    <use href="#lh-crane"></use>
-                </svg>
+            <div style="margin-bottom: 25px; display: flex; justify-content: center;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="LH Logo" width="90">
             </div>
-            <h2 style="border:none; text-align:center; font-size:1.6rem; font-weight:700; margin-bottom: 10px;">Crew Identification</h2>
-            <p style="color:#666; margin-bottom:30px; font-size:0.95rem;">Enter credentials to proceed.</p>
+            <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px;">Crew Login</h2>
+            <p style="color:#666; margin-bottom:30px;">Identify yourself to access OPS.</p>
             
             <div style="text-align: left;">
-                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing: 0.5px;">CALLSIGN</label>
-                <input type="text" id="callsign" placeholder="e.g., DLH001">
+                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing:0.5px;">CALLSIGN</label>
+                <input type="text" id="callsign" placeholder="e.g. DLH001">
                 
-                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing: 0.5px;">PASSCODE</label>
+                <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing:0.5px;">PASSWORD</label>
                 <input type="password" id="password" placeholder="••••••">
             </div>
 
-            <button class="btn btn-yellow" style="width:100%; margin-top: 15px; padding: 15px;" onclick="login()">AUTHENTICATE</button>
-            <p id="login-error" style="color:#d9534f; margin-top:20px; font-size:0.9rem; font-weight: 600;"></p>
+            <button class="btn btn-yellow" style="width:100%; margin-top: 20px;" onclick="login()">Authenticate</button>
+            <p id="login-error" style="color:#dc2626; margin-top:20px; font-size:0.9rem; font-weight: 600;"></p>
         </div>
     </div>
 
@@ -291,11 +270,9 @@
         
         <header>
             <div class="header-content">
-                <div class="logo-text">
-                    <svg class="lh-svg-logo" width="28" height="28" style="color:var(--lh-yellow)">
-                        <use href="#lh-crane"></use>
-                    </svg>
-                    LUFTHANSA GROUP
+                <div class="logo-block">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-white" alt="LH" height="36">
+                    <span>LUFTHANSA GROUP</span>
                 </div>
                 <div id="user-display" style="font-size:0.9rem; opacity:0.9; font-weight: 600;">Not Logged In</div>
             </div>
@@ -313,39 +290,41 @@
 
         <div class="container">
             
-            <div id="active-flight-banner" class="lh-card hidden slide-up" style="padding: 20px 30px;">
-                <div style="display:flex; align-items:center; gap:25px;">
+            <div id="active-flight-banner" class="lh-card hidden slide-up" style="padding: 25px 35px;">
+                <div style="display:flex; align-items:center; gap:30px;">
                     <div>
                         <div class="flight-status">Active Mission</div>
                         <div class="flight-route"><span id="af-info">FRA - JFK</span></div>
                     </div>
-                    <div style="border-left: 2px solid #e0e0e0; padding-left: 25px;">
-                        <div class="flight-status">Aircraft Type</div>
+                    <div style="border-left: 2px solid #e5e7eb; padding-left: 30px;">
+                        <div class="flight-status">Aircraft</div>
                         <div style="font-weight:bold; color:var(--text-main); font-size: 1.1rem;" id="af-ac">A350-900</div>
                     </div>
                 </div>
-                <button class="btn" style="font-size:0.85rem; padding: 10px 20px;" onclick="completeFlight()">Report Arrival</button>
+                <button class="btn" style="padding: 10px 20px; font-size: 0.8rem;" onclick="completeFlight()">Report Arrival</button>
             </div>
 
             <div id="tab-about" class="tab-content fade-in">
                 <h2 style="margin-top:0;">Captain's Briefing</h2>
                 
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:25px;">
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px;">
                     <div class="lh-card border-blue">
-                        <h3 style="color:var(--lh-blue); margin-bottom:15px;">Welcome Aboard</h3>
+                        <h3 style="color:var(--lh-blue); margin-bottom:15px;">Welcome Back</h3>
                         <p style="line-height:1.7; color:#555;">
-                            Добро пожаловать в систему Lufthansa Virtual. Этот портал разработан для управления вашими полетными операциями с максимальным комфортом и эффективностью.
+                            Система управления полетами (FMS) готова к работе. 
+                            Используйте вкладку <strong>Dispatch</strong> для планирования нового рейса или просмотрите текущий статус флота.
+                            Напоминаем о необходимости соблюдения процедур "Quiet Hours" в ночное время.
                         </p>
                         <br>
-                        <button class="btn btn-yellow" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">Start New Flight</button>
+                        <button class="btn btn-yellow" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">New Flight</button>
                     </div>
                     
                     <div class="lh-card border-yellow">
-                        <h4 style="margin-bottom:15px; color:var(--lh-blue);">Quick Stats</h4>
-                        <ul style="list-style:none; line-height:2.2; font-weight: 600; color: #555;">
-                            <li><span style="color:var(--lh-yellow)">✈</span> Status: <span style="color:var(--lh-blue)">Active</span></li>
-                            <li><span style="color:var(--lh-yellow)">📍</span> Base: Frankfurt (EDDF)</li>
-                            <li><span style="color:var(--lh-yellow)">⭐</span> Rank: Senior Captain</li>
+                        <h4 style="margin-bottom:20px; color:var(--lh-blue);">Pilot Status</h4>
+                        <ul style="list-style:none; line-height:2.5; font-weight: 600; color: #555;">
+                            <li><span style="color:var(--lh-yellow)">●</span> Status: <span style="color:#059669;">Active</span></li>
+                            <li><span style="color:var(--lh-yellow)">●</span> Base: Frankfurt (EDDF)</li>
+                            <li><span style="color:var(--lh-yellow)">●</span> Rank: Captain</li>
                         </ul>
                     </div>
                 </div>
@@ -354,17 +333,17 @@
             <div id="tab-rules" class="tab-content hidden fade-in">
                 <h2>Operational Regulations</h2>
                 <div class="lh-card border-blue">
-                    <ul style="margin-left:25px; line-height:1.9; color:#444;">
-                        <li><strong>Professionalism:</strong> Maintain professional conduct with ATC and fellow pilots at all times.</li>
-                        <li><strong>Callsign Usage:</strong> Utilize only your officially assigned group callsign.</li>
-                        <li><strong>Hub Operations:</strong> All flights must originate from a designated airline hub.</li>
-                        <li><strong>Fleet Policy:</strong> Select aircraft appropriate for the route's distance and demand.</li>
+                    <ul style="margin-left:25px; line-height:2; color:#444;">
+                        <li><strong>1. Conduct:</strong> Maintain professional behavior on all frequencies.</li>
+                        <li><strong>2. Callsign:</strong> Use assigned company callsign only (e.g., DLH, SWR, AUA).</li>
+                        <li><strong>3. Hubs:</strong> Initiate flights only from designated hubs unless on a return leg.</li>
+                        <li><strong>4. Equipment:</strong> Match aircraft type to route distance and runway requirements.</li>
                     </ul>
                 </div>
             </div>
 
             <div id="tab-fleet" class="tab-content hidden fade-in">
-                <h2>Fleet Overview</h2>
+                <h2>Group Fleet</h2>
                 <div id="fleet-container" class="fleet-grid">
                     </div>
             </div>
@@ -372,8 +351,8 @@
             <div id="tab-routes" class="tab-content hidden fade-in">
                 <h2>Network Hubs</h2>
                 <div class="lh-card border-blue">
-                    <p style="margin-bottom:20px; color:#666;">Primary operating bases for group airlines:</p>
-                    <ul id="hub-list-display" style="margin-left:25px; line-height:2;">
+                    <p style="margin-bottom:20px; color:#666;">Approved departure points for group airlines:</p>
+                    <ul id="hub-list-display" style="margin-left:25px; line-height:2.2; font-size: 1.05rem;">
                         </ul>
                 </div>
             </div>
@@ -381,13 +360,13 @@
             <div id="tab-generator" class="tab-content hidden fade-in">
                 <h2>Flight Dispatch</h2>
                 
-                <div id="generator-locked" class="lh-card hidden" style="text-align:center; background-color: #fffcf2; border-color: var(--lh-yellow);">
-                    <h3 style="color: #b38600; margin-bottom: 10px;">Flight in Progress</h3>
-                    <p style="color: #666;">Please complete your current active flight before dispatching a new route.</p>
+                <div id="generator-locked" class="lh-card hidden" style="text-align:center; background-color: #fffbeb; border-color: var(--lh-yellow);">
+                    <h3 style="color: #b45309; margin-bottom:10px;">Flight in Progress</h3>
+                    <p style="color: #78350f;">Complete your current assignment before dispatching a new route.</p>
                 </div>
 
                 <div id="generator-form" class="lh-card border-blue">
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
                         <div>
                             <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">OPERATOR</label>
                             <select id="gen-airline" onchange="updateHubs()">
@@ -402,37 +381,37 @@
                         </div>
                     </div>
 
-                    <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">FLIGHT DURATION PREFERENCE</label>
+                    <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue);">MISSION PROFILE</label>
                     <select id="gen-time">
                         <option value="short">Short Haul (1-3 hrs)</option>
                         <option value="medium">Medium Haul (3-7 hrs)</option>
                         <option value="long">Long Haul (8-14 hrs)</option>
                     </select>
 
-                    <button class="btn" style="width:100%; margin-top:15px; padding: 15px;" onclick="generateFlight()">Generate Route</button>
+                    <button class="btn" style="width:100%; margin-top:20px;" onclick="generateFlight()">Generate Route</button>
                 </div>
 
-                <div id="gen-result" class="lh-card ticket-result hidden slide-up" style="padding:0; border:none; box-shadow: var(--shadow-hover-glow);">
+                <div id="gen-result" class="ticket-result hidden slide-up" style="box-shadow: var(--shadow-hover);">
                     <div class="ticket-header">
-                        <span style="font-weight: 600; letter-spacing: 1px;">FLIGHT TICKET</span>
-                        <span style="font-weight:bold; color: var(--lh-yellow);">Lufthansa Group</span>
+                        <span style="font-weight: 700; letter-spacing: 1px;">FLIGHT ASSIGNMENT</span>
+                        <span style="font-weight:bold; color: var(--lh-yellow); opacity: 0.9;">CONFIRMED</span>
                     </div>
-                    <div style="padding: 30px;">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
+                    <div style="padding: 35px;">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:40px;">
                             <div>
-                                <div style="font-size:0.85rem; color:#888; font-weight: 600;">ROUTE</div>
-                                <div style="font-size:2.2rem; font-weight:800; color:var(--lh-blue); margin: 5px 0;">
-                                    <span id="res-dep">FRA</span> <span style="color:var(--lh-yellow); font-size: 1.5rem; vertical-align: middle;">➝</span> <span id="res-arr">JFK</span>
+                                <div style="font-size:0.85rem; color:#888; font-weight: 700;">ROUTE</div>
+                                <div style="font-size:2.5rem; font-weight:800; color:var(--lh-blue); margin: 5px 0; line-height: 1.1;">
+                                    <span id="res-dep">FRA</span> <span style="color:var(--lh-yellow); font-size: 1.8rem;">➝</span> <span id="res-arr">JFK</span>
                                 </div>
-                                <div style="font-size:0.95rem; margin-top:10px; color: #555;">Est. Time: <strong style="color:var(--lh-blue);" id="res-time">8.5h</strong></div>
+                                <div style="font-size:1rem; margin-top:10px; color: #555;">ETE: <strong style="color:var(--lh-blue);" id="res-time">8.5h</strong></div>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:0.85rem; color:#888; font-weight: 600;">AIRCRAFT</div>
-                                <div style="font-size:1.3rem; font-weight:bold; color:var(--lh-blue); margin: 5px 0;" id="res-ac">Airbus A350</div>
-                                <div style="background:var(--lh-grey-bg); display:inline-block; padding:4px 10px; border-radius:4px; font-size:0.9rem; margin-top:10px; font-weight: 600; color: #555;" id="res-reg">D-AIXP</div>
+                                <div style="font-size:0.85rem; color:#888; font-weight: 700;">AIRCRAFT</div>
+                                <div style="font-size:1.4rem; font-weight:bold; color:var(--lh-blue); margin: 5px 0;" id="res-ac">Airbus A350</div>
+                                <div style="background:#f3f4f6; display:inline-block; padding:5px 12px; border-radius:4px; font-size:0.95rem; margin-top:10px; font-weight: 600; color: #374151;" id="res-reg">D-AIXP</div>
                             </div>
                         </div>
-                        <button class="btn btn-yellow" style="width:100%; margin-top:30px; padding: 15px;" onclick="acceptFlight()">Confirm & Book Flight</button>
+                        <button class="btn btn-yellow" style="width:100%; margin-top:35px;" onclick="acceptFlight()">Accept & File Flight Plan</button>
                     </div>
                 </div>
             </div>
@@ -441,7 +420,8 @@
     </div>
 
     <script>
-        // --- ДАННЫЕ ---
+        // --- DATA ---
+        // Возвращены все тестовые пользователи и полные данные
         const USERS = [
             { callsign: "DLH001", pass: "1234", name: "Capt. Hans" },
             { callsign: "SWR202", pass: "swiss", name: "Capt. Mueller" },
@@ -452,7 +432,7 @@
             "Lufthansa": ["EDDF (Frankfurt)", "EDDM (Munich)"],
             "SWISS": ["LSZH (Zurich)"], 
             "Austrian": ["LOWW (Vienna)"],
-            "Eurowings": ["EDDL (Dusseldorf)", "EDDH (Hamburg)"]
+            "Eurowings": ["EDDL (Dusseldorf)", "EDDH (Hamburg)", "EDDS (Stuttgart)"]
         };
 
         const FLEET = [
@@ -471,21 +451,21 @@
             { code: "RJTT", city: "Tokyo", hours: 12 },
             { code: "UUEE", city: "Moscow", hours: 3 },
             { code: "LEMD", city: "Madrid", hours: 2.5 },
-            { code: "FACT", city: "Cape Town", hours: 11.5 }
+            { code: "FACT", city: "Cape Town", hours: 11.5 },
+            { code: "WSSS", city: "Singapore", hours: 12.5 },
+            { code: "SBGL", city: "Rio de Janeiro", hours: 11 }
         ];
 
-        // --- ЛОГИКА ---
+        // --- LOGIC ---
         let currentUser = null;
         let generatedFlightTemp = null;
 
         window.onload = function() {
-            setTimeout(() => {
-               goToLogin();
-            }, 4000);
-
+            setTimeout(() => { goToLogin(); }, 4000); // 4 сек на заставку
             populateFleet();
             populateAirlinesSelect();
             populateHubsInfo();
+            // checkStorage(); - Можно раскомментировать если нужно авто-логин
         };
 
         function goToLogin() {
@@ -512,15 +492,15 @@
                 document.getElementById('dashboard').classList.remove('hidden');
                 checkActiveFlight();
             } else {
-                errorMsg.innerText = "Authentication failed. Verify callsign and passcode.";
-                 // Анимация тряски при ошибке
-                 const box = document.querySelector('.login-box');
-                 box.animate([
+                errorMsg.innerText = "Invalid credentials. Try DLH001 / 1234";
+                const box = document.querySelector('.login-box');
+                // Анимация тряски
+                box.animate([
                     { transform: 'translateX(0)' },
                     { transform: 'translateX(-5px)' },
                     { transform: 'translateX(5px)' },
                     { transform: 'translateX(0)' }
-                 ], { duration: 300 });
+                ], { duration: 300 });
             }
         }
 
@@ -531,52 +511,44 @@
             const selectedTab = document.getElementById(`tab-${tabName}`);
             selectedTab.classList.remove('hidden');
 
-            // Перезапуск анимации появления для таба
+            // Рестарт анимации появления
             selectedTab.style.animation = 'none';
-            selectedTab.offsetHeight; /* trigger reflow */
+            selectedTab.offsetHeight; 
             selectedTab.style.animation = null;
 
             const navBtns = document.querySelectorAll('.nav-item');
             navBtns.forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
 
-             // Если открыли флот, запускаем каскадную анимацию
-            if(tabName === 'fleet') {
-                animateFleetItems();
-            }
+            if(tabName === 'fleet') animateFleetItems();
         }
 
         function populateFleet() {
             const container = document.getElementById('fleet-container');
-            container.innerHTML = ''; // Очистка перед заполнением
+            container.innerHTML = '';
             FLEET.forEach((ac, index) => {
                 container.innerHTML += `
                     <div class="lh-card aircraft-card border-blue stagger-item" style="padding:20px; margin-bottom:0;">
                         <img src="${ac.img}" alt="${ac.type}">
                         <h4 style="color:var(--lh-blue); font-size:1.1rem; margin-bottom: 5px;">${ac.type}</h4>
-                        <div style="font-size:0.9rem; color:#666;">Max Range: <strong>${ac.maxHours} hrs</strong></div>
+                        <div style="font-size:0.9rem; color:#666;">Range: <strong>${ac.maxHours} hrs</strong></div>
                     </div>
                 `;
             });
         }
         
-        // Функция для каскадной анимации флота
         function animateFleetItems() {
             const items = document.querySelectorAll('.stagger-item');
             items.forEach((item, index) => {
-                setTimeout(() => {
-                    item.classList.add('show');
-                }, index * 100); // Задержка для каждого следующего элемента
+                setTimeout(() => { item.classList.add('show'); }, index * 80);
             });
         }
-
 
         function populateAirlinesSelect() {
             const sel = document.getElementById('gen-airline');
             for (let airline in AIRLINES) {
                 let opt = document.createElement('option');
-                opt.value = airline;
-                opt.innerHTML = airline;
+                opt.value = airline; opt.innerHTML = airline;
                 sel.appendChild(opt);
             }
         }
@@ -595,8 +567,7 @@
 
             if (!airline) {
                 hubSel.disabled = true;
-                let opt = document.createElement('option');
-                opt.text = "Select Airline First";
+                let opt = document.createElement('option'); opt.text = "Select Airline First";
                 hubSel.appendChild(opt);
                 return;
             }
@@ -604,17 +575,12 @@
             const hubs = AIRLINES[airline];
             
             if (hubs.length === 1) {
-                let opt = document.createElement('option');
-                opt.value = hubs[0];
-                opt.innerHTML = hubs[0];
-                hubSel.appendChild(opt);
-                hubSel.disabled = true; 
+                let opt = document.createElement('option'); opt.value = hubs[0]; opt.innerHTML = hubs[0];
+                hubSel.appendChild(opt); hubSel.disabled = true; 
             } else {
                 hubSel.disabled = false;
                 hubs.forEach(h => {
-                    let opt = document.createElement('option');
-                    opt.value = h;
-                    opt.innerHTML = h;
+                    let opt = document.createElement('option'); opt.value = h; opt.innerHTML = h;
                     hubSel.appendChild(opt);
                 });
             }
@@ -625,10 +591,7 @@
             const hub = document.getElementById('gen-hub').value;
             const timePref = document.getElementById('gen-time').value;
 
-            if (!airline || !hub) {
-                alert("Please complete flight dispatch parameters.");
-                return;
-            }
+            if (!airline || !hub) { alert("Please complete all fields."); return; }
 
             let minH, maxH;
             if (timePref === 'short') { minH = 1; maxH = 3; }
@@ -641,10 +604,7 @@
                 return ac.maxHours >= 3;
             });
 
-            if (availableAC.length === 0) {
-                alert("No suitable aircraft available for this duration.");
-                return;
-            }
+            if (availableAC.length === 0) { alert("No suitable aircraft found."); return; }
 
             const randomAC = availableAC[Math.floor(Math.random() * availableAC.length)];
 
@@ -672,10 +632,7 @@
 
             const resultBox = document.getElementById('gen-result');
             resultBox.classList.remove('hidden');
-            // Перезапуск анимации появления билета
-            resultBox.style.animation = 'none';
-            resultBox.offsetHeight;
-            resultBox.style.animation = null;
+            resultBox.style.animation = 'none'; resultBox.offsetHeight; resultBox.style.animation = null;
         }
 
         function acceptFlight() {
@@ -687,14 +644,11 @@
 
         function checkActiveFlight() {
             const activeData = localStorage.getItem('activeFlight');
-            
             if (activeData) {
                 const flight = JSON.parse(activeData);
-                
                 document.getElementById('active-flight-banner').classList.remove('hidden');
                 document.getElementById('af-info').innerText = `${flight.dep} - ${flight.arr}`;
                 document.getElementById('af-ac').innerText = flight.ac;
-
                 document.getElementById('generator-form').classList.add('hidden');
                 document.getElementById('generator-locked').classList.remove('hidden');
             } else {
@@ -705,7 +659,7 @@
         }
 
         function completeFlight() {
-            if(confirm("Confirm engine shutdown at the gate?")) {
+            if(confirm("Confirm engine shutdown?")) {
                 localStorage.removeItem('activeFlight');
                 checkActiveFlight();
             }
