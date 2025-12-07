@@ -1,4 +1,4 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -317,11 +317,11 @@
         </div>
     </div>
 
-  <script>
-        // --- DATA & CONFIG ---
+    <script>
+        // --- DATA ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // База реальных гейтов (чтобы было красиво)
+        // --- CUSTOM GATES ---
         const REAL_GATES = {
             "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
@@ -420,7 +420,6 @@
 
         // --- УМНАЯ ПОГОДА (С ЗАЩИТОЙ ОТ ЗАВИСАНИЯ) ---
         
-        // Генератор фейковой погоды (если реальная сломалась)
         function generateSimulatedMETAR(icao) {
             const wind = Math.floor(Math.random()*36)*10;
             const spd = Math.floor(Math.random()*15)+3;
@@ -432,7 +431,6 @@
             return `${icao} ${time} ${wind.toString().padStart(3,'0')}${spd.toString().padStart(2,'0')}KT ${vis} ${cld} ${tmp}/${tmp-4} Q${qnh} NOSIG`;
         }
 
-        // Функция получения погоды с таймаутом
         async function fetchSmartMETAR(icao) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 2000); // Тайм-аут 2 секунды
@@ -442,10 +440,10 @@
                 clearTimeout(timeoutId);
                 if (!response.ok) throw new Error("API Error");
                 const data = await response.json();
-                return data.raw; // Реальная погода
+                return data.raw;
             } catch (error) {
                 console.log("Weather fallback used for " + icao);
-                return generateSimulatedMETAR(icao); // Если зависло или ошибка -> генерируем свою
+                return generateSimulatedMETAR(icao); 
             }
         }
 
@@ -454,7 +452,7 @@
             const zones = ['A','B','C','Z']; return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
         }
 
-        // --- ОСНОВНАЯ ФУНКЦИЯ ГЕНЕРАЦИИ (БЕЗОПАСНАЯ) ---
+        // --- ГЕНЕРАЦИЯ ---
         function generateFlight() {
             const an = document.getElementById('gen-airline').value;
             const h = document.getElementById('gen-hub').value;
@@ -462,7 +460,6 @@
             
             if(!an || !h) { alert("Select Airline & Hub"); return; }
 
-            // 1. Сначала считаем данные (это мгновенно)
             let minH=1, maxH=3; if(tp==='medium'){minH=3;maxH=7;} if(tp==='long'){minH=8;maxH=14;}
             const availAC = FLEET.filter(ac => (tp==='long'?ac.maxHours>=8:(tp==='short'?ac.maxHours<8:ac.maxHours>=3)));
             
@@ -488,18 +485,17 @@
                 depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
                 arrLat: dest.lat, arrLon: dest.lon,
                 pax: pax, cargo: cargo, zfw: zfw, gateDep: generateGate(depIcao), gateArr: generateGate(dest.code),
-                metarDep: "Loading...", metarArr: "Loading..." // Заглушки
+                metarDep: "Loading...", metarArr: "Loading..."
             };
 
-            // 2. Сразу открываем окно (чтобы пользователь видел результат)
+            // 1. Открываем окно МГНОВЕННО (чтобы не висло)
             showBriefingModal(true);
 
-            // 3. Пытаемся подгрузить погоду в фоновом режиме
+            // 2. Грузим погоду в фоне
             Promise.all([fetchSmartMETAR(generatedFlightTemp.dep), fetchSmartMETAR(generatedFlightTemp.arr)])
                 .then(([m1, m2]) => {
                     generatedFlightTemp.metarDep = m1;
                     generatedFlightTemp.metarArr = m2;
-                    // Обновляем текст в уже открытом окне
                     if(document.getElementById('br-metar-dep')) {
                         document.getElementById('br-metar-dep').innerText = m1;
                         document.getElementById('br-metar-arr').innerText = m2;
@@ -511,7 +507,6 @@
             if(!generatedFlightTemp)return;
             const g = generatedFlightTemp;
             
-            // Заполняем данные
             document.getElementById('br-dep').innerText = g.dep; document.getElementById('br-arr').innerText = g.arr;
             document.getElementById('br-ac').innerText = g.ac; document.getElementById('br-flight-num').innerText = g.num;
             document.getElementById('br-time').innerText = g.time + " h"; document.getElementById('br-fl').innerText = g.fl;
@@ -520,13 +515,11 @@
             document.getElementById('br-pax').innerText = `${g.pax} PAX`; document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
             document.getElementById('br-zfw').innerText = `${(g.zfw/1000).toFixed(1)} T`;
 
-            // Ставим спиннеры на погоду
             document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Connecting...';
             document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Connecting...';
 
             document.getElementById('briefing-modal').classList.remove('hidden');
 
-            // Рисуем карту (через небольшую задержку, чтобы модалка успела открыться)
             setTimeout(() => {
                 if(mapObject) { mapObject.off(); mapObject.remove(); }
                 mapObject = L.map('map').setView([g.depLat, g.depLon], 3);
