@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v16</title>
+    <title>Lufthansa Crew Portal - v17</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -125,6 +125,7 @@
         .progress-bar { height: 100%; background: var(--brand-yellow); width: 0%; transition: width 1s linear; }
         .flight-timer { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 5px; text-align: right; }
 
+        /* WELCOME SCREEN */
         #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
         .welcome-overlay { background: rgba(10, 10, 10, 0.92); width: 100%; height: 100%; position: absolute; backdrop-filter: blur(5px); }
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
@@ -133,8 +134,43 @@
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
         .system-status-text { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; opacity: 0.7; min-height: 1.2em; }
 
-        #login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #05164d; }
-        .login-box { background: white; padding: 50px 40px; width: 100%; max-width: 400px; border-radius: 8px; text-align: center; }
+        /* REDESIGNED LOGIN SCREEN */
+        #login-screen { 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background-color: #05164d; /* Dark Blue LH background */
+        }
+        .login-box { 
+            background: #141829; /* Deep dark grey/blue for the panel */
+            padding: 50px 40px; 
+            width: 100%; 
+            max-width: 400px; 
+            border-radius: 8px; 
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.4); 
+            border-top: 5px solid var(--brand-yellow); /* LH Yellow accent */
+            color: white; /* Default text color */
+        }
+        .login-box h2 {
+            color: white; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .login-box input {
+            background: rgba(255, 255, 255, 0.1); /* Slightly transparent input */
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white; /* White input text */
+            padding: 12px 15px; 
+            margin-bottom: 25px;
+        }
+        .login-box input::placeholder {
+            color: rgba(255, 255, 255, 0.5); /* Light placeholder text */
+        }
+        /* Ensure the logo is the white version for contrast on dark background */
+        .login-box img {
+            filter: brightness(0) invert(1);
+        }
     </style>
 </head>
 <body>
@@ -158,14 +194,14 @@
     <div id="login-screen" class="hidden">
         <div class="login-box fade-in">
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" width="140" alt="LH Logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" width="140" alt="LH Logo" style="filter: brightness(0) invert(1);">
             </div>
-            <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px; color:#333;">Crew Access</h2>
+            <h2 style="text-align:center; font-size:1.6rem; margin-bottom: 25px;">CREW ACCESS PORTAL</h2>
             <div style="text-align: left;">
-                <input type="text" id="callsign" placeholder="Callsign (e.g. DLH001)" style="background:#fff; border:1px solid #ccc; color:#000;">
-                <input type="password" id="password" placeholder="Password" style="background:#fff; border:1px solid #ccc; color:#000;">
+                <input type="text" id="callsign" placeholder="Callsign (e.g. DLH001)">
+                <input type="password" id="password" placeholder="Password">
             </div>
-            <button class="btn btn-yellow" style="width:100%; margin-top: 20px;" onclick="login()">Log In</button>
+            <button class="btn btn-yellow" style="width:100%; margin-top: 5px;" onclick="login()">Log In</button>
             <p id="login-error" style="color:#dc2626; margin-top:20px; font-size:0.9rem; font-weight: 600;"></p>
         </div>
     </div>
@@ -371,7 +407,7 @@
         // ФЛОТ С ПРИВЯЗКОЙ К ОПЕРАТОРАМ
         const FLEET = [
             // Narrowbody
-            { type: "Airbus A319", maxHours: 5, seats: 138, fuelReserve: "6,500 KG", layoutImg: "https://www.lufthansa.com/content/dam/lh/images/local_variations/seatmaps/ru/202110-A319-nose-RU.jpg", operators: ["Lufthansa", "SWISS", "Austrian Airlines", "Brussels Airlines", "Lufthansa CityLine", "Lufthansa City Airlines"] },
+            { type: "Airbus A319", maxHours: 5, seats: 138, fuelReserve: "6,500 KG", layoutImg: "https://i.imgur.com/example_a319_layout.png", operators: ["Lufthansa", "SWISS", "Austrian Airlines", "Brussels Airlines", "Lufthansa CityLine", "Lufthansa City Airlines"] },
             { type: "Airbus A320neo", maxHours: 6, seats: 180, fuelReserve: "7,200 KG", layoutImg: "https://i.imgur.com/example_a320_layout.png", operators: ["Lufthansa", "Eurowings", "Air Dolomiti", "SAS Scandinavian Airlines", "ITA Airways"] },
             { type: "Airbus A220-300", maxHours: 6.5, seats: 145, fuelReserve: "8,000 KG", layoutImg: "https://i.imgur.com/example_a220_layout.png", operators: ["AirBaltic", "SWISS"] },
             { type: "Boeing 737-800", maxHours: 6, seats: 189, fuelReserve: "7,000 KG", layoutImg: "https://i.imgur.com/example_b738_layout.png", operators: ["Norwegian Airlines", "SunExpress", "Condor"] },
@@ -379,7 +415,7 @@
             
             // Widebody & Long Haul
             { type: "Airbus A330-300", maxHours: 11, seats: 255, fuelReserve: "18,000 KG", layoutImg: "https://i.imgur.com/example_a330_layout.png", operators: ["Lufthansa", "SWISS", "Austrian Airlines", "Edelweiss Air", "Finnair", "ITA Airways"] },
-            { type: "Airbus A350-900", maxHours: 16, seats: 293, fuelReserve: "22,000 KG", layoutImg: "https://i.imgur.com/example_a350_layout.png", operators: ["Lufthansa", "Finnair"] },
+            { type: "Airbus A350-900", maxHours: 16, seats: 293, fuelReserve: "22,000 KG", layoutImg: "https://i.imgur.com/example_a350_layout.png", operators: ["Lufthansa", "Finnair", "Discover Airlines"] },
             { type: "Boeing 747-8", maxHours: 14, seats: 364, fuelReserve: "30,000 KG", layoutImg: "https://i.imgur.com/example_b748_layout.png", operators: ["Lufthansa"] },
 
             // Cargo
@@ -396,7 +432,6 @@
             { code: "WSSS", city: "Singapore", hours: 12.5, region: "AS", lat: 1.36, lon: 103.98 }
         ];
 
-        // ОБНОВЛЕННЫЕ КООРДИНАТЫ ХАБОВ
         const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56], "EVRA": [56.92, 23.97], "EBBR": [50.9, 4.4], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.99], "LIPZ": [45.5, 12.35], "ENZV": [58.88, 5.63], "ENGM": [60.20, 11.10], "EFHK": [60.32, 24.97], "EKCH": [55.62, 12.65], "ESSA": [59.65, 17.92], "EDDP": [51.42, 12.23], "LTBA": [40.98, 28.82], "LIRF": [41.8, 12.23], "EYVI": [54.64, 25.28], "EETN": [59.41, 24.83], "EDDV": [52.46, 9.68] };
 
         let currentUser = null;
@@ -408,7 +443,7 @@
         window.onload = function() {
             simulateBootSequence();
             populateAirlinesSelect();
-            populateFleetFilter(); // NEW: Populate fleet filter
+            populateFleetFilter(); 
             populateFleet();
             populateHubsInfo();
             loadStats();
@@ -483,10 +518,8 @@
             }
         }
 
-        // NEW: Populate the filter dropdown for the Fleet tab
         function populateFleetFilter() {
             const s = document.getElementById('fleet-filter-airline');
-            // Clear existing options, keeping "ALL OPERATORS"
             while (s.options.length > 1) {
                 s.remove(1);
             }
@@ -499,7 +532,6 @@
             });
         }
 
-        // UPDATED: Filter logic in populateFleet
         function populateFleet() {
             const c = document.getElementById('fleet-container'); 
             const filterValue = document.getElementById('fleet-filter-airline').value;
@@ -538,6 +570,8 @@
         
         function populateAirlinesSelect() { 
             const s = document.getElementById('gen-airline'); 
+            // Clear all existing options first, keeping the default empty one.
+            s.innerHTML = '<option value="">-- Select Airline --</option>';
             const sortedAirlines = Object.keys(AIRLINES).sort();
             sortedAirlines.forEach(a => { 
                 let o = document.createElement('option'); 
