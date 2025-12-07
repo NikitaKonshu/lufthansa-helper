@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -9,66 +9,39 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
-        /* --- 1. CONFIG & COLORS --- */
+        /* --- CONFIG --- */
         :root {
-            /* --- LIGHT THEME --- */
-            --bg-color: #f2f4f7;
-            --card-bg: #ffffff;
-            --text-main: #1a1a1a;
-            --text-sub: #595959;
-            --border-color: #e0e0e0;
-            --brand-blue: #05164d;        
-            --brand-yellow: #ffb600;
-            --header-bg: #05164d;
-            --input-bg: #ffffff;
-            --shadow-soft: 0 4px 15px rgba(0,0,0,0.05);
-            --metar-bg: #eee;
+            --bg-color: #f2f4f7; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #595959;
+            --border-color: #e0e0e0; --brand-blue: #05164d; --brand-yellow: #ffb600;
+            --header-bg: #05164d; --input-bg: #ffffff; --metar-bg: #eee;
             --logo-brightness: brightness(0) invert(1);
         }
 
-        /* --- DARK THEME --- */
         body.dark-mode {
-            --bg-color: #121212;          
-            --card-bg: #1e1e1e;           
-            --text-main: #e0e0e0;         
-            --text-sub: #a0a0a0;          
-            --border-color: #333333;      
-            --brand-blue: #3a3a3a;
-            --brand-yellow: #ffb600;
-            --header-bg: #000000;
-            --input-bg: #252525;
-            --shadow-soft: 0 4px 20px rgba(0,0,0,0.5);
-            --metar-bg: #2a2a2a;
+            --bg-color: #121212; --card-bg: #1e1e1e; --text-main: #e0e0e0; --text-sub: #a0a0a0;
+            --border-color: #333333; --brand-blue: #3a3a3a; --brand-yellow: #ffb600;
+            --header-bg: #000000; --input-bg: #252525; --metar-bg: #2a2a2a;
             --logo-brightness: brightness(0.9);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
-        
-        body { 
-            background-color: var(--bg-color); color: var(--text-main); 
-            min-height: 100vh; display: flex; flex-direction: column;
-        }
-
-        /* Utility Classes */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; transition: 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.6s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .mono-text { font-family: 'Roboto Mono', monospace; }
 
-        /* --- BUTTONS & INPUTS --- */
+        /* UI Elements */
         .btn {
-            background-color: var(--brand-blue); color: #fff;
-            border: 1px solid transparent; padding: 12px 28px; font-size: 0.9rem; cursor: pointer;
-            border-radius: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center;
+            background-color: var(--brand-blue); color: #fff; border: 1px solid transparent;
+            padding: 12px 28px; font-size: 0.9rem; cursor: pointer; border-radius: 4px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; justify-content: center;
         }
         body.dark-mode .btn { border-color: #444; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        
-        .btn-yellow { 
-            background-color: var(--brand-yellow); color: #05164d !important; border: none !important;
-        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-yellow { background-color: var(--brand-yellow); color: #05164d !important; border: none !important; }
         .btn-yellow:hover { background-color: #ffcc33; }
         
         input, select {
@@ -76,12 +49,11 @@
             border: 1px solid var(--border-color); border-radius: 4px;
             font-size: 1rem; background: var(--input-bg); color: var(--text-main);
         }
-        input:focus, select:focus { outline: none; border-color: var(--brand-yellow); }
+        input:focus { outline: none; border-color: var(--brand-yellow); }
 
-        /* --- CARDS --- */
         .lh-card {
             background: var(--card-bg); padding: 30px; border-radius: 8px;
-            box-shadow: var(--shadow-soft); margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
             border-top: 4px solid transparent;
         }
         .border-brand { border-top-color: var(--brand-blue); }
@@ -89,94 +61,63 @@
 
         h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
 
-        /* --- HEADER --- */
-        header {
-            background-color: var(--header-bg); color: #fff; padding: 15px 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100;
-        }
+        /* Header */
+        header { background-color: var(--header-bg); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .header-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
-        
         .logo-white { filter: var(--logo-brightness); }
-
-        .top-tools { display: flex; align-items: center; gap: 20px; }
-        .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; font-size: 1rem; opacity: 0.8; }
         
-        .theme-toggle {
-            background: none; border: 1px solid rgba(255,255,255,0.2); color: white;
-            width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: 0.3s;
-        }
-        .theme-toggle:hover { background: rgba(255,255,255,0.1); border-color: white; }
+        .top-tools { display: flex; align-items: center; gap: 20px; color: white; }
+        .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; font-size: 1rem; opacity: 0.8; }
+        .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* --- NAV --- */
-        .nav-bar { background: var(--card-bg); border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50; }
+        /* Nav */
+        .nav-bar { background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .nav-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; overflow-x: auto; }
-        .nav-item {
-            padding: 20px 25px; background: none; border: none; color: var(--text-sub);
-            font-weight: 600; font-size: 0.9rem; cursor: pointer; white-space: nowrap; position: relative;
-        }
+        .nav-item { padding: 20px 25px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--brand-yellow); }
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; width: 100%; }
 
-        /* --- STATS --- */
+        /* Stats & Grid */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-box { background: var(--card-bg); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border-color); }
         .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
         .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); letter-spacing: 1px; }
 
-        /* --- BRIEFING MODAL (UPDATED GRID) --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 5000;
-            display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(8px);
-        }
+        /* Briefing Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
         .briefing-paper {
-            background: var(--card-bg); width: 95%; max-width: 850px;
-            padding: 30px; border-radius: 6px; box-shadow: 0 0 50px rgba(0,0,0,0.7);
-            color: var(--text-main); position: relative; max-height: 95vh; overflow-y: auto;
+            background: var(--card-bg); width: 95%; max-width: 850px; padding: 30px; border-radius: 6px; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.7); color: var(--text-main); position: relative; max-height: 95vh; overflow-y: auto;
             background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(45)" opacity="0.03" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/></svg>');
         }
-        
         .briefing-header { display: flex; justify-content: space-between; border-bottom: 3px solid #05164d; padding-bottom: 10px; margin-bottom: 20px; }
         body.dark-mode .briefing-header { border-color: var(--brand-yellow); }
-
-        /* New Grid Layout for Briefing */
+        
         .briefing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; }
         .data-block label { display: block; font-size: 0.7rem; color: var(--text-sub); font-weight: bold; }
         .data-block span { font-weight: 600; font-family: 'Roboto Mono', monospace; }
 
-        .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; display: flex; align-items: center;}
-        
+        .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; display: flex; align-items: center; }
         #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid var(--border-color); z-index: 1; }
-        
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; margin-right: 10px; }
-        body.dark-mode .spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--brand-yellow); }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Fleet Grid */
+        /* Screens */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .aircraft-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
 
-        /* Welcome Screen */
-        #welcome-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
-            background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .welcome-overlay { background: rgba(10, 10, 10, 0.92); width: 100%; height: 100%; position: absolute; backdrop-filter: blur(5px); } 
-        .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px;}
+        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
+        .welcome-overlay { background: rgba(10, 10, 10, 0.92); width: 100%; height: 100%; position: absolute; backdrop-filter: blur(5px); }
+        .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
         .loader-bar { width: 300px; height: 2px; background: rgba(255,255,255,0.1); margin: 30px auto; overflow: hidden; }
         .loader-progress { height: 100%; background: #fff; width: 0%; animation: loadProgress 5s ease-in-out forwards; }
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
-        
         .system-status-text { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; opacity: 0.7; min-height: 1.2em; }
 
         #login-screen { height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #05164d; }
         .login-box { background: white; padding: 50px 40px; width: 100%; max-width: 400px; border-radius: 8px; text-align: center; }
-
     </style>
 </head>
 <body>
@@ -188,15 +129,12 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white" alt="LH Logo" width="220">
             </div>
             <div style="font-weight: 300; font-size: 1.1rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 15px; opacity: 0.7;">Lufthansa Group</div>
-            <h1 style="font-weight: 800; font-size: 2.5rem; letter-spacing: 2px; margin: 0;">CREW PORTAL</h1>
-            
+            <h1 style="font-weight: 800; font-size: 2.5rem; letter-spacing: 2px; margin: 0;">CREW OPS</h1>
             <div style="margin-top: 20px; height: 60px; display: flex; flex-direction: column; justify-content: flex-end;">
-                 <div class="system-status-text" id="sys-status-1">Initializing ACARS...</div>
-                 <div class="system-status-text" id="sys-status-2">Connecting to Global Ops...</div>
+                 <div class="system-status-text" id="sys-status-1">Initializing Datalink...</div>
+                 <div class="system-status-text" id="sys-status-2">Syncing Schedule...</div>
             </div>
-
             <div class="loader-bar"><div class="loader-progress"></div></div>
-            <p class="mono-text" style="font-size: 0.8rem; margin-top: 15px; opacity: 0.5;">SECURE HANDSHAKE IN PROGRESS...</p>
         </div>
     </div>
 
@@ -206,7 +144,6 @@
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" width="140" alt="LH Logo">
             </div>
             <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px; color:#333;">Crew Access</h2>
-            <p style="color:#666; margin-bottom:30px;">Identify yourself</p>
             <div style="text-align: left;">
                 <input type="text" id="callsign" placeholder="Callsign (e.g. DLH001)" style="background:#fff; border:1px solid #ccc; color:#000;">
                 <input type="password" id="password" placeholder="Password" style="background:#fff; border:1px solid #ccc; color:#000;">
@@ -217,13 +154,11 @@
     </div>
 
     <div id="dashboard" class="hidden">
-        
         <header>
             <div class="header-content">
                 <div class="logo-block">
                     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white" alt="LH" height="45">
                 </div>
-                
                 <div class="top-tools">
                     <div class="zulu-clock" id="zulu-clock">00:00 Z</div>
                     <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Night Mode">🌙</button>
@@ -243,102 +178,75 @@
         </nav>
 
         <div class="container">
-            
             <div id="active-flight-banner" class="lh-card hidden fade-in" style="padding: 25px 35px; border-left: 6px solid var(--brand-yellow);">
-                <div style="display:flex; align-items:center; justify-content: space-between; gap:30px; flex-wrap:wrap;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
                     <div style="display:flex; align-items:center; gap:30px;">
                         <div>
-                            <div style="text-transform:uppercase; font-size:0.8rem; color:var(--text-sub);">Current Leg</div>
+                            <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Current Leg</div>
                             <div style="font-size:1.5rem; font-weight:800; color:var(--text-main);"><span id="af-dep"></span> ➝ <span id="af-arr"></span></div>
                             <div style="font-size:1rem; color:var(--brand-yellow); font-weight:bold;" id="af-num"></div>
                         </div>
                         <div style="border-left: 2px solid var(--border-color); padding-left: 30px;">
-                            <div style="text-transform:uppercase; font-size:0.8rem; color:var(--text-sub);">Equipment</div>
+                            <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Equipment</div>
                             <div style="font-weight:bold; color:var(--text-main); font-size: 1.1rem;" id="af-ac"></div>
                         </div>
                         <div style="border-left: 2px solid var(--border-color); padding-left: 30px;">
-                            <div style="text-transform:uppercase; font-size:0.8rem; color:var(--text-sub);">Load</div>
+                            <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Load</div>
                             <div style="font-weight:600; color:var(--text-main);" id="af-pax"></div>
                         </div>
                     </div>
-                    <button class="btn" style="padding: 10px 20px; margin-top:10px;" onclick="completeFlight()">File PIREP (Arrival)</button>
+                    <div>
+                        <button class="btn" style="padding: 10px 20px;" onclick="completeFlight()">File PIREP (Arrival)</button>
+                    </div>
                 </div>
             </div>
 
             <div id="tab-about" class="tab-content fade-in">
                 <h2>Captain's Logbook</h2>
-                
                 <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-val" id="stat-flights">0</div>
-                        <div class="stat-label">Legs Flown</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val" id="stat-hours">0</div>
-                        <div class="stat-label">Total Hours</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-val" id="stat-rank" style="color:var(--brand-yellow)">-</div>
-                        <div class="stat-label">Rank</div>
-                    </div>
+                    <div class="stat-box"><div class="stat-val" id="stat-flights">0</div><div class="stat-label">Legs Flown</div></div>
+                    <div class="stat-box"><div class="stat-val" id="stat-hours">0</div><div class="stat-label">Total Hours</div></div>
+                    <div class="stat-box"><div class="stat-val" id="stat-rank" style="color:var(--brand-yellow)">-</div><div class="stat-label">Rank</div></div>
                 </div>
-
-                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:30px;">
-                    <div class="lh-card border-brand">
-                        <h3 style="color:var(--text-main); margin-bottom:15px;">Operations Center</h3>
-                        <p style="line-height:1.7; color:var(--text-sub);">
-                            Welcome to the Flight Operations Portal. The system is synchronized with global servers.
-                            Please check the <strong>Dispatch</strong> section to generate your next assignment with real-time weather integration.
-                        </p>
-                        <br>
-                        <button class="btn btn-yellow" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">Dispatch New Flight</button>
-                    </div>
+                <div class="lh-card border-brand">
+                    <h3 style="color:var(--text-main); margin-bottom:15px;">Operations Center</h3>
+                    <p style="line-height:1.7; color:var(--text-sub);">Welcome back, Captain. System status is nominal.</p>
+                    <br><button class="btn btn-yellow" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">Dispatch New Flight</button>
                 </div>
             </div>
 
             <div id="tab-rules" class="tab-content hidden fade-in">
-                <h2>Operational Regulations</h2>
+                <h2>Regulations</h2>
                 <div class="lh-card border-brand">
                     <ul style="margin-left:25px; line-height:2; color:var(--text-sub);">
-                        <li><strong>Conduct:</strong> Maintain professional standards on all frequencies (VATSIM/IVAO).</li>
-                        <li><strong>Identification:</strong> Use assigned company callsign only.</li>
-                        <li><strong>Routing:</strong> Depart only from designated hubs or current aircraft location.</li>
+                        <li>Maintain professional standards on VATSIM/IVAO.</li>
+                        <li>Depart only from designated hubs.</li>
                     </ul>
                 </div>
             </div>
 
             <div id="tab-fleet" class="tab-content hidden fade-in">
-                <h2>Group Fleet</h2>
-                <div id="fleet-container" class="fleet-grid">
-                    </div>
+                <h2>Fleet</h2>
+                <div id="fleet-container" class="fleet-grid"></div>
             </div>
 
             <div id="tab-routes" class="tab-content hidden fade-in">
                 <h2>Hub Network</h2>
-                <div class="lh-card border-brand">
-                    <ul id="hub-list-display" style="margin-left:25px; line-height:2.2; font-size: 1.05rem; color:var(--text-sub);">
-                        </ul>
-                </div>
+                <div class="lh-card border-brand"><ul id="hub-list-display" style="margin-left:25px; line-height:2;"></ul></div>
             </div>
 
             <div id="tab-generator" class="tab-content hidden fade-in">
                 <h2>Flight Dispatch</h2>
-                
                 <div id="generator-locked" class="lh-card hidden" style="text-align:center; background-color: rgba(255, 182, 0, 0.1); border-color: var(--brand-yellow);">
-                    <h3 style="color: var(--brand-yellow); margin-bottom:10px;">Aircraft Airborne</h3>
-                    <p style="color:var(--text-sub)">Complete current sector before requesting new dispatch.</p>
+                    <h3 style="color: var(--brand-yellow);">Aircraft Airborne</h3>
+                    <p style="color:var(--text-sub)">Complete current sector first.</p>
                 </div>
-
                 <div id="generator-form" class="lh-card border-brand">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px;">
-                        <div>
-                            <label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">OPERATOR</label>
-                            <select id="gen-airline" onchange="updateHubs()"><option value="">-- Select Airline --</option></select>
-                        </div>
-                        <div>
-                            <label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">DEPARTURE HUB</label>
-                            <select id="gen-hub" disabled><option value="">Select Airline First</option></select>
-                        </div>
+                        <div><label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">OPERATOR</label>
+                        <select id="gen-airline" onchange="updateHubs()"><option value="">-- Select Airline --</option></select></div>
+                        <div><label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">DEPARTURE HUB</label>
+                        <select id="gen-hub" disabled><option value="">Select Airline First</option></select></div>
                     </div>
                     <label style="font-size:0.8rem; font-weight:bold; color:var(--text-main);">RANGE PREFERENCE</label>
                     <select id="gen-time">
@@ -346,12 +254,9 @@
                         <option value="medium">Medium Haul (3-7 hrs)</option>
                         <option value="long">Long Haul (8-14 hrs)</option>
                     </select>
-                    <button id="generate-btn" class="btn" style="width:100%; margin-top:20px;" onclick="generateFlight()">
-                        Generate OFP (Live WX)
-                    </button>
+                    <button id="generate-btn" class="btn" style="width:100%; margin-top:20px;" onclick="generateFlight()">Generate OFP (Live WX)</button>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -404,12 +309,8 @@
 
             <div style="margin-bottom:20px;">
                 <h4 style="margin-bottom:5px;">LIVE METAR REPORT (AVWX API)</h4>
-                <div class="metar-box" id="br-metar-dep">
-                    <div class="spinner"></div> Fetching live weather...
-                </div>
-                <div class="metar-box" id="br-metar-arr">
-                    <div class="spinner"></div> Fetching live weather...
-                </div>
+                <div class="metar-box" id="br-metar-dep"><div class="spinner"></div> Fetching live weather...</div>
+                <div class="metar-box" id="br-metar-arr"><div class="spinner"></div> Fetching live weather...</div>
             </div>
 
             <button class="btn btn-yellow" style="width:100%;" onclick="confirmBriefing()">ACCEPT & FILE FLIGHT PLAN</button>
@@ -417,11 +318,12 @@
     </div>
 
     <script>
+        // --- DATA ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // --- РЕДАКТИРОВАНИЕ ГЕЙТОВ ТУТ ---
+        // --- CUSTOM GATES ---
         const REAL_GATES = {
-            "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26", "B28"],
+            "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
             "KJFK": ["4", "5", "6", "7", "8", "10", "12"],
             "EGLL": ["A10", "A18", "B34", "B36", "B38", "B42"],
@@ -442,7 +344,7 @@
             { type: "Airbus A330-300", maxHours: 11, seats: 255, img: "https://upload.wikimedia.org/wikipedia/commons/c/c2/Lufthansa_A330-300_D-AIKQ_01.jpg" },
             { type: "Airbus A350-900", maxHours: 16, seats: 293, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Lufthansa_Airbus_A350-941_D-AIXP_%2849586947268%29.jpg" },
             { type: "Boeing 747-8", maxHours: 14, seats: 364, img: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Boeing_747-830_D-ABYT.jpg" },
-            { type: "Bombardier CRJ900", maxHours: 3.5, img: "https://upload.wikimedia.org/wikipedia/commons/6/63/Lufthansa_CityLine_Bombardier_CRJ-900_D-ACKI.jpg" }
+            { type: "Bombardier CRJ900", maxHours: 3.5, seats: 90, img: "https://upload.wikimedia.org/wikipedia/commons/6/63/Lufthansa_CityLine_Bombardier_CRJ-900_D-ACKI.jpg" }
         ];
 
         const DESTINATIONS = [
@@ -457,323 +359,144 @@
             { code: "SBGL", city: "Rio de Janeiro", hours: 11, region: "SA", lat: -22.81, lon: -43.24 }
         ];
 
-        const HUB_COORDS = {
-            "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55],
-            "LOWW": [48.11, 16.56], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.98]
-        };
+        const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.98] };
 
         // --- STATE ---
-        let currentUser = null;
-        let generatedFlightTemp = null;
-        let pilotStats = { flights: 0, hours: 0 };
-        let mapObject = null;
+        let currentUser=null, generatedFlightTemp=null, pilotStats={flights:0,hours:0}, mapObject=null;
 
         window.onload = function() {
-            simulateBootSequence();
-            populateFleet();
-            populateAirlinesSelect();
-            populateHubsInfo();
-            loadStats();
-            startClock();
+            simulateBootSequence(); populateFleet(); populateAirlinesSelect(); populateHubsInfo(); loadStats(); startClock();
         };
 
-        // --- NEW WELCOME SEQUENCE ---
         function simulateBootSequence() {
-            const s1 = document.getElementById('sys-status-1');
-            const s2 = document.getElementById('sys-status-2');
-            
-            setTimeout(() => { s1.innerText = "ACARS: OK. Datalink: ESTABLISHED."; }, 1500);
-            setTimeout(() => { s2.innerText = "Weather Radar: SELF-TEST OK."; }, 3000);
-            
+            setTimeout(() => { document.getElementById('sys-status-1').innerText = "ACARS: OK. Datalink: ESTABLISHED."; }, 1500);
+            setTimeout(() => { document.getElementById('sys-status-2').innerText = "Weather Radar: SELF-TEST OK."; }, 3000);
             setTimeout(() => { goToLogin(); }, 5000); 
         }
 
         function startClock() {
             setInterval(() => {
                 const now = new Date();
-                const h = String(now.getUTCHours()).padStart(2, '0');
-                const m = String(now.getUTCMinutes()).padStart(2, '0');
-                document.getElementById('zulu-clock').innerText = `${h}:${m} Z`;
+                document.getElementById('zulu-clock').innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} Z`;
             }, 1000);
         }
 
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-            const btn = document.querySelector('.theme-toggle');
-            btn.innerHTML = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        }
-
-        function loadStats() {
-            const saved = localStorage.getItem('pilotStats');
-            if (saved) pilotStats = JSON.parse(saved);
-            updateStatsUI();
-        }
-
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+        function loadStats() { const s=localStorage.getItem('pilotStats'); if(s) pilotStats=JSON.parse(s); updateStatsUI(); }
         function updateStatsUI() {
             document.getElementById('stat-flights').innerText = pilotStats.flights;
             document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours);
-            let rank = "Second Officer";
-            if(pilotStats.flights > 5) rank = "First Officer";
-            if(pilotStats.flights > 20) rank = "Captain";
-            if(pilotStats.flights > 50) rank = "Senior Captain";
-            document.getElementById('stat-rank').innerText = rank;
+            document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer");
         }
 
         function goToLogin() {
-            const welcome = document.getElementById('welcome-screen');
-            welcome.style.opacity = '0';
-            welcome.style.transition = 'opacity 0.8s ease';
-            setTimeout(() => {
-                welcome.classList.add('hidden');
-                document.getElementById('login-screen').classList.remove('hidden');
-            }, 800);
+            const w=document.getElementById('welcome-screen'); w.style.opacity='0'; w.style.transition='0.8s';
+            setTimeout(()=>{ w.classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); },800);
         }
-
         function login() {
-            const callInput = document.getElementById('callsign').value.toUpperCase();
-            const passInput = document.getElementById('password').value;
-            const errorMsg = document.getElementById('login-error');
-            const user = USERS.find(u => u.callsign === callInput && u.pass === passInput);
-
-            if (user) {
-                currentUser = user;
-                document.getElementById('user-display').innerText = user.name;
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('dashboard').classList.remove('hidden');
-                checkActiveFlight();
-            } else {
-                errorMsg.innerText = "Error. Try DLH001 / 1234";
-            }
+            const c=document.getElementById('callsign').value.toUpperCase(), p=document.getElementById('password').value;
+            if(USERS.find(u=>u.callsign===c && u.pass===p)){ 
+                document.getElementById('user-display').innerText=USERS.find(u=>u.callsign===c).name; 
+                document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); checkActiveFlight();
+            } else { document.getElementById('login-error').innerText="Try DLH001 / 1234"; }
         }
-
-        function showTab(tabName, btnElement) {
-            const tabs = document.getElementsByClassName('tab-content');
-            for (let t of tabs) t.classList.add('hidden');
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            const navBtns = document.querySelectorAll('.nav-item');
-            navBtns.forEach(b => b.classList.remove('active'));
-            if(btnElement) btnElement.classList.add('active');
+        function showTab(n,b) {
+            const tabs=document.getElementsByClassName('tab-content'); for(let t of tabs)t.classList.add('hidden');
+            document.getElementById(`tab-${n}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active');
         }
 
         function populateFleet() {
-            const container = document.getElementById('fleet-container');
-            container.innerHTML = '';
-            FLEET.forEach(ac => {
-                container.innerHTML += `
-                    <div class="lh-card aircraft-card border-brand">
-                        <img src="${ac.img}" alt="${ac.type}">
-                        <h4 style="color:var(--text-main); margin-bottom: 5px;">${ac.type}</h4>
-                        <div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: <strong>${ac.maxHours} hrs</strong></div>
-                    </div>
-                `;
-            });
+            const c=document.getElementById('fleet-container'); c.innerHTML='';
+            FLEET.forEach(ac=>{ c.innerHTML+=`<div class="lh-card aircraft-card border-brand"><img src="${ac.img}"><h4 style="color:var(--text-main);">${ac.type}</h4><div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: ${ac.maxHours}h</div></div>`; });
         }
-
-        function populateAirlinesSelect() {
-            const sel = document.getElementById('gen-airline');
-            for (let airline in AIRLINES) {
-                let opt = document.createElement('option');
-                opt.value = airline; opt.innerHTML = airline;
-                sel.appendChild(opt);
-            }
-        }
-
-        function populateHubsInfo() {
-            const list = document.getElementById('hub-list-display');
-            for (let airline in AIRLINES) {
-                list.innerHTML += `<li><strong style="color:var(--text-main)">${airline}:</strong> ${AIRLINES[airline].hubs.join(", ")}</li>`;
-            }
-        }
-
+        function populateAirlinesSelect() { const s=document.getElementById('gen-airline'); for(let a in AIRLINES){ let o=document.createElement('option'); o.value=a; o.text=a; s.add(o); } }
+        function populateHubsInfo() { const l=document.getElementById('hub-list-display'); for(let a in AIRLINES) l.innerHTML+=`<li><strong style="color:var(--text-main)">${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`; }
         function updateHubs() {
-            const airline = document.getElementById('gen-airline').value;
-            const hubSel = document.getElementById('gen-hub');
-            hubSel.innerHTML = "";
-            if (!airline) {
-                hubSel.disabled = true;
-                let opt = document.createElement('option'); opt.text = "Select Airline First";
-                hubSel.appendChild(opt); return;
-            }
-            const hubs = AIRLINES[airline].hubs;
-            if (hubs.length === 1) {
-                let opt = document.createElement('option'); opt.value = hubs[0]; opt.innerHTML = hubs[0];
-                hubSel.appendChild(opt); hubSel.disabled = true; 
-            } else {
-                hubSel.disabled = false;
-                hubs.forEach(h => {
-                    let opt = document.createElement('option'); opt.value = h; opt.innerHTML = h;
-                    hubSel.appendChild(opt);
-                });
-            }
+            const a=document.getElementById('gen-airline').value, h=document.getElementById('gen-hub'); h.innerHTML="";
+            if(!a){ h.disabled=true; return; } h.disabled=false;
+            AIRLINES[a].hubs.forEach(x=>{ let o=document.createElement('option'); o.value=x; o.text=x; h.add(o); });
         }
 
-        // --- REAL API WEATHER FETCH ---
         async function fetchRealMETAR(icao) {
-            try {
-                // Using free AVWX API public endpoint
-                const response = await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`);
-                if (!response.ok) throw new Error('Weather data unavailable');
-                const data = await response.json();
-                // Return the raw METAR string
-                return data.raw;
-            } catch (error) {
-                console.error("METAR fetch error:", error);
-                return `${icao} METAR DATA UNAVAILABLE - CHECK OFFLINE SOURCES`;
-            }
+            try { const r=await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`); if(!r.ok)throw new Error(); const d=await r.json(); return d.raw; }
+            catch{ return `${icao} METAR UNAVAILABLE`; }
         }
 
-        // --- NEW GATE LOGIC ---
         function generateGate(icao) {
-            // Check if we have real gates defined for this airport
-            if (REAL_GATES[icao]) {
-                const gates = REAL_GATES[icao];
-                return gates[Math.floor(Math.random() * gates.length)];
-            }
-            // Fallback random generation
-            const zones = ['A','B','C','Z'];
-            return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
+            if (REAL_GATES[icao]) return REAL_GATES[icao][Math.floor(Math.random() * REAL_GATES[icao].length)];
+            const zones = ['A','B','C','Z']; return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
         }
 
-        // --- GENERATE FLIGHT (ASYNC NOW) ---
         async function generateFlight() {
-            const airlineName = document.getElementById('gen-airline').value;
-            const hub = document.getElementById('gen-hub').value;
-            const timePref = document.getElementById('gen-time').value;
-            const genBtn = document.getElementById('generate-btn');
-
-            if (!airlineName || !hub) { alert("Please complete all fields."); return; }
-
-            // UI Loading State
-            genBtn.disabled = true;
-            genBtn.innerHTML = '<div class="spinner" style="border-top-color:white; width:15px; height:15px;"></div> Computing Flight Plan...';
-
-            let minH, maxH;
-            if (timePref === 'short') { minH = 1; maxH = 3; }
-            else if (timePref === 'medium') { minH = 3; maxH = 7; }
-            else { minH = 8; maxH = 14; }
-
-            const availableAC = FLEET.filter(ac => {
-                if (timePref === 'long') return ac.maxHours >= 8;
-                if (timePref === 'short') return ac.maxHours < 8; 
-                return ac.maxHours >= 3;
-            });
-
-            if (availableAC.length === 0) { 
-                alert("No suitable aircraft."); genBtn.disabled = false; genBtn.innerText = 'Generate OFP (Live WX)'; return; 
-            }
-
-            const randomAC = availableAC[Math.floor(Math.random() * availableAC.length)];
-            let suitableDest = DESTINATIONS.filter(d => d.hours >= minH && d.hours <= maxH);
-            let finalDest = suitableDest.length > 0 ? suitableDest[Math.floor(Math.random() * suitableDest.length)] : DESTINATIONS[Math.floor(Math.random() * DESTINATIONS.length)];
-            
-            const airlineData = AIRLINES[airlineName];
-            const depIcao = hub.split(' ')[0];
-            
-            let num = Math.floor(Math.random() * 900) + 100;
-            if (finalDest.region === 'NA') num = 400 + Math.floor(Math.random() * 99);
-            if (finalDest.region === 'AS') num = 700 + Math.floor(Math.random() * 99);
-            
-            // Load generation
-            const loadFactor = 0.6 + Math.random()*0.4; // 60-100%
-            const pax = Math.floor(randomAC.seats * loadFactor);
-            const cargo = Math.floor(Math.random() * 5000) + 1000;
-            const zfw = 40000 + (pax * 85) + cargo; // Rough ZFW calc
-
-            // Prepare temporary object
-            generatedFlightTemp = {
-                dep: depIcao, 
-                arr: finalDest.code,
-                ac: randomAC.type,
-                time: (Math.random() * (maxH - minH) + minH).toFixed(1),
-                num: airlineData.code + num,
-                fl: "FL" + (Math.floor(Math.random() * 6) * 20 + 320),
-                altn: "EDDK",
-                depLat: HUB_COORDS[depIcao] ? HUB_COORDS[depIcao][0] : 50.0,
-                depLon: HUB_COORDS[depIcao] ? HUB_COORDS[depIcao][1] : 8.0,
-                arrLat: finalDest.lat,
-                arrLon: finalDest.lon,
-                // New Data
-                pax: pax, cargo: cargo, zfw: zfw,
-                gateDep: generateGate(depIcao), gateArr: generateGate(finalDest.code)
-            };
-
-            // Show modal immediately with loading spinners for weather
-            showBriefingModal(true);
-
-            // Fetch real weather in parallel
             try {
-                const [metarDep, metarArr] = await Promise.all([
-                    fetchRealMETAR(generatedFlightTemp.dep),
-                    fetchRealMETAR(generatedFlightTemp.arr)
-                ]);
-                // Update temp object with real data
-                generatedFlightTemp.metarDep = metarDep;
-                generatedFlightTemp.metarArr = metarArr;
-                
-                // Update UI with real data
-                updateBriefingWeather();
-            } catch (e) {
-                document.getElementById('br-metar-dep').innerText = "Weather fetch failed.";
-                document.getElementById('br-metar-arr').innerText = "Weather fetch failed.";
-            }
+                const an=document.getElementById('gen-airline').value, h=document.getElementById('gen-hub').value, tp=document.getElementById('gen-time').value, btn=document.getElementById('generate-btn');
+                if(!an||!h){alert("Select Airline & Hub");return;}
+                btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Computing...';
 
-            // Reset button
-            genBtn.disabled = false;
-            genBtn.innerText = 'Generate OFP (Live WX)';
+                let minH=1, maxH=3; if(tp==='medium'){minH=3;maxH=7;} if(tp==='long'){minH=8;maxH=14;}
+                const availAC = FLEET.filter(ac => (tp==='long'?ac.maxHours>=8:(tp==='short'?ac.maxHours<8:ac.maxHours>=3)));
+                if(availAC.length===0){alert("No aircraft"); btn.disabled=false; btn.innerText='Generate OFP'; return;}
+
+                const selectedAC = availAC[Math.floor(Math.random()*availAC.length)];
+                const dests = DESTINATIONS.filter(d=>d.hours>=minH && d.hours<=maxH);
+                const dest = dests.length>0 ? dests[Math.floor(Math.random()*dests.length)] : DESTINATIONS[0];
+                const depIcao = h.split(' ')[0];
+
+                const loadFactor = 0.6 + Math.random()*0.4; 
+                const pax = Math.floor(selectedAC.seats * loadFactor);
+                const cargo = Math.floor(Math.random() * 5000) + 1000;
+                const zfw = 40000 + (pax * 85) + cargo;
+                
+                let num = Math.floor(Math.random() * 900) + 100;
+                if (dest.region === 'NA') num = 400 + Math.floor(Math.random() * 99);
+                if (dest.region === 'AS') num = 700 + Math.floor(Math.random() * 99);
+
+                generatedFlightTemp = {
+                    dep: depIcao, arr: dest.code, ac: selectedAC.type, time: (Math.random()*(maxH-minH)+minH).toFixed(1),
+                    num: AIRLINES[an].code + num, fl: "FL"+(Math.floor(Math.random()*6)*20+320), altn: "EDDK",
+                    depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
+                    arrLat: dest.lat, arrLon: dest.lon,
+                    pax: pax, cargo: cargo, zfw: zfw, gateDep: generateGate(depIcao), gateArr: generateGate(dest.code)
+                };
+
+                showBriefingModal(true);
+
+                try {
+                    const [m1, m2] = await Promise.all([fetchRealMETAR(generatedFlightTemp.dep), fetchRealMETAR(generatedFlightTemp.arr)]);
+                    generatedFlightTemp.metarDep = m1; generatedFlightTemp.metarArr = m2;
+                    updateBriefingWeather();
+                } catch(e){}
+                btn.disabled=false; btn.innerText='Generate OFP (Live WX)';
+            } catch (err) {
+                alert("Critical System Error: " + err.message);
+                document.getElementById('generate-btn').disabled = false;
+            }
         }
 
-        function showBriefingModal(isLoading) {
-            if(!generatedFlightTemp) return;
+        function showBriefingModal(loading) {
+            if(!generatedFlightTemp)return;
             const g = generatedFlightTemp;
-            document.getElementById('br-dep').innerText = g.dep;
-            document.getElementById('br-arr').innerText = g.arr;
-            document.getElementById('br-ac').innerText = g.ac;
-            document.getElementById('br-flight-num').innerText = g.num;
-            document.getElementById('br-time').innerText = g.time + " hrs";
-            document.getElementById('br-fl').innerText = g.fl;
+            document.getElementById('br-dep').innerText = g.dep; document.getElementById('br-arr').innerText = g.arr;
+            document.getElementById('br-ac').innerText = g.ac; document.getElementById('br-flight-num').innerText = g.num;
+            document.getElementById('br-time').innerText = g.time + " h"; document.getElementById('br-fl').innerText = g.fl;
             document.getElementById('br-altn').innerText = g.altn;
-            
-            // Populate New Fields
-            document.getElementById('br-gate-dep').innerText = g.gateDep; 
-            document.getElementById('br-gate-arr').innerText = g.gateArr;
-            document.getElementById('br-pax').innerText = `${g.pax} PAX`;
-            document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
+            document.getElementById('br-gate-dep').innerText = g.gateDep; document.getElementById('br-gate-arr').innerText = g.gateArr;
+            document.getElementById('br-pax').innerText = `${g.pax} PAX`; document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
             document.getElementById('br-zfw').innerText = `${(g.zfw/1000).toFixed(1)} T`;
-            
-            // Reset Weather boxes to loading state if new generation
-            if (isLoading) {
-                document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Connecting to AVWX API...';
-                document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Connecting to AVWX API...';
-            }
 
+            if(loading) {
+                document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Fetching...';
+                document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Fetching...';
+            }
             document.getElementById('briefing-modal').classList.remove('hidden');
 
-            // Initialize Map
             setTimeout(() => {
-                if(mapObject) { mapObject.remove(); } 
+                if(mapObject) mapObject.remove();
                 mapObject = L.map('map').setView([g.depLat, g.depLon], 3);
-                
-                let tileUrl = document.body.classList.contains('dark-mode') 
-                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' // Dark tiles
-                    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'; // Light tiles
-
-                L.tileLayer(tileUrl, { attribution: '&copy; OpenStreetMap &copy; CARTO' }).addTo(mapObject);
-
-                L.marker([g.depLat, g.depLon]).addTo(mapObject).bindPopup("DEPARTURE");
-                L.marker([g.arrLat, g.arrLon]).addTo(mapObject).bindPopup("ARRIVAL");
-
-                const pointList = [
-                    new L.LatLng(g.depLat, g.depLon),
-                    new L.LatLng(g.arrLat, g.arrLon)
-                ];
-
-                const routeLine = new L.Polyline(pointList, {
-                    color: document.body.classList.contains('dark-mode') ? '#ffb600' : '#05164d',
-                    weight: 3, opacity: 0.8
-                });
-                
-                routeLine.addTo(mapObject);
-                mapObject.fitBounds(routeLine.getBounds(), {padding: [50, 50]});
+                L.tileLayer(document.body.classList.contains('dark-mode') ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM &copy; CARTO' }).addTo(mapObject);
+                L.marker([g.depLat, g.depLon]).addTo(mapObject); L.marker([g.arrLat, g.arrLon]).addTo(mapObject);
+                L.polyline([[g.depLat, g.depLon], [g.arrLat, g.arrLon]], { color: document.body.classList.contains('dark-mode')?'#ffb600':'#05164d', weight: 3 }).addTo(mapObject);
             }, 100);
         }
 
@@ -781,44 +504,29 @@
             document.getElementById('br-metar-dep').innerText = generatedFlightTemp.metarDep;
             document.getElementById('br-metar-arr').innerText = generatedFlightTemp.metarArr;
         }
-
         function confirmBriefing() {
             document.getElementById('briefing-modal').classList.add('hidden');
-            localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp));
-            checkActiveFlight();
+            localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); checkActiveFlight();
         }
-
         function checkActiveFlight() {
-            const activeData = localStorage.getItem('activeFlight');
-            if (activeData) {
-                const flight = JSON.parse(activeData);
+            const d = localStorage.getItem('activeFlight');
+            if(d) {
+                const f = JSON.parse(d);
                 document.getElementById('active-flight-banner').classList.remove('hidden');
-                document.getElementById('af-dep').innerText = flight.dep;
-                document.getElementById('af-arr').innerText = flight.arr;
-                document.getElementById('af-num').innerText = flight.num;
-                document.getElementById('af-ac').innerText = flight.ac;
-                document.getElementById('af-pax').innerText = `${flight.pax} PAX`;
-                document.getElementById('generator-form').classList.add('hidden');
-                document.getElementById('generator-locked').classList.remove('hidden');
+                document.getElementById('af-dep').innerText = f.dep; document.getElementById('af-arr').innerText = f.arr;
+                document.getElementById('af-num').innerText = f.num; document.getElementById('af-ac').innerText = f.ac;
+                document.getElementById('af-pax').innerText = `${f.pax} PAX`;
+                document.getElementById('generator-form').classList.add('hidden'); document.getElementById('generator-locked').classList.remove('hidden');
             } else {
                 document.getElementById('active-flight-banner').classList.add('hidden');
-                document.getElementById('generator-form').classList.remove('hidden');
-                document.getElementById('generator-locked').classList.add('hidden');
+                document.getElementById('generator-form').classList.remove('hidden'); document.getElementById('generator-locked').classList.add('hidden');
             }
         }
-
         function completeFlight() {
-            if(confirm("Confirm engine shutdown and log flight?")) {
-                const activeData = localStorage.getItem('activeFlight');
-                if(activeData) {
-                    const flight = JSON.parse(activeData);
-                    pilotStats.flights++;
-                    pilotStats.hours += parseFloat(flight.time);
-                    localStorage.setItem('pilotStats', JSON.stringify(pilotStats));
-                    updateStatsUI();
-                }
-                localStorage.removeItem('activeFlight');
-                checkActiveFlight();
+            if(confirm("File PIREP?")) {
+                const d=localStorage.getItem('activeFlight');
+                if(d){ const f=JSON.parse(d); pilotStats.flights++; pilotStats.hours+=parseFloat(f.time); localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); updateStatsUI(); }
+                localStorage.removeItem('activeFlight'); checkActiveFlight();
             }
         }
     </script>
