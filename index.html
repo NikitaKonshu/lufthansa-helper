@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v13</title>
+    <title>Lufthansa Crew Portal - v15</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -88,7 +88,6 @@
         .briefing-paper {
             background: var(--card-bg); width: 95%; max-width: 850px; padding: 30px; border-radius: 6px; 
             box-shadow: 0 0 50px rgba(0,0,0,0.7); color: var(--text-main); position: relative; max-height: 95vh; overflow-y: auto;
-            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(45)" opacity="0.03" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/></svg>');
         }
         .briefing-header { display: flex; justify-content: space-between; border-bottom: 3px solid #05164d; padding-bottom: 10px; margin-bottom: 20px; }
         body.dark-mode .briefing-header { border-color: var(--brand-yellow); }
@@ -102,8 +101,27 @@
 
         /* Fleet & Progress */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .aircraft-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; background: #ddd; }
+        .aircraft-card { min-height: 200px; display: flex; flex-direction: column; }
         
+        /* New Style for data box */
+        .aircraft-data-box { 
+            background: var(--bg-color); 
+            border-radius: 4px;
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .aircraft-data-box p {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-sub);
+        }
+        .aircraft-data-box strong {
+            color: var(--text-main);
+            font-weight: 600;
+            float: right;
+        }
+
         .progress-container { width: 100%; background: #e0e0e0; height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--brand-yellow); width: 0%; transition: width 1s linear; }
         .flight-timer { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 5px; text-align: right; }
@@ -325,13 +343,13 @@
             "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" }
         };
 
-        // FIXED IMAGE URLS (Wikimedia Commons)
+        // ОБНОВЛЕННЫЕ ДАННЫЕ С РУЧНЫМИ ХАРАКТЕРИСТИКАМИ
         const FLEET = [
-            { type: "Airbus A319", maxHours: 5, seats: 138, img: "https://upload.wikimedia.org/wikipedia/commons/4/43/Lufthansa_Airbus_A319-100_D-AILU.jpg" },
-            { type: "Airbus A320neo", maxHours: 6, seats: 180, img: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lufthansa_Airbus_A320neo_D-AINA_FRA_2016.jpg" },
-            { type: "Airbus A330-300", maxHours: 11, seats: 255, img: "https://upload.wikimedia.org/wikipedia/commons/c/c2/Lufthansa_A330-300_D-AIKQ_01.jpg" },
-            { type: "Airbus A350-900", maxHours: 16, seats: 293, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Lufthansa_Airbus_A350-941_D-AIXP_%2849586947268%29.jpg" },
-            { type: "Boeing 747-8", maxHours: 14, seats: 364, img: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Boeing_747-830_D-ABYT.jpg" }
+            { type: "Airbus A319", maxHours: 5, seats: 138, fuelReserve: "6,500 KG", layoutImg: "https://i.imgur.com/example_a319_layout.png" },
+            { type: "Airbus A320neo", maxHours: 6, seats: 180, fuelReserve: "7,200 KG", layoutImg: "https://i.imgur.com/example_a320_layout.png" },
+            { type: "Airbus A330-300", maxHours: 11, seats: 255, fuelReserve: "18,000 KG", layoutImg: "https://i.imgur.com/example_a330_layout.png" },
+            { type: "Airbus A350-900", maxHours: 16, seats: 293, fuelReserve: "22,000 KG", layoutImg: "https://i.imgur.com/example_a350_layout.png" },
+            { type: "Boeing 747-8", maxHours: 14, seats: 364, fuelReserve: "30,000 KG", layoutImg: "https://i.imgur.com/example_b748_layout.png" }
         ];
 
         const DESTINATIONS = [
@@ -421,18 +439,35 @@
             document.getElementById('stat-rank').innerText = rank;
         }
 
+        // --- ИЗМЕНЕНИЕ: ФУНКЦИЯ ПРОСМОТРА СХЕМЫ ---
+        function openLayout(type, url) {
+            if (url.includes('example')) {
+                alert(`Layout for ${type} is not yet available. Please replace the placeholder link with a real image link for ${type} in the FLEET data.`);
+            } else {
+                window.open(url, '_blank');
+            }
+        }
+
         function populateFleet() {
             const c = document.getElementById('fleet-container'); 
             c.innerHTML = '';
             FLEET.forEach(ac => { 
                 c.innerHTML += `
                 <div class="lh-card aircraft-card border-brand">
-                    <img src="${ac.img}" alt="${ac.type}">
                     <h4 style="color:var(--text-main);">${ac.type}</h4>
-                    <div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: ${ac.maxHours}h</div>
+                    <div class="aircraft-data-box">
+                        <p>Max Passengers: <strong>${ac.seats}</strong></p>
+                        <p>Max Flight Time: <strong>${ac.maxHours}h</strong></p>
+                        <p>Fuel Reserve Req.: <strong>${ac.fuelReserve}</strong></p>
+                    </div>
+                    <button class="btn btn-yellow" style="width:100%; padding:10px;" 
+                            onclick="openLayout('${ac.type}', '${ac.layoutImg}')">
+                        Seating Layout / Расcадка
+                    </button>
                 </div>`; 
             });
         }
+        
         function populateAirlinesSelect() { 
             const s = document.getElementById('gen-airline'); 
             for(let a in AIRLINES){ let o = document.createElement('option'); o.value=a; o.text=a; s.add(o); } 
@@ -501,7 +536,6 @@
                 const cargo = Math.floor(Math.random() * 5000) + 1000;
                 const zfw = 40000 + (pax * 85) + cargo;
                 
-                // Flight Time Calculation
                 const flightTimeHours = (Math.random() * (maxH - minH) + minH).toFixed(1);
 
                 generatedFlightTemp = {
@@ -592,9 +626,7 @@
         function confirmBriefing() {
             document.getElementById('briefing-modal').classList.add('hidden');
             
-            // Set Start Time
             generatedFlightTemp.startTime = Date.now();
-            // Calculate Duration in Game MS (Hours * Seconds_Per_Hour * 1000)
             generatedFlightTemp.durationMs = generatedFlightTemp.time * SECONDS_PER_FLIGHT_HOUR * 1000;
             
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); 
@@ -615,7 +647,6 @@
                 document.getElementById('generator-form').classList.add('hidden'); 
                 document.getElementById('generator-locked').classList.remove('hidden');
 
-                // Start Progress Loop
                 if(progressInterval) clearInterval(progressInterval);
                 progressInterval = setInterval(updateFlightProgress, 1000);
                 updateFlightProgress();
