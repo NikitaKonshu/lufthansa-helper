@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - Ops</title>
+    <title>Lufthansa Crew Portal - Stable Ops</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -99,7 +99,7 @@
         .data-block label { display: block; font-size: 0.7rem; color: var(--text-sub); font-weight: bold; }
         .data-block span { font-weight: 600; font-family: 'Roboto Mono', monospace; }
 
-        .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; }
+        .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; display: flex; align-items: center; }
         #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid var(--border-color); z-index: 1; }
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -185,6 +185,10 @@
                             <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Current Leg</div>
                             <div style="font-size:1.5rem; font-weight:800; color:var(--text-main);"><span id="af-dep"></span> ➝ <span id="af-arr"></span></div>
                             <div style="font-size:1rem; color:var(--brand-yellow); font-weight:bold;" id="af-num"></div>
+                        </div>
+                        <div style="border-left: 2px solid var(--border-color); padding-left: 30px;">
+                            <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Equipment</div>
+                            <div style="font-weight:bold; color:var(--text-main); font-size: 1.1rem;" id="af-ac"></div>
                         </div>
                         <div style="border-left: 2px solid var(--border-color); padding-left: 30px;">
                             <div style="text-transform:uppercase; font-size:0.75rem; color:var(--text-sub);">Load</div>
@@ -314,10 +318,10 @@
     </div>
 
     <script>
+        // --- 1. CONFIG & DATA ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // --- ЗДЕСЬ МОЖНО ДОБАВИТЬ СВОИ ГЕЙТЫ ---
-        // Просто добавь код аэропорта и список гейтов в кавычках
+        // Твои реальные гейты
         const REAL_GATES = {
             "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26", "B28"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
@@ -333,6 +337,7 @@
             "Austrian": { hubs: ["LOWW (Vienna)"], code: "AUA" },
             "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" }
         };
+
         const FLEET = [
             { type: "Airbus A319", maxHours: 5, seats: 138, img: "https://upload.wikimedia.org/wikipedia/commons/4/43/Lufthansa_Airbus_A319-100_D-AILU.jpg" },
             { type: "Airbus A320neo", maxHours: 6, seats: 180, img: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lufthansa_Airbus_A320neo_D-AINA_FRA_2016.jpg" },
@@ -340,6 +345,7 @@
             { type: "Airbus A350-900", maxHours: 16, seats: 293, img: "https://upload.wikimedia.org/wikipedia/commons/6/69/Lufthansa_Airbus_A350-941_D-AIXP_%2849586947268%29.jpg" },
             { type: "Boeing 747-8", maxHours: 14, seats: 364, img: "https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Boeing_747-830_D-ABYT.jpg" }
         ];
+
         const DESTINATIONS = [
             { code: "KJFK", city: "New York", hours: 8.5, region: "NA", lat: 40.64, lon: -73.77 },
             { code: "EGLL", city: "London", hours: 1.5, region: "EU", lat: 51.47, lon: -0.46 },
@@ -349,18 +355,29 @@
             { code: "FACT", city: "Cape Town", hours: 11.5, region: "AF", lat: -33.97, lon: 18.60 },
             { code: "WSSS", city: "Singapore", hours: 12.5, region: "AS", lat: 1.36, lon: 103.98 }
         ];
+
         const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56] };
 
-        let currentUser=null, generatedFlightTemp=null, pilotStats={flights:0,hours:0}, mapObject=null;
+        // --- 2. SYSTEM STATE ---
+        let currentUser = null;
+        let generatedFlightTemp = null;
+        let pilotStats = { flights: 0, hours: 0 };
+        let mapObject = null;
 
+        // --- 3. INITIALIZATION ---
         window.onload = function() {
-            simulateBootSequence(); populateFleet(); populateAirlinesSelect(); populateHubsInfo(); loadStats(); startClock();
+            simulateBootSequence();
+            populateFleet();
+            populateAirlinesSelect();
+            populateHubsInfo();
+            loadStats();
+            startClock();
         };
 
         function simulateBootSequence() {
             setTimeout(() => { document.getElementById('sys-status-1').innerText = "ACARS: OK. Datalink: ESTABLISHED."; }, 1500);
             setTimeout(() => { document.getElementById('sys-status-2').innerText = "Weather Radar: SELF-TEST OK."; }, 3000);
-            setTimeout(() => { goToLogin(); }, 5000); 
+            setTimeout(() => { goToLogin(); }, 4500); 
         }
 
         function startClock() {
@@ -370,155 +387,267 @@
             }, 1000);
         }
 
+        // --- 4. NAVIGATION & UI ---
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
-        function loadStats() { const s=localStorage.getItem('pilotStats'); if(s) pilotStats=JSON.parse(s); updateStatsUI(); }
-        function updateStatsUI() {
-            document.getElementById('stat-flights').innerText = pilotStats.flights;
-            document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours);
-            document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer");
+        
+        function showTab(n, b) {
+            const tabs = document.getElementsByClassName('tab-content');
+            for(let t of tabs) t.classList.add('hidden');
+            document.getElementById(`tab-${n}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            if(b) b.classList.add('active');
         }
 
         function goToLogin() {
-            const w=document.getElementById('welcome-screen'); w.style.opacity='0'; w.style.transition='0.8s';
-            setTimeout(()=>{ w.classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); },800);
+            const w = document.getElementById('welcome-screen');
+            w.style.opacity = '0';
+            w.style.pointerEvents = 'none'; // Важно: чтобы клики проходили сквозь него
+            setTimeout(() => { 
+                w.classList.add('hidden'); 
+                document.getElementById('login-screen').classList.remove('hidden'); 
+            }, 800);
         }
+
         function login() {
-            const c=document.getElementById('callsign').value.toUpperCase(), p=document.getElementById('password').value;
-            if(USERS.find(u=>u.callsign===c && u.pass===p)){ 
-                document.getElementById('user-display').innerText=USERS.find(u=>u.callsign===c).name; 
-                document.getElementById('login-screen').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); checkActiveFlight();
-            } else { document.getElementById('login-error').innerText="Try DLH001 / 1234"; }
-        }
-        function showTab(n,b) {
-            const tabs=document.getElementsByClassName('tab-content'); for(let t of tabs)t.classList.add('hidden');
-            document.getElementById(`tab-${n}`).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active');
-        }
-
-        function populateFleet() {
-            const c=document.getElementById('fleet-container'); c.innerHTML='';
-            FLEET.forEach(ac=>{ c.innerHTML+=`<div class="lh-card aircraft-card border-brand"><img src="${ac.img}"><h4 style="color:var(--text-main);">${ac.type}</h4><div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: ${ac.maxHours}h</div></div>`; });
-        }
-        function populateAirlinesSelect() { const s=document.getElementById('gen-airline'); for(let a in AIRLINES){ let o=document.createElement('option'); o.value=a; o.text=a; s.add(o); } }
-        function populateHubsInfo() { const l=document.getElementById('hub-list-display'); for(let a in AIRLINES) l.innerHTML+=`<li><strong style="color:var(--text-main)">${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`; }
-        function updateHubs() {
-            const a=document.getElementById('gen-airline').value, h=document.getElementById('gen-hub'); h.innerHTML="";
-            if(!a){ h.disabled=true; return; } h.disabled=false;
-            AIRLINES[a].hubs.forEach(x=>{ let o=document.createElement('option'); o.value=x; o.text=x; h.add(o); });
-        }
-
-        async function fetchRealMETAR(icao) {
-            try { const r=await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`); if(!r.ok)throw new Error(); const d=await r.json(); return d.raw; }
-            catch{ return `${icao} METAR UNAVAILABLE`; }
-        }
-
-        // --- NEW GATE LOGIC ---
-        function generateGate(icao) {
-            // Check if we have real gates defined for this airport
-            if (REAL_GATES[icao]) {
-                const gates = REAL_GATES[icao];
-                return gates[Math.floor(Math.random() * gates.length)];
+            const c = document.getElementById('callsign').value.toUpperCase();
+            const p = document.getElementById('password').value;
+            if(USERS.find(u => u.callsign === c && u.pass === p)){ 
+                document.getElementById('user-display').innerText = USERS.find(u => u.callsign === c).name; 
+                document.getElementById('login-screen').classList.add('hidden'); 
+                document.getElementById('dashboard').classList.remove('hidden'); 
+                checkActiveFlight();
+            } else { 
+                document.getElementById('login-error').innerText = "Try DLH001 / 1234"; 
             }
-            // Fallback random generation
-            const zones = ['A','B','C','Z'];
+        }
+
+        // --- 5. LOGBOOK & STATS ---
+        function loadStats() { 
+            const s = localStorage.getItem('pilotStats'); 
+            if(s) pilotStats = JSON.parse(s); 
+            updateStatsUI(); 
+        }
+        function updateStatsUI() {
+            document.getElementById('stat-flights').innerText = pilotStats.flights;
+            document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours);
+            let rank = "Second Officer";
+            if(pilotStats.flights > 5) rank = "First Officer";
+            if(pilotStats.flights > 20) rank = "Captain";
+            document.getElementById('stat-rank').innerText = rank;
+        }
+
+        // --- 6. POPULATORS ---
+        function populateFleet() {
+            const c = document.getElementById('fleet-container'); 
+            c.innerHTML = '';
+            FLEET.forEach(ac => { 
+                c.innerHTML += `
+                <div class="lh-card aircraft-card border-brand">
+                    <img src="${ac.img}">
+                    <h4 style="color:var(--text-main);">${ac.type}</h4>
+                    <div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: ${ac.maxHours}h</div>
+                </div>`; 
+            });
+        }
+        function populateAirlinesSelect() { 
+            const s = document.getElementById('gen-airline'); 
+            for(let a in AIRLINES){ let o = document.createElement('option'); o.value=a; o.text=a; s.add(o); } 
+        }
+        function populateHubsInfo() { 
+            const l = document.getElementById('hub-list-display'); 
+            for(let a in AIRLINES) l.innerHTML += `<li><strong style="color:var(--text-main)">${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`; 
+        }
+        function updateHubs() {
+            const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); 
+            h.innerHTML = "";
+            if(!a){ h.disabled=true; return; } h.disabled=false;
+            AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); });
+        }
+
+        // --- 7. FLIGHT GENERATION LOGIC ---
+
+        // Функция с тайм-аутом для погоды (чтобы не зависало)
+        async function fetchSafeMETAR(icao) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // Ждем максимум 2 секунды
+
+            try {
+                const r = await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if(!r.ok) throw new Error("API Fail");
+                const d = await r.json(); 
+                return d.raw;
+            } catch (err) {
+                // Если ошибка или тайм-аут - возвращаем заглушку
+                return `${icao} METAR UNAVAILABLE (OFFLINE)`;
+            }
+        }
+
+        function generateGate(icao) {
+            if (REAL_GATES[icao]) return REAL_GATES[icao][Math.floor(Math.random() * REAL_GATES[icao].length)];
+            const zones = ['A','B','C','Z']; 
             return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
         }
 
         async function generateFlight() {
-            const an=document.getElementById('gen-airline').value, h=document.getElementById('gen-hub').value, tp=document.getElementById('gen-time').value, btn=document.getElementById('generate-btn');
-            if(!an||!h){alert("Select Airline & Hub");return;}
-            btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Computing...';
-
-            let minH=1, maxH=3; if(tp==='medium'){minH=3;maxH=7;} if(tp==='long'){minH=8;maxH=14;}
-            const availAC = FLEET.filter(ac => (tp==='long'?ac.maxHours>=8:(tp==='short'?ac.maxHours<8:ac.maxHours>=3)));
-            if(availAC.length===0){alert("No aircraft"); btn.disabled=false; return;}
-
-            const ac = availAC[Math.floor(Math.random()*availAC.length)];
-            const dests = DESTINATIONS.filter(d=>d.hours>=minH && d.hours<=maxH);
-            const dest = dests.length>0 ? dests[Math.floor(Math.random()*dests.length)] : DESTINATIONS[0];
-            const depIcao = h.split(' ')[0];
-
-            // Load generation
-            const loadFactor = 0.6 + Math.random()*0.4; // 60-100%
-            const pax = Math.floor(ac.seats * loadFactor);
-            const cargo = Math.floor(Math.random() * 5000) + 1000;
-            const zfw = 40000 + (pax * 85) + cargo; // Rough ZFW calc
-
-            generatedFlightTemp = {
-                dep: depIcao, arr: dest.code, ac: ac.type, time: (Math.random()*(maxH-minH)+minH).toFixed(1),
-                num: AIRLINES[an].code + (Math.floor(Math.random()*900)+100),
-                fl: "FL"+(Math.floor(Math.random()*6)*20+320), altn: "EDDK",
-                depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
-                arrLat: dest.lat, arrLon: dest.lon,
-                pax: pax, cargo: cargo, zfw: zfw,
-                // Using new logic
-                gateDep: generateGate(depIcao), gateArr: generateGate(dest.code)
-            };
-
-            showBriefingModal(true);
-
+            const btn = document.getElementById('generate-btn');
+            
             try {
-                const [m1, m2] = await Promise.all([fetchRealMETAR(generatedFlightTemp.dep), fetchRealMETAR(generatedFlightTemp.arr)]);
-                generatedFlightTemp.metarDep = m1; generatedFlightTemp.metarArr = m2;
+                const an = document.getElementById('gen-airline').value;
+                const h = document.getElementById('gen-hub').value;
+                const tp = document.getElementById('gen-time').value;
+
+                if(!an || !h){ alert("Select Airline & Hub"); return; }
+                
+                // БЛОКИРУЕМ КНОПКУ
+                btn.disabled = true; 
+                btn.innerHTML = '<div class="spinner"></div> Computing...';
+
+                // ЛОГИКА ПОДБОРА
+                let minH = 1, maxH = 3; 
+                if(tp === 'medium'){ minH = 3; maxH = 7; } 
+                if(tp === 'long'){ minH = 8; maxH = 14; }
+                
+                const availAC = FLEET.filter(ac => (tp === 'long' ? ac.maxHours >= 8 : (tp === 'short' ? ac.maxHours < 8 : ac.maxHours >= 3)));
+                if(availAC.length === 0){ alert("No aircraft"); btn.disabled = false; btn.innerText = 'Generate OFP'; return; }
+
+                const ac = availAC[Math.floor(Math.random() * availAC.length)];
+                const dests = DESTINATIONS.filter(d => d.hours >= minH && d.hours <= maxH);
+                const dest = dests.length > 0 ? dests[Math.floor(Math.random() * dests.length)] : DESTINATIONS[0];
+                const depIcao = h.split(' ')[0];
+
+                const loadFactor = 0.6 + Math.random() * 0.4;
+                const pax = Math.floor(ac.seats * loadFactor);
+                const cargo = Math.floor(Math.random() * 5000) + 1000;
+                const zfw = 40000 + (pax * 85) + cargo;
+
+                generatedFlightTemp = {
+                    dep: depIcao, arr: dest.code, ac: ac.type, 
+                    time: (Math.random() * (maxH - minH) + minH).toFixed(1),
+                    num: AIRLINES[an].code + (Math.floor(Math.random() * 900) + 100),
+                    fl: "FL" + (Math.floor(Math.random() * 6) * 20 + 320), altn: "EDDK",
+                    depLat: HUB_COORDS[depIcao] ? HUB_COORDS[depIcao][0] : 50.0, 
+                    depLon: HUB_COORDS[depIcao] ? HUB_COORDS[depIcao][1] : 8.0,
+                    arrLat: dest.lat, arrLon: dest.lon,
+                    pax: pax, cargo: cargo, zfw: zfw,
+                    gateDep: generateGate(depIcao), gateArr: generateGate(dest.code),
+                    metarDep: "Loading...", metarArr: "Loading..."
+                };
+
+                // ПОКАЗЫВАЕМ ОКНО
+                showBriefingModal(true);
+
+                // ГРУЗИМ ПОГОДУ ПАРАЛЛЕЛЬНО (чтобы не висло)
+                const [m1, m2] = await Promise.all([
+                    fetchSafeMETAR(generatedFlightTemp.dep), 
+                    fetchSafeMETAR(generatedFlightTemp.arr)
+                ]);
+                
+                generatedFlightTemp.metarDep = m1; 
+                generatedFlightTemp.metarArr = m2;
                 updateBriefingWeather();
-            } catch(e){}
-            btn.disabled=false; btn.innerText='Generate OFP (Live WX)';
+
+            } catch (error) {
+                alert("System Error: " + error.message);
+            } finally {
+                // ВСЕГДА РАЗБЛОКИРУЕМ КНОПКУ В КОНЦЕ
+                btn.disabled = false; 
+                btn.innerText = 'Generate OFP (Live WX)';
+            }
         }
 
         function showBriefingModal(loading) {
-            if(!generatedFlightTemp)return;
+            if(!generatedFlightTemp) return;
             const g = generatedFlightTemp;
-            document.getElementById('br-dep').innerText = g.dep; document.getElementById('br-arr').innerText = g.arr;
-            document.getElementById('br-ac').innerText = g.ac; document.getElementById('br-flight-num').innerText = g.num;
-            document.getElementById('br-time').innerText = g.time + " h"; document.getElementById('br-fl').innerText = g.fl;
+            
+            // Заполнение данных
+            document.getElementById('br-dep').innerText = g.dep; 
+            document.getElementById('br-arr').innerText = g.arr;
+            document.getElementById('br-ac').innerText = g.ac; 
+            document.getElementById('br-flight-num').innerText = g.num;
+            document.getElementById('br-time').innerText = g.time + " h"; 
+            document.getElementById('br-fl').innerText = g.fl;
             document.getElementById('br-altn').innerText = g.altn;
-            document.getElementById('br-gate-dep').innerText = g.gateDep; document.getElementById('br-gate-arr').innerText = g.gateArr;
+            document.getElementById('br-gate-dep').innerText = g.gateDep; 
+            document.getElementById('br-gate-arr').innerText = g.gateArr;
             document.getElementById('br-pax').innerText = `${g.pax} PAX`;
             document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
             document.getElementById('br-zfw').innerText = `${(g.zfw/1000).toFixed(1)} T`;
 
             if(loading) {
-                document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Fetching...';
-                document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Fetching...';
+                document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Connecting...';
+                document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Connecting...';
             }
+            
             document.getElementById('briefing-modal').classList.remove('hidden');
 
+            // Карта (через задержку, чтобы не ломалась в модалке)
             setTimeout(() => {
-                if(mapObject) mapObject.remove();
+                if(mapObject) { mapObject.off(); mapObject.remove(); }
                 mapObject = L.map('map').setView([g.depLat, g.depLon], 3);
-                L.tileLayer(document.body.classList.contains('dark-mode') ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM &copy; CARTO' }).addTo(mapObject);
-                L.marker([g.depLat, g.depLon]).addTo(mapObject); L.marker([g.arrLat, g.arrLon]).addTo(mapObject);
-                L.polyline([[g.depLat, g.depLon], [g.arrLat, g.arrLon]], { color: document.body.classList.contains('dark-mode')?'#ffb600':'#05164d', weight: 3 }).addTo(mapObject);
-            }, 100);
+                
+                let tileUrl = document.body.classList.contains('dark-mode') 
+                    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+                    : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+
+                L.tileLayer(tileUrl, { attribution: '&copy; OSM &copy; CARTO' }).addTo(mapObject);
+
+                L.marker([g.depLat, g.depLon]).addTo(mapObject).bindPopup("DEP"); 
+                L.marker([g.arrLat, g.arrLon]).addTo(mapObject).bindPopup("ARR");
+                
+                const route = L.polyline([[g.depLat, g.depLon], [g.arrLat, g.arrLon]], { 
+                    color: document.body.classList.contains('dark-mode') ? '#ffb600' : '#05164d', 
+                    weight: 3 
+                }).addTo(mapObject);
+                
+                try { mapObject.fitBounds(route.getBounds(), {padding:[50,50]}); } catch(e){}
+            }, 300);
         }
 
         function updateBriefingWeather() {
-            document.getElementById('br-metar-dep').innerText = generatedFlightTemp.metarDep;
-            document.getElementById('br-metar-arr').innerText = generatedFlightTemp.metarArr;
+            if(document.getElementById('br-metar-dep')) {
+                document.getElementById('br-metar-dep').innerText = generatedFlightTemp.metarDep;
+                document.getElementById('br-metar-arr').innerText = generatedFlightTemp.metarArr;
+            }
         }
+
         function confirmBriefing() {
             document.getElementById('briefing-modal').classList.add('hidden');
-            localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); checkActiveFlight();
+            localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); 
+            checkActiveFlight();
         }
+
         function checkActiveFlight() {
             const d = localStorage.getItem('activeFlight');
             if(d) {
                 const f = JSON.parse(d);
                 document.getElementById('active-flight-banner').classList.remove('hidden');
-                document.getElementById('af-dep').innerText = f.dep; document.getElementById('af-arr').innerText = f.arr;
-                document.getElementById('af-num').innerText = f.num; document.getElementById('af-ac').innerText = f.ac;
+                document.getElementById('af-dep').innerText = f.dep; 
+                document.getElementById('af-arr').innerText = f.arr;
+                document.getElementById('af-num').innerText = f.num; 
+                document.getElementById('af-ac').innerText = f.ac;
                 document.getElementById('af-pax').innerText = `${f.pax} PAX`;
-                document.getElementById('generator-form').classList.add('hidden'); document.getElementById('generator-locked').classList.remove('hidden');
+                document.getElementById('generator-form').classList.add('hidden'); 
+                document.getElementById('generator-locked').classList.remove('hidden');
             } else {
                 document.getElementById('active-flight-banner').classList.add('hidden');
-                document.getElementById('generator-form').classList.remove('hidden'); document.getElementById('generator-locked').classList.add('hidden');
+                document.getElementById('generator-form').classList.remove('hidden'); 
+                document.getElementById('generator-locked').classList.add('hidden');
             }
         }
+
         function completeFlight() {
-            if(confirm("File PIREP?")) {
-                const d=localStorage.getItem('activeFlight');
-                if(d){ const f=JSON.parse(d); pilotStats.flights++; pilotStats.hours+=parseFloat(f.time); localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); updateStatsUI(); }
-                localStorage.removeItem('activeFlight'); checkActiveFlight();
+            if(confirm("Confirm Arrival and File PIREP?")) {
+                const d = localStorage.getItem('activeFlight');
+                if(d){ 
+                    const f = JSON.parse(d); 
+                    pilotStats.flights++; 
+                    pilotStats.hours += parseFloat(f.time); 
+                    localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); 
+                    updateStatsUI(); 
+                }
+                localStorage.removeItem('activeFlight'); 
+                checkActiveFlight();
             }
         }
     </script>
