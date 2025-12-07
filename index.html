@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - Fixed</title>
+    <title>Lufthansa Crew Portal - v13</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -31,7 +31,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .mono-text { font-family: 'Roboto Mono', monospace; }
 
-        /* UI */
+        /* UI Elements */
         .btn {
             background-color: var(--brand-blue); color: #fff; border: 1px solid transparent;
             padding: 12px 28px; font-size: 0.9rem; cursor: pointer; border-radius: 4px;
@@ -40,8 +40,9 @@
         }
         body.dark-mode .btn { border-color: #444; }
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; background-color: #ccc; color: #666; }
         .btn-yellow { background-color: var(--brand-yellow); color: #05164d !important; border: none !important; }
+        .btn-yellow:hover { background-color: #ffcc33; }
         
         input, select {
             width: 100%; padding: 14px 15px; margin: 8px 0 20px 0;
@@ -53,11 +54,13 @@
         .lh-card {
             background: var(--card-bg); padding: 30px; border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            border-top: 4px solid var(--brand-blue);
+            border-top: 4px solid transparent;
         }
-        body.dark-mode .lh-card { border-top-color: #555; }
+        .border-brand { border-top-color: var(--brand-blue); }
+        body.dark-mode .border-brand { border-top-color: #555; }
 
-        /* Header */
+        h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+
         header { background-color: var(--header-bg); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
         .header-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
         .logo-white { filter: var(--logo-brightness); }
@@ -66,7 +69,7 @@
         .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; font-size: 1rem; opacity: 0.8; }
         .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Navigation */
+        /* Nav */
         .nav-bar { background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .nav-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; overflow-x: auto; }
         .nav-item { padding: 20px 25px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; }
@@ -75,7 +78,6 @@
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; width: 100%; }
 
-        /* Dashboard Items */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-box { background: var(--card-bg); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border-color); }
         .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
@@ -86,24 +88,26 @@
         .briefing-paper {
             background: var(--card-bg); width: 95%; max-width: 850px; padding: 30px; border-radius: 6px; 
             box-shadow: 0 0 50px rgba(0,0,0,0.7); color: var(--text-main); position: relative; max-height: 95vh; overflow-y: auto;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(45)" opacity="0.03" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/></svg>');
         }
         .briefing-header { display: flex; justify-content: space-between; border-bottom: 3px solid #05164d; padding-bottom: 10px; margin-bottom: 20px; }
         body.dark-mode .briefing-header { border-color: var(--brand-yellow); }
-        
         .briefing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; font-size: 0.9rem; }
         .data-block label { display: block; font-size: 0.7rem; color: var(--text-sub); font-weight: bold; }
         .data-block span { font-weight: 600; font-family: 'Roboto Mono', monospace; }
-
         .metar-box { font-family: 'Roboto Mono', monospace; background: var(--metar-bg); padding: 10px; font-size: 0.85rem; margin-top: 5px; border-left: 4px solid var(--brand-yellow); color: var(--text-main); min-height: 40px; display: flex; align-items: center; }
         #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid var(--border-color); z-index: 1; }
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Fleet */
+        /* Fleet & Progress */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        .aircraft-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
+        .aircraft-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; background: #ddd; }
+        
+        .progress-container { width: 100%; background: #e0e0e0; height: 8px; border-radius: 4px; margin-top: 15px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--brand-yellow); width: 0%; transition: width 1s linear; }
+        .flight-timer { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 5px; text-align: right; }
 
-        /* Welcome Screen */
         #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
         .welcome-overlay { background: rgba(10, 10, 10, 0.92); width: 100%; height: 100%; position: absolute; backdrop-filter: blur(5px); }
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
@@ -195,6 +199,10 @@
                         <button class="btn" style="padding: 10px 20px;" onclick="completeFlight()">File PIREP (Arrival)</button>
                     </div>
                 </div>
+                <div class="progress-container">
+                    <div id="flight-progress-bar" class="progress-bar"></div>
+                </div>
+                <div id="flight-timer" class="flight-timer">On Ground</div>
             </div>
 
             <div id="tab-about" class="tab-content fade-in">
@@ -299,16 +307,15 @@
     </div>
 
     <script>
-        // CONFIG
+        // --- CONFIG ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
-        
+        // 1 Flight Hour = 30 Real Seconds (Game Speed)
+        const SECONDS_PER_FLIGHT_HOUR = 30; 
+
         const REAL_GATES = {
-            "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26", "B28"],
-            "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
-            "KJFK": ["4", "5", "6", "7", "8", "10", "12"],
-            "EGLL": ["A10", "A18", "B34", "B36", "B38", "B42"],
-            "LOWW": ["F01", "F05", "F12", "F22", "G03", "G11"],
-            "LSZH": ["A06", "A12", "A54", "E18", "E26", "E34"]
+            "EDDF": ["A13", "A20", "Z50", "B24"], "EDDM": ["G08", "G30", "H12", "L11"],
+            "KJFK": ["4", "8", "12"], "EGLL": ["A10", "B34"],
+            "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"]
         };
 
         const AIRLINES = {
@@ -318,6 +325,7 @@
             "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" }
         };
 
+        // FIXED IMAGE URLS (Wikimedia Commons)
         const FLEET = [
             { type: "Airbus A319", maxHours: 5, seats: 138, img: "https://upload.wikimedia.org/wikipedia/commons/4/43/Lufthansa_Airbus_A319-100_D-AILU.jpg" },
             { type: "Airbus A320neo", maxHours: 6, seats: 180, img: "https://upload.wikimedia.org/wikipedia/commons/e/e3/Lufthansa_Airbus_A320neo_D-AINA_FRA_2016.jpg" },
@@ -338,13 +346,12 @@
 
         const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56] };
 
-        // STATE
         let currentUser = null;
         let generatedFlightTemp = null;
         let pilotStats = { flights: 0, hours: 0 };
         let mapObject = null;
+        let progressInterval = null;
 
-        // INIT
         window.onload = function() {
             simulateBootSequence();
             populateFleet();
@@ -420,7 +427,7 @@
             FLEET.forEach(ac => { 
                 c.innerHTML += `
                 <div class="lh-card aircraft-card border-brand">
-                    <img src="${ac.img}">
+                    <img src="${ac.img}" alt="${ac.type}">
                     <h4 style="color:var(--text-main);">${ac.type}</h4>
                     <div style="font-size:0.9rem; color:var(--text-sub);">Seats: ${ac.seats} | Range: ${ac.maxHours}h</div>
                 </div>`; 
@@ -441,7 +448,7 @@
             AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); });
         }
 
-        // --- CORE LOGIC ---
+        // --- FLIGHT LOGIC ---
 
         async function fetchSafeMETAR(icao) {
             const controller = new AbortController();
@@ -493,10 +500,13 @@
                 const pax = Math.floor(ac.seats * loadFactor);
                 const cargo = Math.floor(Math.random() * 5000) + 1000;
                 const zfw = 40000 + (pax * 85) + cargo;
+                
+                // Flight Time Calculation
+                const flightTimeHours = (Math.random() * (maxH - minH) + minH).toFixed(1);
 
                 generatedFlightTemp = {
                     dep: depIcao, arr: dest.code, ac: ac.type, 
-                    time: (Math.random() * (maxH - minH) + minH).toFixed(1),
+                    time: flightTimeHours,
                     num: AIRLINES[an].code + (Math.floor(Math.random() * 900) + 100),
                     fl: "FL" + (Math.floor(Math.random() * 6) * 20 + 320), altn: "EDDK",
                     depLat: HUB_COORDS[depIcao] ? HUB_COORDS[depIcao][0] : 50.0, 
@@ -535,11 +545,8 @@
             document.getElementById('br-ac').innerText = g.ac; 
             document.getElementById('br-flight-num').innerText = g.num;
             document.getElementById('br-time').innerText = g.time + " h"; 
-            
-            // ВОТ ЗДЕСЬ БЫЛА ОШИБКА, ТЕПЕРЬ ОНИ В HTML
             document.getElementById('br-fl').innerText = g.fl;
             document.getElementById('br-altn').innerText = g.altn;
-            
             document.getElementById('br-gate-dep').innerText = g.gateDep; 
             document.getElementById('br-gate-arr').innerText = g.gateArr;
             document.getElementById('br-pax').innerText = `${g.pax} PAX`;
@@ -584,6 +591,12 @@
 
         function confirmBriefing() {
             document.getElementById('briefing-modal').classList.add('hidden');
+            
+            // Set Start Time
+            generatedFlightTemp.startTime = Date.now();
+            // Calculate Duration in Game MS (Hours * Seconds_Per_Hour * 1000)
+            generatedFlightTemp.durationMs = generatedFlightTemp.time * SECONDS_PER_FLIGHT_HOUR * 1000;
+            
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); 
             checkActiveFlight();
         }
@@ -598,25 +611,63 @@
                 document.getElementById('af-num').innerText = f.num; 
                 document.getElementById('af-ac').innerText = f.ac;
                 document.getElementById('af-pax').innerText = `${f.pax} PAX`;
+                
                 document.getElementById('generator-form').classList.add('hidden'); 
                 document.getElementById('generator-locked').classList.remove('hidden');
+
+                // Start Progress Loop
+                if(progressInterval) clearInterval(progressInterval);
+                progressInterval = setInterval(updateFlightProgress, 1000);
+                updateFlightProgress();
+
             } else {
                 document.getElementById('active-flight-banner').classList.add('hidden');
                 document.getElementById('generator-form').classList.remove('hidden'); 
                 document.getElementById('generator-locked').classList.add('hidden');
+                if(progressInterval) clearInterval(progressInterval);
+            }
+        }
+
+        function updateFlightProgress() {
+            const d = localStorage.getItem('activeFlight');
+            if(!d) return;
+            const f = JSON.parse(d);
+            
+            const elapsed = Date.now() - f.startTime;
+            const progress = Math.min((elapsed / f.durationMs) * 100, 100);
+            
+            document.getElementById('flight-progress-bar').style.width = progress + "%";
+            
+            const remainingMs = Math.max(0, f.durationMs - elapsed);
+            const remainingSec = Math.ceil(remainingMs / 1000);
+            
+            if(progress >= 100) {
+                document.getElementById('flight-timer').innerText = "ARRIVED - READY TO PIREP";
+                document.getElementById('flight-timer').style.color = "#00c853";
+            } else {
+                document.getElementById('flight-timer').innerText = `IN FLIGHT (${remainingSec}s remain)`;
+                document.getElementById('flight-timer').style.color = "var(--text-sub)";
             }
         }
 
         function completeFlight() {
+            const d = localStorage.getItem('activeFlight');
+            if(!d) return;
+            const f = JSON.parse(d);
+
+            const elapsed = Date.now() - f.startTime;
+            
+            if(elapsed < f.durationMs) {
+                alert(`Cannot file PIREP yet! Aircraft is still airborne.\nTime remaining: ${Math.ceil((f.durationMs - elapsed)/1000)}s`);
+                return;
+            }
+
             if(confirm("Confirm Arrival and File PIREP?")) {
-                const d = localStorage.getItem('activeFlight');
-                if(d){ 
-                    const f = JSON.parse(d); 
-                    pilotStats.flights++; 
-                    pilotStats.hours += parseFloat(f.time); 
-                    localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); 
-                    updateStatsUI(); 
-                }
+                pilotStats.flights++; 
+                pilotStats.hours += parseFloat(f.time); 
+                localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); 
+                updateStatsUI(); 
+                
                 localStorage.removeItem('activeFlight'); 
                 checkActiveFlight();
             }
