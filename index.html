@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lufthansa Group Crew Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* --- 1. CONFIG & COLORS --- */
         :root {
-            --lh-blue: #05164d;       /* Официальный темно-синий */
+            --lh-blue: #05164d;       
             --lh-blue-hover: #0a247a;
-            --lh-yellow: #ffb600;     /* Официальный желтый */
+            --lh-yellow: #ffb600;     
             --lh-yellow-glow: rgba(255, 182, 0, 0.4);
             --lh-blue-glow: rgba(5, 22, 77, 0.15);
             --lh-grey-bg: #f2f4f7;
@@ -22,7 +22,6 @@
             --card-radius: 12px;
             --btn-radius: 4px;
             
-            /* Анимации и тени */
             --shadow-card: 0 4px 12px rgba(0,0,0,0.06);
             --shadow-hover: 0 12px 24px rgba(5, 22, 77, 0.12);
             --smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -47,13 +46,11 @@
         .slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; opacity: 0; transform: translateY(30px); }
         @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
 
-        /* Каскадное появление карточек */
         .stagger-item { opacity: 0; transform: translateY(20px); transition: var(--smooth); }
         .stagger-item.show { opacity: 1; transform: translateY(0); }
 
         /* --- 3. UI ELEMENTS --- */
         
-        /* Кнопки */
         .btn {
             background-color: var(--lh-blue);
             color: var(--white);
@@ -81,7 +78,6 @@
             box-shadow: 0 6px 15px var(--lh-yellow-glow);
         }
         
-        /* Поля ввода */
         input, select {
             width: 100%;
             padding: 14px 15px;
@@ -98,7 +94,6 @@
             box-shadow: 0 0 0 3px var(--lh-blue-glow);
         }
 
-        /* Карточки */
         .lh-card {
             background: var(--white);
             padding: 30px;
@@ -124,7 +119,7 @@
             padding-bottom: 15px;
         }
 
-        /* Фильтр для превращения синего логотипа в желтый/белый */
+        /* Фильтры логотипов */
         .logo-filter-yellow { filter: brightness(0) saturate(100%) invert(78%) sepia(70%) saturate(1007%) hue-rotate(359deg) brightness(103%) contrast(104%); }
         .logo-filter-white { filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%); }
 
@@ -140,13 +135,10 @@
         .welcome-overlay { background: rgba(5, 22, 77, 0.9); width: 100%; height: 100%; position: absolute; }
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px;}
         
-        .logo-circle {
-            width: 120px; height: 120px;
-            border: 3px solid var(--lh-yellow); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 30px auto;
-            background: rgba(255,255,255,0.05);
-            box-shadow: 0 0 40px var(--lh-yellow-glow);
+        /* ИЗМЕНЕНИЕ: Убран круг, просто контейнер для лого */
+        .logo-container-welcome {
+            margin: 0 auto 20px auto;
+            /* Убраны border, background, shadow */
         }
         
         .loader-bar { width: 220px; height: 4px; background: rgba(255,255,255,0.2); margin: 30px auto; border-radius: 2px; overflow: hidden; }
@@ -165,6 +157,11 @@
             border-radius: var(--card-radius); box-shadow: 0 25px 80px rgba(0,0,0,0.4);
             text-align: center;
         }
+        /* ИЗМЕНЕНИЕ: Увеличен логотип входа */
+        .login-logo-img {
+            width: 150px; 
+            height: auto;
+        }
 
         /* DASHBOARD Header */
         header {
@@ -176,8 +173,15 @@
             max-width: 1200px; margin: 0 auto; padding: 0 25px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        /* Фикс наложения: flex и gap */
-        .logo-block { display: flex; align-items: center; gap: 15px; font-weight: 700; font-size: 1.2rem; letter-spacing: 1px;}
+        
+        /* ИЗМЕНЕНИЕ: Четкий текст */
+        .logo-block { 
+            display: flex; align-items: center; gap: 15px; 
+            font-weight: 800; /* Более жирный шрифт */
+            font-size: 1.4rem; 
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
         
         /* Nav Bar */
         .nav-bar {
@@ -232,8 +236,8 @@
     <div id="welcome-screen">
         <div class="welcome-overlay"></div>
         <div class="welcome-content fade-in">
-            <div class="logo-circle">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-yellow" alt="LH Logo" width="70">
+            <div class="logo-container-welcome">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-yellow" alt="LH Logo" width="120">
             </div>
             <h1 style="font-weight: 300; font-size: 3rem; margin-bottom: 10px; letter-spacing: 2px;">Lufthansa Group</h1>
             <p style="opacity: 0.8; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;">Virtual Crew Center</p>
@@ -248,7 +252,7 @@
     <div id="login-screen" class="hidden">
         <div class="login-box slide-up">
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="LH Logo" width="90">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="login-logo-img" alt="LH Logo">
             </div>
             <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px;">Crew Login</h2>
             <p style="color:#666; margin-bottom:30px;">Identify yourself to access OPS.</p>
