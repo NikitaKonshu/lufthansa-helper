@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - Stable Ops</title>
+    <title>Lufthansa Crew Portal - Fixed</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
-        /* --- CONFIG --- */
+        /* CONFIG */
         :root {
             --bg-color: #f2f4f7; --card-bg: #ffffff; --text-main: #1a1a1a; --text-sub: #595959;
             --border-color: #e0e0e0; --brand-blue: #05164d; --brand-yellow: #ffb600;
@@ -31,7 +31,7 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .mono-text { font-family: 'Roboto Mono', monospace; }
 
-        /* UI Elements */
+        /* UI */
         .btn {
             background-color: var(--brand-blue); color: #fff; border: 1px solid transparent;
             padding: 12px 28px; font-size: 0.9rem; cursor: pointer; border-radius: 4px;
@@ -42,7 +42,6 @@
         .btn:hover { opacity: 0.9; transform: translateY(-1px); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-yellow { background-color: var(--brand-yellow); color: #05164d !important; border: none !important; }
-        .btn-yellow:hover { background-color: #ffcc33; }
         
         input, select {
             width: 100%; padding: 14px 15px; margin: 8px 0 20px 0;
@@ -54,12 +53,9 @@
         .lh-card {
             background: var(--card-bg); padding: 30px; border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px;
-            border-top: 4px solid transparent;
+            border-top: 4px solid var(--brand-blue);
         }
-        .border-brand { border-top-color: var(--brand-blue); }
-        body.dark-mode .border-brand { border-top-color: #555; }
-
-        h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        body.dark-mode .lh-card { border-top-color: #555; }
 
         /* Header */
         header { background-color: var(--header-bg); padding: 15px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
@@ -70,7 +66,7 @@
         .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; font-size: 1rem; opacity: 0.8; }
         .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.2); color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Nav */
+        /* Navigation */
         .nav-bar { background: var(--card-bg); border-bottom: 1px solid var(--border-color); }
         .nav-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; overflow-x: auto; }
         .nav-item { padding: 20px 25px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; }
@@ -79,18 +75,17 @@
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; width: 100%; }
 
-        /* Stats & Grid */
+        /* Dashboard Items */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-box { background: var(--card-bg); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--border-color); }
         .stat-val { font-size: 1.8rem; font-weight: 800; color: var(--text-main); }
         .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); letter-spacing: 1px; }
 
-        /* Briefing Modal */
+        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
         .briefing-paper {
             background: var(--card-bg); width: 95%; max-width: 850px; padding: 30px; border-radius: 6px; 
             box-shadow: 0 0 50px rgba(0,0,0,0.7); color: var(--text-main); position: relative; max-height: 95vh; overflow-y: auto;
-            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" transform="rotate(45)" opacity="0.03" version="1.1" xmlns="http://www.w3.org/2000/svg"><path d="M22,16.39v-3.52L13.57,7.25V3.9C13.57,2.85,12.86,2,12,2S10.43,2.85,10.43,3.9v3.35L2,12.87v3.52l8.43-2.67v5.82 L8.5,20.94v2.38L12,22l3.5-1.32v-2.38l-1.93-1.38v-5.82L22,16.39z"/></svg>');
         }
         .briefing-header { display: flex; justify-content: space-between; border-bottom: 3px solid #05164d; padding-bottom: 10px; margin-bottom: 20px; }
         body.dark-mode .briefing-header { border-color: var(--brand-yellow); }
@@ -104,10 +99,11 @@
         .spinner { border: 3px solid rgba(0,0,0,0.1); border-radius: 50%; border-top: 3px solid var(--brand-yellow); width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 10px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* Screens */
+        /* Fleet */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .aircraft-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 15px; }
 
+        /* Welcome Screen */
         #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat; display: flex; align-items: center; justify-content: center; }
         .welcome-overlay { background: rgba(10, 10, 10, 0.92); width: 100%; height: 100%; position: absolute; backdrop-filter: blur(5px); }
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px; }
@@ -274,35 +270,20 @@
             </div>
 
             <div class="briefing-grid">
-                <div class="data-block">
-                    <label>DEPARTURE</label><span id="br-dep"></span>
-                </div>
-                <div class="data-block">
-                    <label>ARRIVAL</label><span id="br-arr"></span>
-                </div>
-                <div class="data-block">
-                    <label>AIRCRAFT</label><span id="br-ac"></span>
-                </div>
+                <div class="data-block"><label>DEPARTURE</label><span id="br-dep"></span></div>
+                <div class="data-block"><label>ARRIVAL</label><span id="br-arr"></span></div>
+                <div class="data-block"><label>AIRCRAFT</label><span id="br-ac"></span></div>
                 
-                <div class="data-block">
-                    <label>GATE (DEP)</label><span id="br-gate-dep"></span>
-                </div>
-                 <div class="data-block">
-                    <label>GATE (ARR)</label><span id="br-gate-arr"></span>
-                </div>
-                <div class="data-block">
-                    <label>ETE</label><span id="br-time"></span>
-                </div>
+                <div class="data-block"><label>GATE (DEP)</label><span id="br-gate-dep"></span></div>
+                <div class="data-block"><label>GATE (ARR)</label><span id="br-gate-arr"></span></div>
+                <div class="data-block"><label>ETE</label><span id="br-time"></span></div>
 
-                <div class="data-block">
-                    <label>PAX / CAP</label><span id="br-pax"></span>
-                </div>
-                <div class="data-block">
-                    <label>CARGO</label><span id="br-cargo"></span>
-                </div>
-                <div class="data-block">
-                    <label>ZFW (EST)</label><span id="br-zfw"></span>
-                </div>
+                <div class="data-block"><label>FLIGHT LEVEL</label><span id="br-fl"></span></div>
+                <div class="data-block"><label>ALTERNATE</label><span id="br-altn"></span></div>
+                <div class="data-block"><label>PAX / CAP</label><span id="br-pax"></span></div>
+                
+                <div class="data-block"><label>CARGO</label><span id="br-cargo"></span></div>
+                <div class="data-block"><label>ZFW (EST)</label><span id="br-zfw"></span></div>
             </div>
 
             <div id="map"></div>
@@ -318,10 +299,9 @@
     </div>
 
     <script>
-        // --- 1. CONFIG & DATA ---
+        // CONFIG
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // Твои реальные гейты
         const REAL_GATES = {
             "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26", "B28"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
@@ -358,13 +338,13 @@
 
         const HUB_COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56] };
 
-        // --- 2. SYSTEM STATE ---
+        // STATE
         let currentUser = null;
         let generatedFlightTemp = null;
         let pilotStats = { flights: 0, hours: 0 };
         let mapObject = null;
 
-        // --- 3. INITIALIZATION ---
+        // INIT
         window.onload = function() {
             simulateBootSequence();
             populateFleet();
@@ -387,7 +367,6 @@
             }, 1000);
         }
 
-        // --- 4. NAVIGATION & UI ---
         function toggleTheme() { document.body.classList.toggle('dark-mode'); }
         
         function showTab(n, b) {
@@ -401,7 +380,7 @@
         function goToLogin() {
             const w = document.getElementById('welcome-screen');
             w.style.opacity = '0';
-            w.style.pointerEvents = 'none'; // Важно: чтобы клики проходили сквозь него
+            w.style.pointerEvents = 'none'; 
             setTimeout(() => { 
                 w.classList.add('hidden'); 
                 document.getElementById('login-screen').classList.remove('hidden'); 
@@ -421,7 +400,6 @@
             }
         }
 
-        // --- 5. LOGBOOK & STATS ---
         function loadStats() { 
             const s = localStorage.getItem('pilotStats'); 
             if(s) pilotStats = JSON.parse(s); 
@@ -436,7 +414,6 @@
             document.getElementById('stat-rank').innerText = rank;
         }
 
-        // --- 6. POPULATORS ---
         function populateFleet() {
             const c = document.getElementById('fleet-container'); 
             c.innerHTML = '';
@@ -464,12 +441,11 @@
             AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); });
         }
 
-        // --- 7. FLIGHT GENERATION LOGIC ---
+        // --- CORE LOGIC ---
 
-        // Функция с тайм-аутом для погоды (чтобы не зависало)
         async function fetchSafeMETAR(icao) {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2000); // Ждем максимум 2 секунды
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
 
             try {
                 const r = await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`, { signal: controller.signal });
@@ -478,7 +454,6 @@
                 const d = await r.json(); 
                 return d.raw;
             } catch (err) {
-                // Если ошибка или тайм-аут - возвращаем заглушку
                 return `${icao} METAR UNAVAILABLE (OFFLINE)`;
             }
         }
@@ -499,11 +474,9 @@
 
                 if(!an || !h){ alert("Select Airline & Hub"); return; }
                 
-                // БЛОКИРУЕМ КНОПКУ
                 btn.disabled = true; 
                 btn.innerHTML = '<div class="spinner"></div> Computing...';
 
-                // ЛОГИКА ПОДБОРА
                 let minH = 1, maxH = 3; 
                 if(tp === 'medium'){ minH = 3; maxH = 7; } 
                 if(tp === 'long'){ minH = 8; maxH = 14; }
@@ -534,10 +507,8 @@
                     metarDep: "Loading...", metarArr: "Loading..."
                 };
 
-                // ПОКАЗЫВАЕМ ОКНО
                 showBriefingModal(true);
 
-                // ГРУЗИМ ПОГОДУ ПАРАЛЛЕЛЬНО (чтобы не висло)
                 const [m1, m2] = await Promise.all([
                     fetchSafeMETAR(generatedFlightTemp.dep), 
                     fetchSafeMETAR(generatedFlightTemp.arr)
@@ -550,7 +521,6 @@
             } catch (error) {
                 alert("System Error: " + error.message);
             } finally {
-                // ВСЕГДА РАЗБЛОКИРУЕМ КНОПКУ В КОНЦЕ
                 btn.disabled = false; 
                 btn.innerText = 'Generate OFP (Live WX)';
             }
@@ -560,14 +530,16 @@
             if(!generatedFlightTemp) return;
             const g = generatedFlightTemp;
             
-            // Заполнение данных
             document.getElementById('br-dep').innerText = g.dep; 
             document.getElementById('br-arr').innerText = g.arr;
             document.getElementById('br-ac').innerText = g.ac; 
             document.getElementById('br-flight-num').innerText = g.num;
             document.getElementById('br-time').innerText = g.time + " h"; 
+            
+            // ВОТ ЗДЕСЬ БЫЛА ОШИБКА, ТЕПЕРЬ ОНИ В HTML
             document.getElementById('br-fl').innerText = g.fl;
             document.getElementById('br-altn').innerText = g.altn;
+            
             document.getElementById('br-gate-dep').innerText = g.gateDep; 
             document.getElementById('br-gate-arr').innerText = g.gateArr;
             document.getElementById('br-pax').innerText = `${g.pax} PAX`;
@@ -581,7 +553,6 @@
             
             document.getElementById('briefing-modal').classList.remove('hidden');
 
-            // Карта (через задержку, чтобы не ломалась в модалке)
             setTimeout(() => {
                 if(mapObject) { mapObject.off(); mapObject.remove(); }
                 mapObject = L.map('map').setView([g.depLat, g.depLon], 3);
