@@ -3,352 +3,300 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Pilot Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+    <title>Lufthansa Group VA - Night Operations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- 1. CONFIG & VARIABLES --- */
+        /* --- 1. CSS VARIABLES & DARK THEME CONFIG --- */
         :root {
-            --lh-blue: #0b1f52; /* Чуть насыщеннее для контраста */
-            --lh-blue-light: #1a3a8a;
+            --lh-blue-dark: #05164d;
             --lh-yellow: #ffb600;
-            --bg-color: #f0f4f8; /* Мягкий голубовато-серый фон (небо) */
-            --white: #ffffff;
-            --text-main: #2c3e50;
-            --radius-box: 24px; /* Сильные закругления */
-            --radius-btn: 50px;
-            --shadow-soft: 0 10px 40px rgba(5, 22, 77, 0.08);
-            --shadow-hover: 0 15px 45px rgba(5, 22, 77, 0.15);
-            --gradient-blue: linear-gradient(135deg, #0b1f52 0%, #162e6e 100%);
+            --neon-blue: #4cc9f0;
+            --text-light: #e0e0e0;
+            --text-muted: #a0a0a0;
+            
+            /* Liquid Glass Vars */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(12px);
+            --box-shadow-glow: 0 0 20px rgba(5, 22, 77, 0.5), inset 0 0 10px rgba(255,255,255,0.05);
+            --box-shadow-neon: 0 0 15px rgba(255, 182, 0, 0.4);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Quicksand', sans-serif; }
         
         body { 
-            background-color: var(--bg-color); 
-            color: var(--text-main); 
+            /* Анимированный темный фон "Ночной полет" */
+            background: linear-gradient(135deg, #020a24 0%, #0b1f52 50%, #1a0b2e 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-light); 
             overflow-x: hidden; 
             min-height: 100vh;
         }
 
-        /* --- 2. UTILITIES & ANIMATIONS --- */
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.6s ease-in-out; }
-        .slide-up { animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); } /* Пружинистая анимация */
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        h2 {
-            color: var(--lh-blue);
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 1.8rem;
+        /* Анимация фона */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* --- 3. UI COMPONENTS --- */
+        /* --- 2. GLOBAL ANIMATIONS --- */
+        .hidden { display: none !important; }
+        
+        /* Плавное появление */
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        /* Появление снизу */
+        .slide-up { animation: slideUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards; opacity: 0; transform: translateY(40px); }
+        @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Пульсация для акцентов */
+        .pulse { animation: pulse 2s infinite ease-in-out; }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 182, 0, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 182, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 182, 0, 0); }
+        }
+
+        /* Лоадер для приветствия */
+        .loader {
+            width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
+            border-radius: 50%; border-top-color: var(--lh-yellow);
+            animation: spin 1s ease-in-out infinite; margin-top: 30px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+
+        /* --- 3. GLASSMORPHISM COMPONENTS --- */
+        
+        /* Базовый класс для стекла */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--box-shadow-glow);
+            border-radius: 24px;
+            color: var(--text-light);
+            transition: 0.3s all ease;
+        }
+
+        h2 { color: var(--lh-yellow); font-weight: 700; margin-bottom: 25px; text-align: center; text-shadow: 0 0 10px rgba(255, 182, 0, 0.3); }
+
+        /* Кнопки с неоновым свечением */
         .btn {
-            background: var(--lh-blue);
-            color: var(--white);
-            border: none;
-            padding: 12px 30px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-            border-radius: var(--radius-btn);
-            font-weight: 700;
-            box-shadow: 0 4px 15px rgba(11, 31, 82, 0.2);
-            display: inline-block;
+            background: rgba(5, 22, 77, 0.6);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+            padding: 12px 30px; font-size: 1rem; cursor: pointer; transition: 0.3s;
+            border-radius: 50px; font-weight: 700;
+            backdrop-filter: blur(5px);
         }
         .btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 20px rgba(11, 31, 82, 0.3);
+            background: var(--lh-blue-dark);
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.5); /* Синее свечение при наведении */
+            transform: translateY(-2px);
+            border-color: var(--neon-blue);
         }
         .btn-yellow { 
-            background: var(--lh-yellow); 
-            color: var(--lh-blue); 
+            background: linear-gradient(135deg, #ffb600 0%, #ff8c00 100%); color: var(--lh-blue-dark); border: none;
+            box-shadow: var(--box-shadow-neon);
         }
-        .btn-yellow:hover { background: #ffcc00; }
+        .btn-yellow:hover { 
+            background: linear-gradient(135deg, #ffcc33 0%, #ff9900 100%); 
+            box-shadow: 0 0 25px rgba(255, 182, 0, 0.7);
+        }
         
+        /* Поля ввода в стиле стекла */
         input, select {
-            width: 100%;
-            padding: 15px 20px;
-            margin: 8px 0 20px 0;
-            border: 2px solid #e1e8ed;
-            border-radius: 15px;
-            font-size: 1rem;
-            background: #fff;
-            transition: 0.3s;
-            font-weight: 600;
+            width: 100%; padding: 15px 20px; margin: 8px 0 20px 0;
+            border: 1px solid var(--glass-border); border-radius: 15px; font-size: 1rem;
+            background: rgba(255,255,255,0.03); color: var(--text-light);
+            transition: 0.3s; outline: none;
         }
+        input::placeholder { color: var(--text-muted); }
         input:focus, select:focus {
-            outline: none;
-            border-color: var(--lh-blue);
-            background: #fff;
+            border-color: var(--lh-yellow);
+            box-shadow: 0 0 15px rgba(255, 182, 0, 0.2), inset 0 0 10px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.07);
         }
+        select option { background: var(--lh-blue-dark); color: var(--text-light); } /* Фикс для выпадающего списка в темной теме */
 
-        .card {
-            background: var(--white);
-            padding: 30px;
-            border-radius: var(--radius-box);
-            box-shadow: var(--shadow-soft);
-            margin-bottom: 25px;
-            border: none;
-            transition: 0.3s;
-        }
-        .card:hover { transform: translateY(-3px); }
+        .card { padding: 30px; margin-bottom: 25px; }
+        .card:hover { box-shadow: 0 0 30px rgba(5, 22, 77, 0.8), inset 0 0 20px rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+
 
         /* --- 4. SECTIONS --- */
         
-        /* Welcome Screen */
+        /* WELCOME SCREEN (Больше анимаций, авто-переход) */
         #welcome-screen {
             height: 100vh;
-            background: var(--gradient-blue);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: var(--white);
-            text-align: center;
-            padding: 20px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+            position: relative; overflow: hidden;
         }
+        /* Декоративные плавающие элементы на фоне */
+        #welcome-screen::before, #welcome-screen::after {
+            content: ''; position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; z-index: -1;
+        }
+        #welcome-screen::before { width: 300px; height: 300px; background: var(--lh-yellow); top: 10%; left: -10%; animation: float 8s ease-in-out infinite alternate; }
+        #welcome-screen::after { width: 400px; height: 400px; background: var(--lh-blue-dark); bottom: 10%; right: -10%; animation: float 10s ease-in-out infinite alternate-reverse; }
+        @keyframes float { from { transform: translate(0, 0); } to { transform: translate(30px, 50px); } }
+
         .logo-circle {
-            width: 120px; height: 120px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
+            width: 130px; height: 130px;
+            background: rgba(255, 182, 0, 0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 20px;
-            border: 3px solid var(--lh-yellow);
+            margin-bottom: 30px; border: 3px solid var(--lh-yellow);
+            box-shadow: 0 0 30px rgba(255, 182, 0, 0.3);
         }
-        .crane { font-size: 4rem; color: var(--lh-yellow); }
-        .welcome-title { font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
-        
-        /* Login Screen */
-        #login-screen {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(#dbe9f6 2px, transparent 2px); /* Точки на фоне */
-            background-size: 30px 30px;
-        }
-        .login-box {
-            background: var(--white);
-            padding: 50px 40px;
-            border-radius: var(--radius-box);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: var(--shadow-soft);
-        }
+        .crane { font-size: 4.5rem; color: var(--lh-yellow); }
+        .welcome-title { font-size: 2.8rem; font-weight: 800; margin-bottom: 10px; letter-spacing: 2px; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
+        .welcome-subtitle { font-size: 1.2rem; opacity: 0.8; color: var(--text-muted); }
 
-        /* DASHBOARD NAV (CENTERED & FLOATING) */
-        .nav-container {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            padding: 0 20px;
-        }
         
+        /* LOGIN SCREEN */
+        #login-screen { height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .login-box { width: 100%; max-width: 400px; text-align: center; padding: 50px 40px; }
+
+        /* DASHBOARD NAV (Стеклянный островок) */
+        .nav-container { position: sticky; top: 20px; z-index: 100; display: flex; justify-content: center; padding: 0 20px; }
         nav {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 10px 15px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            justify-content: center;
+            padding: 10px 15px; border-radius: 50px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
+            background: rgba(5, 22, 77, 0.7); /* Чуть темнее для контраста меню */
         }
-
         nav button {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-weight: 700;
-            cursor: pointer;
-            padding: 10px 20px;
-            border-radius: 40px;
-            transition: 0.3s;
-            font-size: 0.9rem;
+            background: transparent; border: none; color: var(--text-muted);
+            font-weight: 600; cursor: pointer; padding: 10px 20px; border-radius: 40px;
+            transition: 0.3s; font-size: 0.9rem;
         }
-        nav button:hover { background: #f0f4f8; color: var(--lh-blue); }
-        nav button.active { background: var(--lh-blue); color: var(--white); box-shadow: 0 4px 10px rgba(11, 31, 82, 0.3); }
+        nav button:hover { color: var(--text-light); text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+        nav button.active { 
+            background: var(--lh-yellow); color: var(--lh-blue-dark); 
+            box-shadow: var(--box-shadow-neon);
+        }
 
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; padding-bottom: 50px;}
         
-        /* Header Profile */
-        .profile-bar {
-            text-align: center;
-            margin-top: 30px;
-            margin-bottom: 10px;
-            color: var(--lh-blue);
-        }
+        .profile-bar { text-align: center; margin-top: 30px; margin-bottom: 10px; }
         .rank-badge {
-            background: var(--lh-yellow);
-            color: var(--lh-blue);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-            display: inline-block;
-            margin-top: 5px;
+            background: rgba(255, 182, 0, 0.2); color: var(--lh-yellow); border: 1px solid var(--lh-yellow);
+            padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; display: inline-block; margin-top: 5px;
+            box-shadow: 0 0 10px rgba(255, 182, 0, 0.2);
         }
 
         /* Fleet Grid */
-        .fleet-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 25px; 
-        }
-        .aircraft-card {
-            padding: 15px; 
-            text-align: center;
-        }
-        .aircraft-card img { 
-            width: 100%; 
-            height: 160px; 
-            object-fit: cover; 
-            border-radius: 16px; 
-            margin-bottom: 15px;
-        }
-        .ac-stats {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 8px;
-            font-size: 0.9rem;
-            color: #666;
-            margin-top: 5px;
-        }
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .aircraft-card { padding: 20px; text-align: center; }
+        .aircraft-card img { width: 100%; height: 160px; object-fit: cover; border-radius: 16px; margin-bottom: 15px; opacity: 0.9; transition: 0.3s; }
+        .aircraft-card:hover img { opacity: 1; transform: scale(1.03); }
+        .ac-stats { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 8px; font-size: 0.9rem; color: var(--text-muted); margin-top: 5px; }
 
         /* Active Flight Banner */
         #active-flight-banner {
-            background: var(--gradient-blue);
-            color: var(--white);
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            border-radius: var(--radius-box);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 25px rgba(11, 31, 82, 0.25);
-            flex-wrap: wrap;
-            gap: 15px;
+            background: linear-gradient(90deg, rgba(5, 22, 77, 0.8) 0%, rgba(26, 58, 138, 0.8) 100%);
+            border: 1px solid var(--lh-yellow);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+            animation: pulseBorder 4s infinite alternate;
         }
-        
-        /* Ticket Style for Result */
-        .ticket {
-            border: 2px dashed #ccc;
-            background: #fff;
-            padding: 20px;
-            border-radius: 20px;
-            position: relative;
-        }
-        .ticket::before, .ticket::after {
-            content: ''; position: absolute; top: 50%; width: 20px; height: 20px;
-            background: var(--bg-color); border-radius: 50%;
-        }
-        .ticket::before { left: -12px; }
-        .ticket::after { right: -12px; }
+        @keyframes pulseBorder { from { border-color: rgba(255, 182, 0, 0.3); } to { border-color: rgba(255, 182, 0, 1); } }
 
-        /* List styling */
+        /* Ticket Style */
+        .ticket {
+            border: 2px dashed var(--glass-border); background: rgba(255,255,255,0.02);
+            padding: 25px; border-radius: 20px; position: relative;
+        }
+        /* Rules List */
         .rules-list li {
-            background: #f8f9fa;
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 12px;
-            list-style: none;
-            border-left: 5px solid var(--lh-yellow);
+            background: rgba(255,255,255,0.03); margin-bottom: 10px; padding: 15px;
+            border-radius: 12px; list-style: none; border-left: 4px solid var(--lh-yellow); color: var(--text-light);
         }
 
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen" class="fade-in">
-        <div class="logo-circle">
+    <div id="welcome-screen">
+        <div class="logo-circle pulse">
             <span class="crane">✈</span>
         </div>
-        <div class="welcome-title">LUFTHANSA GROUP</div>
-        <p style="font-size: 1.2rem; opacity: 0.9; margin-bottom: 30px;">Виртуальный портал для пилотов</p>
-        <button class="btn btn-yellow" style="font-size: 1.2rem; padding: 15px 40px;" onclick="goToLogin()">НАЧАТЬ ПОЛЕТ</button>
+        <div class="welcome-title slide-up" style="animation-delay: 0.2s;">LUFTHANSA GROUP</div>
+        <p class="welcome-subtitle slide-up" style="animation-delay: 0.4s;">Virtual Cockpit System v2.0</p>
+        
+        <div class="loader slide-up" style="animation-delay: 0.6s;"></div>
+        <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.6;" class="slide-up" style="animation-delay: 0.8s;">Инициализация систем...</p>
     </div>
 
     <div id="login-screen" class="hidden">
-        <div class="login-box slide-up">
-            <h2 style="margin-bottom: 10px;">Вход в кабину</h2>
-            <p style="margin-bottom:25px; color:#7f8c8d;">Введите позывной для доступа к системе</p>
+        <div class="login-box glass-panel slide-up">
+            <h2 style="margin-bottom: 10px;">Вход в систему</h2>
+            <p style="margin-bottom:25px; color:var(--text-muted);">Идентификация экипажа</p>
             
-            <input type="text" id="callsign" placeholder="Ваш позывной (например, DLH001)">
-            <input type="password" id="password" placeholder="Секретный код">
+            <input type="text" id="callsign" placeholder="Позывной (напр. DLH001)">
+            <input type="password" id="password" placeholder="Код доступа">
             
-            <button class="btn" style="width:100%" onclick="login()">ЗАПУСТИТЬ СИСТЕМУ</button>
-            <p id="login-error" style="color:#e74c3c; margin-top:15px; font-weight:bold;"></p>
+            <button class="btn btn-yellow" style="width:100%; margin-top: 10px;" onclick="login()">ПОДКЛЮЧИТЬСЯ</button>
+            <p id="login-error" style="color:#ff5c5c; margin-top:15px; font-weight:bold;"></p>
         </div>
     </div>
 
     <div id="dashboard" class="hidden">
         
-        <div class="profile-bar slide-up">
-            <div style="font-size: 1.5rem; font-weight: 800;">Lufthansa Group VA</div>
+        <div class="profile-bar fade-in">
+            <div style="font-size: 1.5rem; font-weight: 800; letter-spacing: 1px;">LGVA Night Ops</div>
             <div class="rank-badge" id="user-display">Captain Not Logged In</div>
         </div>
 
         <div class="nav-container slide-up">
-            <nav>
+            <nav class="glass-panel" style="border-radius: 50px;">
                 <button class="active" onclick="showTab('about', this)">🌍 О Нас</button>
                 <button onclick="showTab('rules', this)">📜 Кодекс</button>
                 <button onclick="showTab('fleet', this)">✈ Флот</button>
                 <button onclick="showTab('routes', this)">📍 Хабы</button>
                 <button onclick="showTab('generator', this)">🎲 Рейс</button>
-                <button onclick="showTab('pilots', this)">👨‍✈️ Пилоты</button>
-            </nav>
+                </nav>
         </div>
 
         <div class="container">
             
-            <div id="active-flight-banner" class="hidden slide-up">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div style="font-size:2rem;">🛫</div>
+            <div id="active-flight-banner" class="glass-panel hidden slide-up">
+                <div style="display:flex; align-items:center; gap:20px;">
+                    <div style="font-size:2.2rem; color:var(--lh-yellow);">🛫</div>
                     <div>
-                        <div style="font-size:0.8rem; opacity:0.8; text-transform:uppercase;">Текущая миссия</div>
-                        <div style="font-size:1.4rem; font-weight:bold;"><span id="af-info">EDDF - KJFK</span></div>
-                        <div style="font-size:0.9rem; color:var(--lh-yellow);" id="af-ac">A350-900</div>
+                        <div style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing: 1px;">Активная миссия</div>
+                        <div style="font-size:1.6rem; font-weight:bold; text-shadow: 0 0 10px rgba(255,255,255,0.2);"><span id="af-info">EDDF - KJFK</span></div>
+                        <div style="font-size:1rem; color:var(--lh-yellow);" id="af-ac">A350-900</div>
                     </div>
                 </div>
                 <button class="btn btn-yellow" onclick="completeFlight()">ЗАВЕРШИТЬ МИССИЮ</button>
             </div>
 
-            <div id="tab-about" class="tab-content fade-in">
+            <div id="tab-about" class="tab-content fade-in" style="animation-delay: 0.2s;">
                 <h2>Добро пожаловать на борт!</h2>
-                <div class="card">
-                    <h3>Мы рады видеть тебя, Капитан! 👋</h3>
-                    <p style="margin-top:15px; line-height:1.6;">
-                        Это твой личный кабинет в Lufthansa Group Virtual. Здесь всё как в настоящей авиации, но немного веселее. 
-                        Мы ценим аккуратность, уважение к диспетчерам и любовь к небу.
+                <div class="card glass-panel">
+                    <h3 style="color:var(--text-light)">Ночная смена, Капитан. 👋</h3>
+                    <p style="margin-top:15px; line-height:1.7; color:var(--text-muted);">
+                        Вы находитесь в системе ночных операций Lufthansa Group Virtual. Наш новый интерфейс "Liquid Glass" разработан для снижения нагрузки на глаза во время длительных ночных перелетов. 
                     </p>
-                    <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
-                        <span class="rank-badge" style="background:#e1e8ed; color:#333">#Aviation</span>
-                        <span class="rank-badge" style="background:#e1e8ed; color:#333">#Simulation</span>
-                        <span class="rank-badge" style="background:#e1e8ed; color:#333">#Friends</span>
+                    <div style="margin-top:25px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <span class="rank-badge" style="background:rgba(255,255,255,0.1); color:var(--text-light); border:none;">#NightOps</span>
+                        <span class="rank-badge" style="background:rgba(255,255,255,0.1); color:var(--text-light); border:none;">#GlassUI</span>
+                        <span class="rank-badge" style="background:rgba(255,255,255,0.1); color:var(--text-light); border:none;">#Simulation</span>
                     </div>
                 </div>
             </div>
 
             <div id="tab-rules" class="tab-content hidden fade-in">
                 <h2>Кодекс Пилота</h2>
-                <div class="card">
+                <div class="card glass-panel">
                     <ul class="rules-list">
                         <li><strong>🤝 Уважение:</strong> Мы команда. Относись к другим пилотам дружелюбно.</li>
                         <li><strong>🎙 Позывной:</strong> В небе используй только свой официальный код.</li>
                         <li><strong>🏠 Домашний Хаб:</strong> Вылетай только из базы своей авиакомпании.</li>
                         <li><strong>✈ Правильный самолет:</strong> Не бери огромный лайнер для полета в соседний город!</li>
-                        <li><strong>📅 Активность:</strong> Старайся летать хотя бы раз в месяц, чтобы не потерять лицензию.</li>
                     </ul>
                 </div>
             </div>
@@ -360,9 +308,9 @@
             </div>
 
             <div id="tab-routes" class="tab-content hidden fade-in">
-                <h2>Где мы базируемся?</h2>
-                <div class="card">
-                    <p style="margin-bottom:15px;">У каждой авиакомпании свой "дом" (Хаб). Запомни их:</p>
+                <h2>Базовые Аэропорты</h2>
+                <div class="card glass-panel">
+                    <p style="margin-bottom:15px; color:var(--text-muted);">Список домашних хабов для каждой авиакомпании группы:</p>
                     <ul id="hub-list-display" class="rules-list">
                         </ul>
                 </div>
@@ -371,72 +319,62 @@
             <div id="tab-generator" class="tab-content hidden fade-in">
                 <h2>Центр Полетов</h2>
                 
-                <div id="generator-locked" class="card hidden" style="text-align:center; background-color: #fff8e1; border: 2px solid var(--lh-yellow);">
-                    <div style="font-size:3rem;">🔒</div>
-                    <h3>Задача уже взята!</h3>
-                    <p>Вы не можете взять новую миссию, пока не приземлитесь и не завершите текущую.</p>
+                <div id="generator-locked" class="card glass-panel hidden" style="text-align:center; border-color: var(--lh-yellow); box-shadow: var(--box-shadow-neon);">
+                    <div style="font-size:3rem; color:var(--lh-yellow);">🔒</div>
+                    <h3 style="color:var(--lh-yellow);">Задача выполняется</h3>
+                    <p style="color:var(--text-muted);">Завершите текущий полет, чтобы получить новое задание.</p>
                 </div>
 
-                <div id="generator-form" class="card">
-                    <label>1. Выбери свою авиакомпанию:</label>
+                <div id="generator-form" class="card glass-panel">
+                    <label style="color:var(--lh-yellow); font-weight:bold;">1. Авиакомпания:</label>
                     <select id="gen-airline" onchange="updateHubs()">
-                        <option value="">-- Нажми для выбора --</option>
+                        <option value="">-- Выберите из списка --</option>
                     </select>
 
-                    <label>2. Аэропорт вылета (Хаб):</label>
+                    <label style="color:var(--lh-yellow); font-weight:bold;">2. Точка вылета (Хаб):</label>
                     <select id="gen-hub" disabled>
-                        <option value="">Сначала выбери компанию ☝️</option>
+                        <option value="">Сначала выберите компанию ☝️</option>
                     </select>
 
-                    <label>3. Сколько хочешь лететь?</label>
+                    <label style="color:var(--lh-yellow); font-weight:bold;">3. Длительность смены:</label>
                     <select id="gen-time">
-                        <option value="short">Быстро (1-3 часа)</option>
-                        <option value="medium">Нормально (3-7 часов)</option>
-                        <option value="long">Долго (8-14 часов)</option>
+                        <option value="short">Короткий рейс (1-3 часа)</option>
+                        <option value="medium">Средний рейс (3-7 часов)</option>
+                        <option value="long">Дальний рейс (8-14 часов)</option>
                     </select>
 
-                    <button class="btn" style="width:100%; margin-top:10px;" onclick="generateFlight()">СГЕНЕРИРОВАТЬ ЗАДАНИЕ</button>
+                    <button class="btn btn-yellow" style="width:100%; margin-top:15px;" onclick="generateFlight()">СГЕНЕРИРОВАТЬ ЗАДАНИЕ</button>
                 </div>
 
-                <div id="gen-result" class="card hidden slide-up" style="background: #f4f9ff;">
+                <div id="gen-result" class="card glass-panel hidden slide-up" style="border-color: var(--neon-blue);">
                     <div class="ticket">
-                        <h3 style="color: var(--lh-blue); margin-bottom:15px;">🎫 Твое полетное задание</h3>
+                        <h3 style="color: var(--neon-blue); margin-bottom:20px; text-align: left;">🎫 Полетное задание готово</h3>
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                             <div>
-                                <div style="font-size:0.8rem; color:#888;">МАРШРУТ</div>
-                                <strong style="font-size:1.2rem;"><span id="res-dep">FRA</span> ➝ <span id="res-arr">JFK</span></strong>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">МАРШРУТ</div>
+                                <strong style="font-size:1.4rem; color:var(--text-light);"><span id="res-dep">FRA</span> ➝ <span id="res-arr">JFK</span></strong>
                                 <br><br>
-                                <div style="font-size:0.8rem; color:#888;">ВРЕМЯ</div>
-                                <span>⏱ <span id="res-time">8.5ч</span></span>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">ВРЕМЯ В ПУТИ</div>
+                                <span>⏱ <span id="res-time" style="color:var(--neon-blue); font-weight:bold;">8.5ч</span></span>
                             </div>
                             <div style="text-align:right;">
-                                <div style="font-size:0.8rem; color:#888;">САМОЛЕТ</div>
-                                <strong id="res-ac">A350</strong>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">ТИП ВС</div>
+                                <strong id="res-ac" style="font-size:1.2rem;">A350</strong>
                                 <br><br>
-                                <div style="font-size:0.8rem; color:#888;">БОРТОВОЙ</div>
-                                <span id="res-reg" style="background:var(--lh-yellow); padding:2px 6px; border-radius:4px; color:#000;">D-AIXP</span>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">РЕГИСТРАЦИЯ</div>
+                                <span id="res-reg" style="background:var(--lh-yellow); padding:4px 8px; border-radius:4px; color:var(--lh-blue-dark); font-weight:bold;">D-AIXP</span>
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-yellow" style="margin-top:20px; width:100%;" onclick="acceptFlight()">ПРИНЯТЬ И ВЗЛЕТЕТЬ</button>
+                    <button class="btn btn-yellow" style="margin-top:25px; width:100%;" onclick="acceptFlight()">ПРИНЯТЬ И ВЗЛЕТЕТЬ</button>
                 </div>
             </div>
 
-            <div id="tab-pilots" class="tab-content hidden fade-in">
-                <h2>Наши Капитаны</h2>
-                <div class="card">
-                    <table style="width:100%; border-collapse: separate; border-spacing: 0 10px;">
-                        <tbody id="pilots-table">
-                            </tbody>
-                    </table>
-                </div>
             </div>
-
-        </div>
     </div>
 
     <script>
-        // --- ДАННЫЕ (РЕДАКТИРУЙ ЗДЕСЬ) ---
+        // --- ДАННЫЕ ---
         
         const USERS = [
             { callsign: "DLH001", pass: "1234", name: "Captain Hans" },
@@ -477,18 +415,26 @@
         let generatedFlightTemp = null;
 
         window.onload = function() {
+            // АВТОМАТИЧЕСКИЙ ПЕРЕХОД С ПРИВЕТСТВИЯ ЧЕРЕЗ 4.5 СЕКУНДЫ
+            setTimeout(() => {
+               goToLogin();
+            }, 4500);
+
             populateFleet();
             populateAirlinesSelect();
             populateHubsInfo();
-            populatePilots();
-            
-            // Если была активная сессия (упрощено)
-            // checkStorage(); 
+            // populatePilots(); // ФУНКЦИЯ УДАЛЕНА
         };
 
         function goToLogin() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('login-screen').classList.remove('hidden');
+            const welcome = document.getElementById('welcome-screen');
+            welcome.style.opacity = '0'; // Плавное исчезновение
+            welcome.style.transition = 'opacity 1s ease';
+
+            setTimeout(() => {
+                welcome.classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+            }, 1000); // Ждем окончания анимации исчезновения
         }
 
         function login() {
@@ -505,16 +451,27 @@
                 document.getElementById('dashboard').classList.remove('hidden');
                 checkActiveFlight();
             } else {
-                errorMsg.innerText = "Упс! Неверный позывной или пароль.";
+                errorMsg.innerText = "Ошибка доступа. Проверьте данные.";
+                // Добавляем эффект "тряски" при ошибке
+                document.querySelector('.login-box').style.animation = "shake 0.5s";
+                setTimeout(() => document.querySelector('.login-box').style.animation = "", 500);
             }
         }
+        // Добавляем анимацию тряски для ошибки в CSS (вставим сюда для удобства)
+        document.head.insertAdjacentHTML("beforeend", `<style>@keyframes shake { 0% { transform: translate(1px, 1px); } 10% { transform: translate(-1px, -2px); } 20% { transform: translate(-3px, 0px); } 30% { transform: translate(3px, 2px); } 40% { transform: translate(1px, -1px); } 50% { transform: translate(-1px, 2px); } 60% { transform: translate(-3px, 1px); } 70% { transform: translate(3px, 1px); } 80% { transform: translate(-1px, -1px); } 90% { transform: translate(1px, 2px); } 100% { transform: translate(1px, -2px); } }</style>`);
+
 
         function showTab(tabName, btnElement) {
             const tabs = document.getElementsByClassName('tab-content');
             for (let t of tabs) t.classList.add('hidden');
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            
+            const selectedTab = document.getElementById(`tab-${tabName}`);
+            selectedTab.classList.remove('hidden');
+            // Сброс и запуск анимации заново при переключении
+            selectedTab.style.animation = 'none';
+            selectedTab.offsetHeight; /* trigger reflow */
+            selectedTab.style.animation = null; 
 
-            // Обновляем кнопки
             const navBtns = document.querySelectorAll('nav button');
             navBtns.forEach(b => b.classList.remove('active'));
             if(btnElement) btnElement.classList.add('active');
@@ -524,26 +481,16 @@
             const container = document.getElementById('fleet-container');
             FLEET.forEach(ac => {
                 container.innerHTML += `
-                    <div class="card aircraft-card">
+                    <div class="card aircraft-card glass-panel">
                         <img src="${ac.img}" alt="${ac.type}">
-                        <h4 style="color:var(--lh-blue)">${ac.type}</h4>
-                        <div class="ac-stats">Макс. полет: <strong>${ac.maxHours} ч.</strong></div>
+                        <h4 style="color:var(--lh-yellow); margin-top:10px;">${ac.type}</h4>
+                        <div class="ac-stats">Дальность: <strong>${ac.maxHours} ч.</strong></div>
                     </div>
                 `;
             });
         }
 
-        function populatePilots() {
-            const table = document.getElementById('pilots-table');
-            USERS.forEach(u => {
-                table.innerHTML += `
-                    <tr style="background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-                        <td style="padding:15px; border-radius:10px 0 0 10px; font-weight:bold;">${u.callsign}</td>
-                        <td style="padding:15px; border-radius:0 10px 10px 0; color:#27ae60; text-align:right;">● В сети</td>
-                    </tr>
-                `;
-            });
-        }
+        // ФУНКЦИЯ populatePilots ПОЛНОСТЬЮ УДАЛЕНА
 
         function populateAirlinesSelect() {
             const sel = document.getElementById('gen-airline');
@@ -558,7 +505,7 @@
         function populateHubsInfo() {
             const list = document.getElementById('hub-list-display');
             for (let airline in AIRLINES) {
-                list.innerHTML += `<li><strong style="color:var(--lh-blue)">${airline}:</strong> ${AIRLINES[airline].join(", ")}</li>`;
+                list.innerHTML += `<li><strong style="color:var(--lh-yellow)">${airline}:</strong> ${AIRLINES[airline].join(", ")}</li>`;
             }
         }
 
@@ -570,7 +517,7 @@
             if (!airline) {
                 hubSel.disabled = true;
                 let opt = document.createElement('option');
-                opt.text = "Сначала выбери компанию ☝️";
+                opt.text = "Сначала выберите компанию ☝️";
                 hubSel.appendChild(opt);
                 return;
             }
@@ -580,7 +527,7 @@
             if (hubs.length === 1) {
                 let opt = document.createElement('option');
                 opt.value = hubs[0];
-                opt.innerHTML = hubs[0] + " (Единственный хаб)";
+                opt.innerHTML = hubs[0] + " (Фиксирован)";
                 hubSel.appendChild(opt);
                 hubSel.disabled = true; 
             } else {
@@ -600,7 +547,7 @@
             const timePref = document.getElementById('gen-time').value;
 
             if (!airline || !hub) {
-                alert("Пожалуйста, заполните все поля, Капитан!");
+                alert("Необходимо заполнить все поля для расчета маршрута.");
                 return;
             }
 
@@ -616,7 +563,7 @@
             });
 
             if (availableAC.length === 0) {
-                alert("У нас нет подходящего самолета для такой длительности.");
+                alert("Нет доступных ВС для указанной длительности полета.");
                 return;
             }
 
@@ -630,7 +577,7 @@
             const flightTime = (Math.random() * (maxH - minH) + minH).toFixed(1);
 
             generatedFlightTemp = {
-                dep: hub.split(' ')[0], // Берем только код ICAO
+                dep: hub.split(' ')[0], 
                 arr: finalDest.code,
                 ac: randomAC.type,
                 time: flightTime + " ч.",
@@ -644,7 +591,12 @@
             document.getElementById('res-ac').innerText = generatedFlightTemp.ac;
             document.getElementById('res-reg').innerText = generatedFlightTemp.reg;
 
-            document.getElementById('gen-result').classList.remove('hidden');
+            const resultBox = document.getElementById('gen-result');
+            resultBox.classList.remove('hidden');
+             // Сброс и запуск анимации заново
+            resultBox.style.animation = 'none';
+            resultBox.offsetHeight;
+            resultBox.style.animation = null; 
         }
 
         function acceptFlight() {
@@ -652,7 +604,6 @@
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp));
             document.getElementById('gen-result').classList.add('hidden');
             checkActiveFlight();
-            alert("Задание принято! Счастливого пути!");
         }
 
         function checkActiveFlight() {
@@ -675,10 +626,9 @@
         }
 
         function completeFlight() {
-            if(confirm("Вы приземлились и заглушили двигатели? Завершить миссию?")) {
+            if(confirm("Подтвердите завершение полета и выключение двигателей.")) {
                 localStorage.removeItem('activeFlight');
                 checkActiveFlight();
-                alert("Поздравляю! Рейс успешно завершен.");
             }
         }
 
