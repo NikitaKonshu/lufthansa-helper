@@ -317,11 +317,11 @@
         </div>
     </div>
 
-    <script>
-        // --- DATA ---
+  <script>
+        // --- DATA & CONFIG ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         
-        // --- CUSTOM GATES ---
+        // База реальных гейтов (чтобы было красиво)
         const REAL_GATES = {
             "EDDF": ["A13", "A15", "A20", "A22", "A26", "Z50", "Z54", "Z58", "Z62", "B24", "B26"],
             "EDDM": ["G08", "G12", "G24", "G30", "H08", "H12", "H30", "L11", "L14"],
@@ -371,7 +371,7 @@
         function simulateBootSequence() {
             setTimeout(() => { document.getElementById('sys-status-1').innerText = "ACARS: OK. Datalink: ESTABLISHED."; }, 1500);
             setTimeout(() => { document.getElementById('sys-status-2').innerText = "Weather Radar: SELF-TEST OK."; }, 3000);
-            setTimeout(() => { goToLogin(); }, 5000); 
+            setTimeout(() => { goToLogin(); }, 4000); 
         }
 
         function startClock() {
@@ -418,9 +418,35 @@
             AIRLINES[a].hubs.forEach(x=>{ let o=document.createElement('option'); o.value=x; o.text=x; h.add(o); });
         }
 
-        async function fetchRealMETAR(icao) {
-            try { const r=await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`); if(!r.ok)throw new Error(); const d=await r.json(); return d.raw; }
-            catch{ return `${icao} METAR UNAVAILABLE`; }
+        // --- УМНАЯ ПОГОДА (С ЗАЩИТОЙ ОТ ЗАВИСАНИЯ) ---
+        
+        // Генератор фейковой погоды (если реальная сломалась)
+        function generateSimulatedMETAR(icao) {
+            const wind = Math.floor(Math.random()*36)*10;
+            const spd = Math.floor(Math.random()*15)+3;
+            const vis = Math.random()>0.8 ? "4000" : "9999";
+            const cld = Math.random()>0.5 ? "SCT030" : "CAVOK";
+            const tmp = Math.floor(Math.random()*25);
+            const qnh = 1000 + Math.floor(Math.random()*30);
+            const time = new Date().getUTCDate() + "1200Z";
+            return `${icao} ${time} ${wind.toString().padStart(3,'0')}${spd.toString().padStart(2,'0')}KT ${vis} ${cld} ${tmp}/${tmp-4} Q${qnh} NOSIG`;
+        }
+
+        // Функция получения погоды с таймаутом
+        async function fetchSmartMETAR(icao) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000); // Тайм-аут 2 секунды
+
+            try {
+                const response = await fetch(`https://avwx.rest/api/metar/${icao}?options=summary&format=json`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
+                return data.raw; // Реальная погода
+            } catch (error) {
+                console.log("Weather fallback used for " + icao);
+                return generateSimulatedMETAR(icao); // Если зависло или ошибка -> генерируем свою
+            }
         }
 
         function generateGate(icao) {
@@ -428,55 +454,64 @@
             const zones = ['A','B','C','Z']; return zones[Math.floor(Math.random()*zones.length)] + Math.floor(Math.random()*40+1);
         }
 
-        async function generateFlight() {
-            try {
-                const an=document.getElementById('gen-airline').value, h=document.getElementById('gen-hub').value, tp=document.getElementById('gen-time').value, btn=document.getElementById('generate-btn');
-                if(!an||!h){alert("Select Airline & Hub");return;}
-                btn.disabled=true; btn.innerHTML='<div class="spinner"></div> Computing...';
+        // --- ОСНОВНАЯ ФУНКЦИЯ ГЕНЕРАЦИИ (БЕЗОПАСНАЯ) ---
+        function generateFlight() {
+            const an = document.getElementById('gen-airline').value;
+            const h = document.getElementById('gen-hub').value;
+            const tp = document.getElementById('gen-time').value;
+            
+            if(!an || !h) { alert("Select Airline & Hub"); return; }
 
-                let minH=1, maxH=3; if(tp==='medium'){minH=3;maxH=7;} if(tp==='long'){minH=8;maxH=14;}
-                const availAC = FLEET.filter(ac => (tp==='long'?ac.maxHours>=8:(tp==='short'?ac.maxHours<8:ac.maxHours>=3)));
-                if(availAC.length===0){alert("No aircraft"); btn.disabled=false; btn.innerText='Generate OFP'; return;}
+            // 1. Сначала считаем данные (это мгновенно)
+            let minH=1, maxH=3; if(tp==='medium'){minH=3;maxH=7;} if(tp==='long'){minH=8;maxH=14;}
+            const availAC = FLEET.filter(ac => (tp==='long'?ac.maxHours>=8:(tp==='short'?ac.maxHours<8:ac.maxHours>=3)));
+            
+            if(availAC.length===0){alert("No aircraft available"); return;}
 
-                const selectedAC = availAC[Math.floor(Math.random()*availAC.length)];
-                const dests = DESTINATIONS.filter(d=>d.hours>=minH && d.hours<=maxH);
-                const dest = dests.length>0 ? dests[Math.floor(Math.random()*dests.length)] : DESTINATIONS[0];
-                const depIcao = h.split(' ')[0];
+            const selectedAC = availAC[Math.floor(Math.random()*availAC.length)];
+            const dests = DESTINATIONS.filter(d=>d.hours>=minH && d.hours<=maxH);
+            const dest = dests.length>0 ? dests[Math.floor(Math.random()*dests.length)] : DESTINATIONS[0];
+            const depIcao = h.split(' ')[0];
 
-                const loadFactor = 0.6 + Math.random()*0.4; 
-                const pax = Math.floor(selectedAC.seats * loadFactor);
-                const cargo = Math.floor(Math.random() * 5000) + 1000;
-                const zfw = 40000 + (pax * 85) + cargo;
-                
-                let num = Math.floor(Math.random() * 900) + 100;
-                if (dest.region === 'NA') num = 400 + Math.floor(Math.random() * 99);
-                if (dest.region === 'AS') num = 700 + Math.floor(Math.random() * 99);
+            const loadFactor = 0.6 + Math.random()*0.4; 
+            const pax = Math.floor(selectedAC.seats * loadFactor);
+            const cargo = Math.floor(Math.random() * 5000) + 1000;
+            const zfw = 40000 + (pax * 85) + cargo;
+            
+            let num = Math.floor(Math.random() * 900) + 100;
+            if (dest.region === 'NA') num = 400 + Math.floor(Math.random() * 99);
+            if (dest.region === 'AS') num = 700 + Math.floor(Math.random() * 99);
 
-                generatedFlightTemp = {
-                    dep: depIcao, arr: dest.code, ac: selectedAC.type, time: (Math.random()*(maxH-minH)+minH).toFixed(1),
-                    num: AIRLINES[an].code + num, fl: "FL"+(Math.floor(Math.random()*6)*20+320), altn: "EDDK",
-                    depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
-                    arrLat: dest.lat, arrLon: dest.lon,
-                    pax: pax, cargo: cargo, zfw: zfw, gateDep: generateGate(depIcao), gateArr: generateGate(dest.code)
-                };
+            generatedFlightTemp = {
+                dep: depIcao, arr: dest.code, ac: selectedAC.type, time: (Math.random()*(maxH-minH)+minH).toFixed(1),
+                num: AIRLINES[an].code + num, fl: "FL"+(Math.floor(Math.random()*6)*20+320), altn: "EDDK",
+                depLat: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][0]:50.0, depLon: HUB_COORDS[depIcao]?HUB_COORDS[depIcao][1]:8.0,
+                arrLat: dest.lat, arrLon: dest.lon,
+                pax: pax, cargo: cargo, zfw: zfw, gateDep: generateGate(depIcao), gateArr: generateGate(dest.code),
+                metarDep: "Loading...", metarArr: "Loading..." // Заглушки
+            };
 
-                showBriefingModal(true);
+            // 2. Сразу открываем окно (чтобы пользователь видел результат)
+            showBriefingModal(true);
 
-                try {
-                    const [m1, m2] = await Promise.all([fetchRealMETAR(generatedFlightTemp.dep), fetchRealMETAR(generatedFlightTemp.arr)]);
-                    generatedFlightTemp.metarDep = m1; generatedFlightTemp.metarArr = m2;
-                    updateBriefingWeather();
-                } catch(e){}
-                btn.disabled=false; btn.innerText='Generate OFP (Live WX)';
-            } catch (err) {
-                alert("Critical System Error: " + err.message);
-                document.getElementById('generate-btn').disabled = false;
-            }
+            // 3. Пытаемся подгрузить погоду в фоновом режиме
+            Promise.all([fetchSmartMETAR(generatedFlightTemp.dep), fetchSmartMETAR(generatedFlightTemp.arr)])
+                .then(([m1, m2]) => {
+                    generatedFlightTemp.metarDep = m1;
+                    generatedFlightTemp.metarArr = m2;
+                    // Обновляем текст в уже открытом окне
+                    if(document.getElementById('br-metar-dep')) {
+                        document.getElementById('br-metar-dep').innerText = m1;
+                        document.getElementById('br-metar-arr').innerText = m2;
+                    }
+                });
         }
 
         function showBriefingModal(loading) {
             if(!generatedFlightTemp)return;
             const g = generatedFlightTemp;
+            
+            // Заполняем данные
             document.getElementById('br-dep').innerText = g.dep; document.getElementById('br-arr').innerText = g.arr;
             document.getElementById('br-ac').innerText = g.ac; document.getElementById('br-flight-num').innerText = g.num;
             document.getElementById('br-time').innerText = g.time + " h"; document.getElementById('br-fl').innerText = g.fl;
@@ -485,25 +520,23 @@
             document.getElementById('br-pax').innerText = `${g.pax} PAX`; document.getElementById('br-cargo').innerText = `${g.cargo} KG`;
             document.getElementById('br-zfw').innerText = `${(g.zfw/1000).toFixed(1)} T`;
 
-            if(loading) {
-                document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Fetching...';
-                document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Fetching...';
-            }
+            // Ставим спиннеры на погоду
+            document.getElementById('br-metar-dep').innerHTML = '<div class="spinner"></div> Connecting...';
+            document.getElementById('br-metar-arr').innerHTML = '<div class="spinner"></div> Connecting...';
+
             document.getElementById('briefing-modal').classList.remove('hidden');
 
+            // Рисуем карту (через небольшую задержку, чтобы модалка успела открыться)
             setTimeout(() => {
-                if(mapObject) mapObject.remove();
+                if(mapObject) { mapObject.off(); mapObject.remove(); }
                 mapObject = L.map('map').setView([g.depLat, g.depLon], 3);
                 L.tileLayer(document.body.classList.contains('dark-mode') ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; OSM &copy; CARTO' }).addTo(mapObject);
-                L.marker([g.depLat, g.depLon]).addTo(mapObject); L.marker([g.arrLat, g.arrLon]).addTo(mapObject);
+                L.marker([g.depLat, g.depLon]).addTo(mapObject).bindPopup("DEP"); 
+                L.marker([g.arrLat, g.arrLon]).addTo(mapObject).bindPopup("ARR");
                 L.polyline([[g.depLat, g.depLon], [g.arrLat, g.arrLon]], { color: document.body.classList.contains('dark-mode')?'#ffb600':'#05164d', weight: 3 }).addTo(mapObject);
-            }, 100);
+            }, 200);
         }
 
-        function updateBriefingWeather() {
-            document.getElementById('br-metar-dep').innerText = generatedFlightTemp.metarDep;
-            document.getElementById('br-metar-arr').innerText = generatedFlightTemp.metarArr;
-        }
         function confirmBriefing() {
             document.getElementById('briefing-modal').classList.add('hidden');
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); checkActiveFlight();
@@ -523,7 +556,7 @@
             }
         }
         function completeFlight() {
-            if(confirm("File PIREP?")) {
+            if(confirm("Confirm Arrival and File PIREP?")) {
                 const d=localStorage.getItem('activeFlight');
                 if(d){ const f=JSON.parse(d); pilotStats.flights++; pilotStats.hours+=parseFloat(f.time); localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); updateStatsUI(); }
                 localStorage.removeItem('activeFlight'); checkActiveFlight();
