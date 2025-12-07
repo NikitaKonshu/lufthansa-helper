@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v18</title>
+    <title>Lufthansa Crew Portal - v19</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -134,47 +134,48 @@
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
         .system-status-text { font-family: 'Roboto Mono', monospace; font-size: 0.8rem; opacity: 0.7; min-height: 1.2em; }
 
-        /* REDESIGNED LOGIN SCREEN V18: FROSTED GLASS */
+        /* REDESIGNED LOGIN SCREEN V19: HIGH CONTRAST CORPORATE LOOK */
         #login-screen { 
             height: 100vh; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            background-color: #05164d; /* Deep Blue LH background */
+            background-color: var(--brand-blue); /* Deep Blue LH background */
         }
         .login-box { 
-            background: rgba(255, 255, 255, 0.08); /* Light, slightly transparent background */
-            backdrop-filter: blur(10px); /* Frosted glass effect */
+            background: #ffffff; /* Crisp White Background */
             padding: 50px 40px; 
             width: 100%; 
             max-width: 400px; 
-            border-radius: 12px; 
+            border-radius: 8px; 
             text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3); /* Stronger, modern shadow */
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: white; /* Default text color */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+            border-top: 5px solid var(--brand-yellow); /* Strong Yellow Accent */
+            color: var(--text-main); /* Dark text on white background */
         }
         .login-box h2 {
-            color: white; 
-            font-weight: 400; /* Lighter font weight for modern look */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--brand-blue); /* Use deep blue for title */
+            font-weight: 600; 
+            border-bottom: 1px solid var(--border-color); /* Light grey separator */
             padding-bottom: 15px;
+            font-size: 1.6rem;
         }
         .login-box input {
-            background: rgba(0, 0, 0, 0.2); /* Darker, slightly transparent input background */
-            border: 1px solid rgba(255, 255, 255, 0.4); 
-            color: white; /* White input text */
-            margin-bottom: 25px; /* Increase spacing */
+            background: var(--input-bg); /* White input background */
+            border: 1px solid var(--border-color); 
+            color: var(--text-main); /* Dark text */
+            margin-bottom: 25px; 
         }
         .login-box input:focus {
-            border-color: var(--brand-yellow); 
-            background: rgba(0, 0, 0, 0.3);
+            border-color: var(--brand-blue); /* Focus blue */
+            background: #f8f8f8;
         }
         .login-box input::placeholder {
-            color: rgba(255, 255, 255, 0.6); /* Clear placeholder text */
+            color: var(--text-sub); /* Grey placeholder text */
         }
+        /* Ensure the logo is the COLORED (non-filtered) version on white background */
         .login-box img {
-            filter: brightness(0) invert(1);
+            filter: none; 
             margin-bottom: 5px;
         }
     </style>
@@ -202,7 +203,7 @@
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" width="140" alt="LH Logo">
             </div>
-            <h2 style="text-align:center; font-size:1.6rem; margin-bottom: 25px;">CREW ACCESS PORTAL</h2>
+            <h2 style="text-align:center; margin-bottom: 25px;">CREW ACCESS PORTAL</h2>
             <div style="text-align: left;">
                 <input type="text" id="callsign" placeholder="Callsign (e.g. DLH001)">
                 <input type="password" id="password" placeholder="Password">
@@ -284,6 +285,7 @@
                     <ul style="margin-left:25px; line-height:2; color:var(--text-sub);">
                         <li>Maintain professional standards on VATSIM/IVAO.</li>
                         <li>Depart only from designated hubs.</li>
+                        <li>Maintain proper flight time simulation as per system rules.</li>
                     </ul>
                 </div>
             </div>
