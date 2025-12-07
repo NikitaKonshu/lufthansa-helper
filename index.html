@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lufthansa Group Crew Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     
     <style>
         /* --- 1. CONFIG & COLORS --- */
@@ -19,7 +19,7 @@
             --text-main: #333333;
             --text-light: #666666;
             
-            --card-radius: 12px;
+            --card-radius: 8px; /* Более строгие углы */
             --btn-radius: 4px;
             
             --shadow-card: 0 4px 12px rgba(0,0,0,0.06);
@@ -40,7 +40,7 @@
         /* --- 2. ANIMATIONS --- */
         .hidden { display: none !important; }
         
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        .fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
         @keyframes fadeIn { to { opacity: 1; } }
 
         .slide-up { animation: slideUp 0.6s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; opacity: 0; transform: translateY(30px); }
@@ -119,30 +119,43 @@
             padding-bottom: 15px;
         }
 
-        /* Фильтры логотипов */
-        .logo-filter-yellow { filter: brightness(0) saturate(100%) invert(78%) sepia(70%) saturate(1007%) hue-rotate(359deg) brightness(103%) contrast(104%); }
-        .logo-filter-white { filter: brightness(0) saturate(100%) invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(102%) contrast(102%); }
+        /* Логотипы: Белый для темного фона */
+        .logo-white { filter: brightness(0) invert(1); }
+        /* Оригинальный логотип не требует фильтра, если он на светлом фоне */
 
         /* --- 4. SECTIONS --- */
         
-        /* WELCOME SCREEN */
+        /* WELCOME SCREEN - "Corporate Tech" Style */
         #welcome-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://images.unsplash.com/photo-1542296332-2e44a996aa0d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
+            background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
             z-index: 9999;
             display: flex; align-items: center; justify-content: center;
         }
-        .welcome-overlay { background: rgba(5, 22, 77, 0.9); width: 100%; height: 100%; position: absolute; }
+        /* Темная маска с блюром для реализма */
+        .welcome-overlay { 
+            background: rgba(5, 22, 77, 0.85); 
+            backdrop-filter: blur(8px);
+            width: 100%; height: 100%; position: absolute; 
+        }
         .welcome-content { position: relative; z-index: 2; text-align: center; color: white; padding: 20px;}
         
-        /* ИЗМЕНЕНИЕ: Убран круг, просто контейнер для лого */
         .logo-container-welcome {
-            margin: 0 auto 20px auto;
-            /* Убраны border, background, shadow */
+            margin-bottom: 40px;
         }
         
-        .loader-bar { width: 220px; height: 4px; background: rgba(255,255,255,0.2); margin: 30px auto; border-radius: 2px; overflow: hidden; }
-        .loader-progress { height: 100%; background: var(--lh-yellow); width: 0%; animation: loadProgress 4s ease-in-out forwards; }
+        .loader-bar { 
+            width: 300px; height: 2px; 
+            background: rgba(255,255,255,0.1); 
+            margin: 40px auto 20px auto; 
+            overflow: hidden; 
+        }
+        .loader-progress { 
+            height: 100%; 
+            background: #fff; 
+            width: 0%; 
+            animation: loadProgress 4s ease-in-out forwards; 
+        }
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
         /* LOGIN SCREEN */
@@ -157,15 +170,14 @@
             border-radius: var(--card-radius); box-shadow: 0 25px 80px rgba(0,0,0,0.4);
             text-align: center;
         }
-        /* ИЗМЕНЕНИЕ: Увеличен логотип входа */
         .login-logo-img {
-            width: 150px; 
+            width: 140px; 
             height: auto;
         }
 
         /* DASHBOARD Header */
         header {
-            background-color: var(--lh-blue); color: white; padding: 15px 0;
+            background-color: var(--lh-blue); color: white; padding: 18px 0;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             position: relative; z-index: 100;
         }
@@ -174,14 +186,15 @@
             display: flex; justify-content: space-between; align-items: center;
         }
         
-        /* ИЗМЕНЕНИЕ: Четкий текст */
+        /* ЛОГО В ШАПКЕ */
         .logo-block { 
             display: flex; align-items: center; gap: 15px; 
-            font-weight: 800; /* Более жирный шрифт */
             font-size: 1.4rem; 
             letter-spacing: 0.5px;
-            text-transform: uppercase;
         }
+        /* Стиль текста в шапке */
+        .lh-text-light { font-weight: 400; }
+        .lh-text-bold { font-weight: 800; text-transform: uppercase; }
         
         /* Nav Bar */
         .nav-bar {
@@ -237,15 +250,18 @@
         <div class="welcome-overlay"></div>
         <div class="welcome-content fade-in">
             <div class="logo-container-welcome">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-yellow" alt="LH Logo" width="120">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white" alt="LH Logo" width="200">
             </div>
-            <h1 style="font-weight: 300; font-size: 3rem; margin-bottom: 10px; letter-spacing: 2px;">Lufthansa Group</h1>
-            <p style="opacity: 0.8; letter-spacing: 1px; font-weight: 600; text-transform: uppercase;">Virtual Crew Center</p>
+            
+            <div style="font-weight: 300; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; opacity: 0.8;">
+                Flight Operations System
+            </div>
+            <h1 style="font-weight: 700; font-size: 2.5rem; letter-spacing: 1px; margin: 0;">Lufthansa Group</h1>
             
             <div class="loader-bar">
                 <div class="loader-progress"></div>
             </div>
-            <p style="font-size: 0.9rem; margin-top: 15px; opacity: 0.7;">System Initialization...</p>
+            <p style="font-size: 0.8rem; margin-top: 15px; opacity: 0.6; font-family: monospace;">INITIALIZING CONNECTION...</p>
         </div>
     </div>
 
@@ -254,8 +270,8 @@
             <div style="margin-bottom: 25px; display: flex; justify-content: center;">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="login-logo-img" alt="LH Logo">
             </div>
-            <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px;">Crew Login</h2>
-            <p style="color:#666; margin-bottom:30px;">Identify yourself to access OPS.</p>
+            <h2 style="border:none; text-align:center; font-size:1.6rem; margin-bottom: 10px;">Crew Identification</h2>
+            <p style="color:#666; margin-bottom:30px;">Access Secure Portal</p>
             
             <div style="text-align: left;">
                 <label style="font-size:0.8rem; font-weight:bold; color:var(--lh-blue); letter-spacing:0.5px;">CALLSIGN</label>
@@ -265,7 +281,7 @@
                 <input type="password" id="password" placeholder="••••••">
             </div>
 
-            <button class="btn btn-yellow" style="width:100%; margin-top: 20px;" onclick="login()">Authenticate</button>
+            <button class="btn btn-yellow" style="width:100%; margin-top: 20px;" onclick="login()">Log In</button>
             <p id="login-error" style="color:#dc2626; margin-top:20px; font-size:0.9rem; font-weight: 600;"></p>
         </div>
     </div>
@@ -275,8 +291,10 @@
         <header>
             <div class="header-content">
                 <div class="logo-block">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-filter-white" alt="LH" height="36">
-                    <span>LUFTHANSA GROUP</span>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white" alt="LH" height="40">
+                    <div>
+                        <span class="lh-text-light">Lufthansa</span> <span class="lh-text-bold">GROUP</span>
+                    </div>
                 </div>
                 <div id="user-display" style="font-size:0.9rem; opacity:0.9; font-weight: 600;">Not Logged In</div>
             </div>
@@ -425,7 +443,6 @@
 
     <script>
         // --- DATA ---
-        // Возвращены все тестовые пользователи и полные данные
         const USERS = [
             { callsign: "DLH001", pass: "1234", name: "Capt. Hans" },
             { callsign: "SWR202", pass: "swiss", name: "Capt. Mueller" },
@@ -465,11 +482,10 @@
         let generatedFlightTemp = null;
 
         window.onload = function() {
-            setTimeout(() => { goToLogin(); }, 4000); // 4 сек на заставку
+            setTimeout(() => { goToLogin(); }, 4000); 
             populateFleet();
             populateAirlinesSelect();
             populateHubsInfo();
-            // checkStorage(); - Можно раскомментировать если нужно авто-логин
         };
 
         function goToLogin() {
@@ -498,7 +514,6 @@
             } else {
                 errorMsg.innerText = "Invalid credentials. Try DLH001 / 1234";
                 const box = document.querySelector('.login-box');
-                // Анимация тряски
                 box.animate([
                     { transform: 'translateX(0)' },
                     { transform: 'translateX(-5px)' },
@@ -515,7 +530,6 @@
             const selectedTab = document.getElementById(`tab-${tabName}`);
             selectedTab.classList.remove('hidden');
 
-            // Рестарт анимации появления
             selectedTab.style.animation = 'none';
             selectedTab.offsetHeight; 
             selectedTab.style.animation = null;
