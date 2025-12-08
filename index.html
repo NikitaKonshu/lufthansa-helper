@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v36 (Stable Timer)</title>
+    <title>Lufthansa Crew Portal - v37 (No Roster)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -31,7 +31,7 @@
             background: #1e1e1e; color: #e0e0e0; border-color: #333;
         }
         body.dark-mode #login-screen-container { background-color: #121212; }
-        body.dark-mode .flight-card, body.dark-mode .roster-card, body.dark-mode .aircraft-card, body.dark-mode .news-item { background: #1e1e1e; border-color: #333; }
+        body.dark-mode .flight-card, body.dark-mode .aircraft-card, body.dark-mode .news-item { background: #1e1e1e; border-color: #333; }
         body.dark-mode .flight-card:hover, body.dark-mode .aircraft-card:hover { border-color: var(--brand-yellow); }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
@@ -110,14 +110,15 @@
         .wx-IFR { background: #ffebee; color: #c62828; }
         .wx-temp { font-family: 'Roboto Mono'; font-size: 0.8rem; text-align: right; width: 40px; }
 
-        .quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .qa-btn { background: var(--bg-main); border: 1px solid var(--input-border); padding: 20px; border-radius: 4px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        /* QUICK ACTIONS */
+        .quick-actions-grid { display: grid; grid-template-columns: 1fr; gap: 15px; } /* Changed to 1 column for single button */
+        .qa-btn { background: var(--bg-main); border: 1px solid var(--input-border); padding: 20px; border-radius: 4px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 15px; }
         .qa-btn:hover { background: #eef2f5; border-color: var(--brand-blue); }
         body.dark-mode .qa-btn:hover { background: #2c2c2c; }
-        .qa-icon { font-size: 2rem; }
-        .qa-text { font-size: 0.9rem; font-weight: 600; color: var(--text-sub); }
+        .qa-icon { font-size: 1.5rem; }
+        .qa-text { font-size: 1rem; font-weight: 600; color: var(--text-sub); }
 
-        /* ACTIVE FLIGHT BANNER (FIXED) */
+        /* ACTIVE FLIGHT BANNER */
         #active-flight-banner { background: var(--card-bg); border-left: 6px solid var(--brand-yellow); box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 25px; border-radius: 4px; margin-bottom: 30px; display: block; }
         body.dark-mode #active-flight-banner { background: #1e1e1e; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .af-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; align-items: center; }
@@ -130,7 +131,7 @@
             height: 100%; width: 0%; background-color: var(--brand-yellow); 
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); 
             background-size: 1rem 1rem; 
-            transition: width 0.5s ease-in-out; /* Smooth transition */
+            transition: width 0.5s ease-in-out;
             display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; color: #000; font-size: 0.7rem; font-weight: bold;
         }
         .af-timer { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; text-align: right; margin-top: 8px; color: var(--text-sub); font-weight: bold; }
@@ -177,14 +178,6 @@
         .stat-box { background: var(--card-bg); padding: 20px; border-radius: 4px; text-align: center; border: 1px solid var(--input-border); }
         .stat-val { font-size: 2rem; font-weight: 300; color: var(--text-main); }
         .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); margin-top: 5px; }
-
-        .roster-list { display: flex; flex-direction: column; gap: 15px; }
-        .roster-card { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); border: 1px solid var(--input-border); padding: 20px; border-radius: 6px; border-left: 5px solid var(--brand-blue); }
-        .roster-date { font-weight: bold; font-size: 1.1rem; color: var(--text-main); min-width: 100px; }
-        .roster-info { flex: 1; }
-        .roster-route { font-size: 1.2rem; font-weight: 300; }
-        .roster-time { font-family: 'Roboto Mono'; color: var(--text-sub); font-size: 0.9rem; margin-top: 5px; }
-        .roster-status { font-size: 0.8rem; font-weight: 700; color: #2e7d32; text-transform: uppercase; }
 
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         .aircraft-card { background: var(--card-bg); padding: 25px; border-radius: 6px; border: 1px solid var(--input-border); transition: 0.2s; }
@@ -251,7 +244,6 @@
             <div class="nav-content">
                 <button class="nav-item active" onclick="showTab('about', this)">Dashboard</button>
                 <button class="nav-item" onclick="showTab('news', this)">News Center</button>
-                <button class="nav-item" onclick="showTab('roster', this)">My Roster</button>
                 <button class="nav-item" onclick="showTab('fleet', this)">Fleet</button>
                 <button class="nav-item" onclick="showTab('routes', this)">Schedule</button>
                 <button class="nav-item" onclick="showTab('generator', this)">Dispatch</button>
@@ -309,13 +301,9 @@
                         <div class="lh-card">
                              <h4 style="margin-bottom:15px; color:var(--text-sub); text-transform:uppercase; font-size:0.8rem;">Quick Actions</h4>
                              <div class="quick-actions-grid">
-                                 <div class="qa-btn" onclick="showTab('roster', document.querySelectorAll('.nav-item')[2])">
-                                     <div class="qa-icon">📅</div>
-                                     <div class="qa-text">My Roster</div>
-                                 </div>
-                                 <div class="qa-btn" onclick="showTab('generator', document.querySelectorAll('.nav-item')[5])">
+                                 <div class="qa-btn" onclick="showTab('generator', document.querySelectorAll('.nav-item')[4])">
                                      <div class="qa-icon">✈️</div>
-                                     <div class="qa-text">Dispatch</div>
+                                     <div class="qa-text">Dispatch Flight</div>
                                  </div>
                              </div>
                         </div>
@@ -326,24 +314,6 @@
             <div id="tab-news" class="tab-content hidden fade-in">
                 <h2>News Center</h2>
                 <div class="lh-card border-brand"><div id="news-archive-container" class="news-archive-grid"></div></div>
-            </div>
-
-            <div id="tab-roster" class="tab-content hidden fade-in">
-                <h2>My Flight Roster</h2>
-                <div class="lh-card border-brand">
-                    <div class="roster-list">
-                        <div class="roster-card">
-                            <div class="roster-date">09 DEC</div>
-                            <div class="roster-info"><div class="roster-route">EDDF <span style="color:#999;">➝</span> KJFK</div><div class="roster-time">DLH400 | DEP: 10:00Z | B747-8</div></div>
-                            <div class="roster-status">CONFIRMED</div>
-                        </div>
-                        <div class="roster-card">
-                            <div class="roster-date">10 DEC</div>
-                            <div class="roster-info"><div class="roster-route">KJFK <span style="color:#999;">➝</span> EDDF</div><div class="roster-time">DLH401 | DEP: 22:00Z | B747-8</div></div>
-                            <div class="roster-status">CONFIRMED</div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div id="tab-fleet" class="tab-content hidden fade-in">
@@ -360,7 +330,7 @@
         </div>
 
         <div class="system-footer">
-            System v36.0 | Connected to LH Group Server | <span class="reset-link" onclick="hardReset()">System Reset</span>
+            System v37.0 | Connected to LH Group Server | <span class="reset-link" onclick="hardReset()">System Reset</span>
         </div>
     </div>
 
