@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v38 (i18n & Premium Dark)</title>
+    <title>Lufthansa Crew Portal - v39 (Stable Rescue)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -41,12 +41,11 @@
             --shadow-card: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
         }
 
-        /* Override specific components for Dark Mode consistency */
         body.dark-mode .login-box-official { background: var(--card-bg); border-color: var(--input-border); }
         body.dark-mode .nav-bar { background: var(--card-bg); border-color: var(--input-border); }
         body.dark-mode .nav-item { color: var(--text-sub); }
         body.dark-mode .nav-item.active { color: var(--text-main); }
-        body.dark-mode .hub-code { color: #60a5fa; } /* Lighter blue for dark mode text */
+        body.dark-mode .hub-code { color: #60a5fa; } 
         body.dark-mode .fc-ac { color: #60a5fa; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); transition: background-color 0.3s ease, color 0.3s ease; }
@@ -110,7 +109,7 @@
         .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; }
         .lh-card { background: var(--card-bg); padding: 25px; border-radius: 8px; box-shadow: var(--shadow-card); margin-bottom: 25px; border: 1px solid var(--input-border); }
         .border-brand { border-top: 4px solid var(--brand-blue); }
-        body.dark-mode .border-brand { border-top-color: #3b82f6; } /* Brighter blue in dark mode */
+        body.dark-mode .border-brand { border-top-color: #3b82f6; } 
         h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--input-border); padding-bottom: 15px; }
 
         .dash-layout-flex { display: flex; gap: 25px; align-items: flex-start; }
@@ -123,9 +122,9 @@
         .weather-row:last-child { border-bottom: none; }
         .hub-code { font-weight: 700; color: var(--brand-blue); width: 45px; }
         .wx-status-pill { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; width: 60px; text-align: center; }
-        .wx-VFR { background: #dcfce7; color: #15803d; } /* Green */
-        .wx-MVFR { background: #dbeafe; color: #1d4ed8; } /* Blue */
-        .wx-IFR { background: #fee2e2; color: #b91c1c; } /* Red */
+        .wx-VFR { background: #dcfce7; color: #15803d; }
+        .wx-MVFR { background: #dbeafe; color: #1d4ed8; }
+        .wx-IFR { background: #fee2e2; color: #b91c1c; }
         .wx-temp { font-family: 'Roboto Mono'; font-size: 0.8rem; text-align: right; width: 40px; }
 
         /* QUICK ACTIONS */
@@ -155,7 +154,7 @@
         /* COMMON ELEMENTS */
         .dashboard-input { width: 100%; padding: 12px; margin: 5px 0 20px 0; border: 1px solid var(--input-border); border-radius: 4px; background: var(--input-bg); color: var(--text-main); }
         .btn-dash { background-color: var(--brand-blue); color: #fff; border: none; padding: 10px 20px; font-size: 0.85rem; cursor: pointer; border-radius: 4px; font-weight: 700; text-transform: uppercase; transition:0.2s; }
-        body.dark-mode .btn-dash { background-color: #3b82f6; color: #fff; } /* Lighter blue btn */
+        body.dark-mode .btn-dash { background-color: #3b82f6; color: #fff; } 
         .btn-dash-yellow { background-color: var(--brand-yellow); color: var(--brand-blue); }
         .btn-dash-yellow:hover { background-color: #e0a100; }
         .btn-dash:disabled { background-color: var(--input-border); cursor: not-allowed; color: var(--text-sub); transform: none !important; animation: none; }
@@ -347,7 +346,7 @@
         </div>
 
         <div class="system-footer">
-            System v38.0 | Connected to LH Group Server | <span class="reset-link" onclick="hardReset()">System Reset</span>
+            System v39.0 (Stable) | Connected to LH Group Server | <span class="reset-link" onclick="hardReset()">System Reset</span>
         </div>
     </div>
 
@@ -371,10 +370,11 @@
     </div>
 
     <script>
+        // --- CONSTANTS FIRST ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         const SECONDS_PER_FLIGHT_HOUR = 10; 
-
-        // --- I18N DICTIONARY ---
+        
+        // I18N DICTIONARY
         const I18N = {
             en: {
                 login: "Login", login_sub: "Please identify yourself with your Callsign and Password.", callsign: "Callsign / ID", password: "Password", next_btn: "Next",
@@ -404,9 +404,6 @@
             }
         };
 
-        let currentLang = localStorage.getItem('lang') || 'en';
-
-        // --- NEWS DATA (Dual Language) ---
         const DEFAULT_NEWS = [
             { 
                 date: "08 DEC", tag: "URGENT", 
@@ -424,9 +421,7 @@
                 title_ru: "Технические работы", text_ru: "Плановое обслуживание портала в воскресенье 12-го с 0200Z до 0400Z."
             }
         ];
-        let NEWS_DB = [];
 
-        // --- FLEET DATA ---
         const FLEET = [
             { type: "Airbus A319", maxHours: 5, seats: 138, engines: "CFM56-5B", speed: "M0.78", ceiling: "39,000 ft", operators: ["Lufthansa", "SWISS", "Austrian", "Brussels", "Air Dolomiti"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/A319_seat_map.svg/1024px-A319_seat_map.svg.png" },
             { type: "Airbus A320neo", maxHours: 6, seats: 180, engines: "LEAP-1A", speed: "M0.78", ceiling: "39,800 ft", operators: ["Lufthansa", "Eurowings", "SAS", "Austrian", "Brussels"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/A320_seat_map.svg/300px-A320_seat_map.svg.png" },
@@ -437,42 +432,51 @@
             { type: "Boeing 777F", maxHours: 12, seats: 0, engines: "GE90-110B", speed: "M0.84", ceiling: "43,100 ft", operators: ["Lufthansa Cargo"], map: "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg" }
         ];
 
-        // CONSTANTS
         const REAL_GATES = { "EDDF": ["A13", "A20", "B24"], "EDDM": ["G08", "H12"], "KJFK": ["4", "8"], "EGLL": ["A10", "B34"], "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"], "EBBR": ["A40", "B12"], "RJTT": ["105", "107"], "FACT": ["A4", "A7"], "KLAX": ["148", "152"], "LIRF": ["E12", "D04"] };
         const AIRLINES = { "Lufthansa": { hubs: ["EDDF", "EDDM"], code: "DLH" }, "SWISS": { hubs: ["LSZH"], code: "SWR" }, "Austrian": { hubs: ["LOWW"], code: "AUA" }, "Eurowings": { hubs: ["EDDL", "EDDH"], code: "EWG" }, "Brussels": { hubs: ["EBBR"], code: "BEL" }, "Air Dolomiti": { hubs: ["LIPZ", "EDDM"], code: "DLA" }, "Lufthansa Cargo": { hubs: ["EDDF"], code: "GEC" }, "AirBaltic": { hubs: ["EVRA", "EETN"], code: "BTI" }, "SAS": { hubs: ["EKCH", "ESSA"], code: "SAS" } };
         const COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.99], "EBBR": [50.90, 4.48], "LIPZ": [45.50, 12.35], "EVRA": [56.92, 23.97], "EKCH": [55.61, 12.65], "ESSA": [59.65, 17.92], "EETN": [59.41, 24.83], "KJFK": [40.64, -73.77], "EGLL": [51.47, -0.46], "OMDB": [25.25, 55.36], "RJTT": [35.54, 139.77], "FACT": [-33.97, 18.60], "KLAX": [33.94, -118.40], "KSFO": [37.62, -122.37], "VHHH": [22.30, 113.91], "WSSS": [1.36, 103.98], "LFPG": [49.00, 2.55], "EHAM": [52.31, 4.76], "LIRF": [41.80, 12.24], "LEMD": [40.48, -3.56], "LEBL": [41.29, 2.08], "LPPT": [38.77, -9.13], "EFHK": [60.32, 24.96], "LLBG": [32.00, 34.88], "HECA": [30.11, 31.40], "KBOS": [42.36, -71.00], "KORD": [41.97, -87.90], "LIPE": [44.53, 11.29], "LIPX": [45.39, 10.88], "LGAV": [37.93, 23.94], "LTBA": [40.97, 28.81], "LEPA": [39.55, 2.73] };
         const REAL_ROUTES = { "Lufthansa": [{code: "KJFK", h: 8.5}, {code: "KLAX", h: 11.5}, {code: "RJTT", h: 12.0}, {code: "FACT", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "LFPG", h: 1.2}], "SWISS": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "WSSS", h: 12.0}], "Austrian": [{code: "KJFK", h: 9.0}, {code: "EGLL", h: 2.1}, {code: "LIRF", h: 1.5}, {code: "EFHK", h: 2.4}], "Eurowings": [{code: "LEPA", h: 2.2}, {code: "LEBL", h: 2.1}, {code: "EGLL", h: 1.4}, {code: "LIRF", h: 1.8}], "Air Dolomiti": [{code: "LIPE", h: 0.8}, {code: "LIPX", h: 0.7}, {code: "LIPZ", h: 0.8}, {code: "EDDF", h: 0.9}], "Brussels": [{code: "KJFK", h: 8.2}, {code: "FACT", h: 11.2}, {code: "EGLL", h: 0.9}, {code: "LFPG", h: 0.8}], "AirBaltic": [{code: "EGLL", h: 2.5}, {code: "EDDF", h: 2.0}, {code: "EDDM", h: 1.9}, {code: "EFHK", h: 0.5}], "SAS": [{code: "EGLL", h: 1.8}, {code: "KJFK", h: 8.8}, {code: "KORD", h: 9.2}, {code: "LEPA", h: 3.2}], "Lufthansa Cargo": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "KORD", h: 9.5}, {code: "OMDB", h: 6.2}] };
 
-        let generatedFlightTemp = null; let pilotStats = { flights: 0, hours: 0 }; let mapObject = null; let progressInterval = null;
+        let generatedFlightTemp = null; 
+        let pilotStats = { flights: 0, hours: 0 }; 
+        let mapObject = null; 
+        let progressInterval = null;
+        let currentLang = localStorage.getItem('lang') || 'en';
+        let NEWS_DB = [];
 
+        // --- SAFE INITIALIZATION ---
         window.onload = function() {
-            setTimeout(() => { const ws = document.getElementById('welcome-screen'); ws.style.opacity = '0'; ws.style.visibility = 'hidden'; }, 3000);
+            setTimeout(() => { const ws = document.getElementById('welcome-screen'); ws.style.opacity = '0'; ws.style.visibility = 'hidden'; }, 2000);
             
-            // Apply Saved Theme
-            if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-            
-            // Apply Saved Lang
-            applyLanguage(currentLang);
+            // 1. DATA INIT
+            try {
+                if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+                
+                const savedNews = localStorage.getItem('companyNews');
+                NEWS_DB = savedNews ? JSON.parse(savedNews) : DEFAULT_NEWS;
+                
+                const s = localStorage.getItem('pilotStats'); 
+                if(s) pilotStats = JSON.parse(s);
+            } catch(e) { console.log("Data init error", e); }
 
-            const savedNews = localStorage.getItem('companyNews');
-            NEWS_DB = savedNews ? JSON.parse(savedNews) : DEFAULT_NEWS;
-            renderNews();
-            populateAirlinesSelect(); populateFleetFilter(); populateFleet(); loadStats(); startClock();
-            simulateHubWeather();
+            // 2. DOM POPULATION (Order matters!)
+            try {
+                populateAirlinesSelect(); // Fill dropdowns FIRST
+                populateFleetFilter();
+            } catch(e) { console.log("Dropdown init error", e); }
 
-            // ROBUST SELF HEALING
-            const af = localStorage.getItem('activeFlight');
-            if(af) { 
-                try { 
-                    const f = JSON.parse(af); 
-                    if(!f.startTime || isNaN(f.startTime) || !f.time || isNaN(f.time)) {
-                        localStorage.removeItem('activeFlight');
-                    }
-                } catch(e) { localStorage.removeItem('activeFlight'); } 
-            }
+            // 3. APPLY TEXT & RENDER
+            try {
+                // Now safe to apply language because dropdowns exist
+                applyLanguage(currentLang); 
+                updateStatsUI();
+                startClock();
+                simulateHubWeather();
+                checkActiveFlight();
+            } catch(e) { console.log("Render error", e); }
         };
 
-        // --- I18N LOGIC ---
+        // --- LOGIC ---
         function toggleLanguage() {
             currentLang = currentLang === 'en' ? 'ru' : 'en';
             localStorage.setItem('lang', currentLang);
@@ -480,43 +484,46 @@
         }
 
         function applyLanguage(lang) {
+            // Apply text to static elements
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if(I18N[lang][key]) el.innerText = I18N[lang][key];
             });
-            // Update Lang Button
-            document.getElementById('lang-toggle-btn').innerText = lang === 'en' ? 'EN | RU' : 'RU | EN';
-            // Re-render content that depends on language
+            
+            // Toggle Button Text
+            const btn = document.getElementById('lang-toggle-btn');
+            if(btn) btn.innerText = lang === 'en' ? 'EN | RU' : 'RU | EN';
+
+            // Re-render Dynamic Components
             renderNews();
             populateFleet();
-            populateSchedule();
+            // populateSchedule relies on DOM values, so we try-catch it
+            try { populateSchedule(); } catch(e){}
         }
 
-        // --- HARD RESET ---
-        function hardReset() {
-            if(confirm("System Reset: This will clear all data (stats, flight, news) and reload. Confirm?")) {
-                localStorage.clear();
-                window.location.reload();
-            }
+        function populateAirlinesSelect() { 
+            const s = document.getElementById('gen-airline'); 
+            const r = document.getElementById('route-airline'); 
+            // Clear to prevent duplicates on reload
+            s.innerHTML = '<option value="">-- Select Airline --</option>';
+            r.innerHTML = '';
+            
+            Object.keys(AIRLINES).sort().forEach(a => { 
+                let o1 = document.createElement('option'); o1.value=a; o1.text=a; s.add(o1); 
+                let o2 = document.createElement('option'); o2.value=a; o2.text=a; r.add(o2); 
+            }); 
+            // Default selection for Schedule
+            r.value = "Lufthansa"; 
         }
 
-        // --- SIMULATED WEATHER ---
-        function simulateHubWeather() {
-            const hubs = ['EDDF', 'EDDM', 'LSZH', 'LOWW'];
-            hubs.forEach(icao => {
-                const el = document.getElementById(`wx-${icao}`);
-                const rand = Math.random();
-                let rule, temp;
-                if(rand > 0.7) { rule = "VFR"; temp = Math.floor(Math.random()*5)+3; } 
-                else if (rand > 0.4) { rule = "MVFR"; temp = Math.floor(Math.random()*3)+1; } 
-                else { rule = "IFR"; temp = Math.floor(Math.random()*3)-2; } 
-                el.querySelector('.wx-status-pill').className = `wx-status-pill wx-${rule}`;
-                el.querySelector('.wx-status-pill').innerText = rule;
-                el.querySelector('.wx-temp').innerText = `${temp}°C`;
-            });
+        function populateFleetFilter() { 
+            const s = document.getElementById('fleet-filter-airline'); 
+            s.innerHTML = '<option value="ALL">ALL OPERATORS</option>';
+            Object.keys(AIRLINES).sort().forEach(a => { 
+                let o = document.createElement('option'); o.value = a; o.text = a; s.add(o); 
+            }); 
         }
 
-        // --- CORE FUNCTIONS ---
         function populateFleet() { 
             const c = document.getElementById('fleet-container'); 
             const fv = document.getElementById('fleet-filter-airline').value; 
@@ -528,18 +535,12 @@
             }); 
         }
 
-        function openSeatMap(url, title) {
-            document.getElementById('sm-title').innerText = title + " Configuration";
-            document.getElementById('seatmap-img').src = url;
-            document.getElementById('seatmap-modal').classList.remove('hidden');
-        }
-
         function renderNews() {
             const listContainer = document.getElementById('dashboard-news-list');
             const archiveContainer = document.getElementById('news-archive-container');
-            listContainer.innerHTML = ''; archiveContainer.innerHTML = '';
+            if(!listContainer || !archiveContainer) return;
             
-            // Helper to get translated news props
+            listContainer.innerHTML = ''; archiveContainer.innerHTML = '';
             const getTitle = (p) => currentLang === 'ru' && p.title_ru ? p.title_ru : (p.title_en || p.title);
             const getText = (p) => currentLang === 'ru' && p.text_ru ? p.text_ru : (p.text_en || p.text);
 
@@ -551,107 +552,83 @@
             });
         }
 
-        function startClock() { setInterval(() => { const now = new Date(); document.getElementById('zulu-clock').innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} Z`; }, 1000); }
-        function toggleTheme() { 
-            document.body.classList.toggle('dark-mode'); 
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-        function login() {
-            const c = document.getElementById('callsign').value.toUpperCase(); const p = document.getElementById('password').value;
-            if(USERS.find(u => u.callsign === c && u.pass === p)){ 
-                document.getElementById('user-display').innerText = USERS.find(u => u.callsign === c).name;
-                document.getElementById('login-screen-container').classList.add('hidden'); 
-                document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('header-tools').classList.add('visible');
-                checkActiveFlight(); populateSchedule();
-            } else { document.getElementById('login-error').innerText = "Authentication failed."; }
-        }
-        function loadStats() { const s = localStorage.getItem('pilotStats'); if(s) pilotStats = JSON.parse(s); updateStatsUI(); }
-        function updateStatsUI() { document.getElementById('stat-flights').innerText = pilotStats.flights; document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours); document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer"); }
-        function showTab(n, b) { document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(`tab-${n}`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); }
+        function populateSchedule() {
+            const airlineSelect = document.getElementById('route-airline');
+            const timeSelect = document.getElementById('route-time');
+            if(!airlineSelect || !timeSelect) return;
 
-        // --- BULLETPROOF TIMER ---
+            const an = airlineSelect.value;
+            const tf = timeSelect.value;
+            const grid = document.getElementById('schedule-grid'); 
+            
+            grid.innerHTML = ""; 
+            if(!AIRLINES[an]) return; // Safety check
+
+            const hubs = AIRLINES[an].hubs; 
+            const dests = REAL_ROUTES[an] || [];
+            const t = I18N[currentLang];
+            
+            hubs.forEach(hub => { dests.forEach(dest => { let pass = false; if (tf === "ALL") pass = true; else if (tf === "9+") { if(dest.h >= 9) pass = true; } else { let [min, max] = tf.split("-").map(Number); if(dest.h >= min && dest.h < max + 0.9) pass = true; }
+                    if(pass) { const suitable = FLEET.filter(ac => ac.operators.includes(an) && ac.maxHours >= dest.h); if(suitable.length>0) { const ac = suitable[Math.floor(Math.random()*suitable.length)].type; const fn = AIRLINES[an].code + Math.floor(Math.random()*899+100); let card = document.createElement('div'); card.className = 'flight-card'; card.innerHTML = `<div class="fc-header"><span class="fc-airline">${an}</span><span style="font-weight:bold;color:#05164d;">${fn}</span></div><div class="fc-route">${hub} ➝ ${dest.code}</div><div class="fc-time">⏱ ${dest.h}h</div><div class="fc-details"><span class="fc-ac">${ac}</span><button class="btn-dash btn-dash-yellow" onclick="selectSpecificFlight('${hub}', '${dest.code}', '${ac}', ${dest.h}, '${fn}')">${t.select}</button></div>`; grid.appendChild(card); } } }); });
+            if(grid.innerHTML==="") grid.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:20px;color:#999;'>No flights found.</div>";
+        }
+
+        // --- STANDARD UTILS ---
+        function updateHubs() { const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); h.innerHTML = ""; if(!a){ h.disabled=true; return; } h.disabled=false; AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); }); }
+        function hardReset() { if(confirm("System Reset: This will clear all data and reload. Confirm?")) { localStorage.clear(); window.location.reload(); } }
+        function startClock() { setInterval(() => { const now = new Date(); document.getElementById('zulu-clock').innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} Z`; }, 1000); }
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light'); }
+        function updateStatsUI() { document.getElementById('stat-flights').innerText = pilotStats.flights; document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours); document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer"); }
+        function login() { const c = document.getElementById('callsign').value.toUpperCase(); const p = document.getElementById('password').value; if(USERS.find(u => u.callsign === c && u.pass === p)){ document.getElementById('user-display').innerText = USERS.find(u => u.callsign === c).name; document.getElementById('login-screen-container').classList.add('hidden'); document.getElementById('dashboard').classList.remove('hidden'); document.getElementById('header-tools').classList.add('visible'); checkActiveFlight(); try{populateSchedule();}catch(e){} } else { document.getElementById('login-error').innerText = "Authentication failed."; } }
+        function showTab(n, b) { document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(`tab-${n}`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); }
+        function simulateHubWeather() { const hubs = ['EDDF', 'EDDM', 'LSZH', 'LOWW']; hubs.forEach(icao => { const el = document.getElementById(`wx-${icao}`); const rand = Math.random(); let rule, temp; if(rand > 0.7) { rule = "VFR"; temp = Math.floor(Math.random()*5)+3; } else if (rand > 0.4) { rule = "MVFR"; temp = Math.floor(Math.random()*3)+1; } else { rule = "IFR"; temp = Math.floor(Math.random()*3)-2; } el.querySelector('.wx-status-pill').className = `wx-status-pill wx-${rule}`; el.querySelector('.wx-status-pill').innerText = rule; el.querySelector('.wx-temp').innerText = `${temp}°C`; }); }
+        
+        // --- FLIGHT LOGIC ---
         function checkActiveFlight() {
             const af = localStorage.getItem('activeFlight');
             if (af) {
-                const flight = JSON.parse(af);
-                if(!flight.startTime || isNaN(flight.startTime)) { console.error("Corrupt flight data detected. Resetting."); localStorage.removeItem('activeFlight'); return; }
-                
-                document.getElementById('active-flight-banner').classList.remove('hidden');
-                document.getElementById('af-dep').innerText = flight.dep;
-                document.getElementById('af-arr').innerText = flight.arr;
-                document.getElementById('af-ac').innerText = flight.ac;
-                document.getElementById('af-num').innerText = flight.num;
-                
-                document.querySelectorAll('.btn-dash-yellow').forEach(b => b.disabled = true);
-                if(document.getElementById('generate-btn')) document.getElementById('generate-btn').disabled = true;
-                
-                if (progressInterval) clearInterval(progressInterval);
-                progressInterval = setInterval(() => updateProgress(flight), 500); 
-                updateProgress(flight); 
+                try {
+                    const flight = JSON.parse(af);
+                    if(!flight.startTime || isNaN(flight.startTime)) { throw new Error("Invalid Flight"); }
+                    document.getElementById('active-flight-banner').classList.remove('hidden');
+                    document.getElementById('af-dep').innerText = flight.dep;
+                    document.getElementById('af-arr').innerText = flight.arr;
+                    document.getElementById('af-ac').innerText = flight.ac;
+                    document.getElementById('af-num').innerText = flight.num;
+                    document.querySelectorAll('.btn-dash-yellow').forEach(b => b.disabled = true);
+                    if(document.getElementById('generate-btn')) document.getElementById('generate-btn').disabled = true;
+                    if (progressInterval) clearInterval(progressInterval);
+                    progressInterval = setInterval(() => updateProgress(flight), 500); 
+                    updateProgress(flight);
+                } catch(e) { localStorage.removeItem('activeFlight'); }
             } else {
                 document.getElementById('active-flight-banner').classList.add('hidden');
                 document.querySelectorAll('.btn-dash-yellow').forEach(b => b.disabled = false);
                 if(document.getElementById('generate-btn')) document.getElementById('generate-btn').disabled = false;
             }
         }
-
         function updateProgress(flight) {
             const now = Date.now();
             const start = parseFloat(flight.startTime);
             const durationHrs = parseFloat(flight.time);
-            
             if(isNaN(start) || isNaN(durationHrs)) { document.getElementById('af-timer').innerText = "DATA ERROR"; if(progressInterval) clearInterval(progressInterval); return; }
-
             const elapsed = now - start;
             const totalMs = durationHrs * SECONDS_PER_FLIGHT_HOUR * 1000;
             let pct = (elapsed / totalMs) * 100;
             pct = Math.max(0, Math.min(100, pct));
-
             const bar = document.getElementById('af-progress');
             if(bar) { bar.style.width = pct + "%"; bar.innerText = Math.floor(pct) + "%"; }
-
-            if (pct >= 100) {
-                document.getElementById('af-timer').innerText = "ARRIVED - ON BLOCKS";
-                const finishBtn = document.getElementById('btn-pirep');
-                finishBtn.style.display = 'inline-block'; finishBtn.disabled = false; finishBtn.classList.add('pulse-btn');
-                document.getElementById('btn-cancel').style.display = 'none';
-                if(progressInterval) clearInterval(progressInterval);
-            } else {
-                const remainMs = totalMs - elapsed;
-                const safeRemain = Math.max(0, remainMs);
-                const min = Math.floor((safeRemain / 1000) / 60);
-                const sec = Math.floor((safeRemain / 1000) % 60);
-                document.getElementById('af-timer').innerText = `IN FLIGHT (${min}m ${sec}s)`;
-                document.getElementById('btn-pirep').style.display = 'none';
-                document.getElementById('btn-cancel').style.display = 'inline-block';
-            }
+            if (pct >= 100) { document.getElementById('af-timer').innerText = "ARRIVED - ON BLOCKS"; const finishBtn = document.getElementById('btn-pirep'); finishBtn.style.display = 'inline-block'; finishBtn.disabled = false; finishBtn.classList.add('pulse-btn'); document.getElementById('btn-cancel').style.display = 'none'; if(progressInterval) clearInterval(progressInterval); } 
+            else { const remainMs = totalMs - elapsed; const safeRemain = Math.max(0, remainMs); const min = Math.floor((safeRemain / 1000) / 60); const sec = Math.floor((safeRemain / 1000) % 60); document.getElementById('af-timer').innerText = `IN FLIGHT (${min}m ${sec}s)`; document.getElementById('btn-pirep').style.display = 'none'; document.getElementById('btn-cancel').style.display = 'inline-block'; }
         }
-
         function cancelFlight() { if(confirm("Are you sure?")) { if (progressInterval) clearInterval(progressInterval); localStorage.removeItem('activeFlight'); checkActiveFlight(); } }
         function finishFlight() { const af = JSON.parse(localStorage.getItem('activeFlight')); pilotStats.flights++; pilotStats.hours += parseFloat(af.time); localStorage.setItem('pilotStats', JSON.stringify(pilotStats)); updateStatsUI(); localStorage.removeItem('activeFlight'); checkActiveFlight(); alert("PIREP Filed Successfully!"); }
-
-        function populateFleetFilter() { const s = document.getElementById('fleet-filter-airline'); Object.keys(AIRLINES).sort().forEach(a => { let o = document.createElement('option'); o.value = a; o.text = a; s.add(o); }); }
-        function populateAirlinesSelect() { const s = document.getElementById('gen-airline'); const r = document.getElementById('route-airline'); Object.keys(AIRLINES).sort().forEach(a => { let o1 = document.createElement('option'); o1.value=a; o1.text=a; s.add(o1); let o2 = document.createElement('option'); o2.value=a; o2.text=a; r.add(o2); }); r.value = "Lufthansa"; }
-        function updateHubs() { const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); h.innerHTML = ""; if(!a){ h.disabled=true; return; } h.disabled=false; AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); }); }
+        function openSeatMap(url, title) { document.getElementById('sm-title').innerText = title + " Configuration"; document.getElementById('seatmap-img').src = url; document.getElementById('seatmap-modal').classList.remove('hidden'); }
         function generateGate(icao) { if (REAL_GATES[icao]) return REAL_GATES[icao][Math.floor(Math.random() * REAL_GATES[icao].length)]; return 'A' + Math.floor(Math.random()*20+1); }
-        function populateSchedule() {
-            const an = document.getElementById('route-airline').value; const tf = document.getElementById('route-time').value; const grid = document.getElementById('schedule-grid'); grid.innerHTML = ""; const hubs = AIRLINES[an].hubs; const dests = REAL_ROUTES[an] || [];
-            const t = I18N[currentLang];
-            hubs.forEach(hub => { dests.forEach(dest => { let pass = false; if (tf === "ALL") pass = true; else if (tf === "9+") { if(dest.h >= 9) pass = true; } else { let [min, max] = tf.split("-").map(Number); if(dest.h >= min && dest.h < max + 0.9) pass = true; }
-                    if(pass) { const suitable = FLEET.filter(ac => ac.operators.includes(an) && ac.maxHours >= dest.h); if(suitable.length>0) { const ac = suitable[Math.floor(Math.random()*suitable.length)].type; const fn = AIRLINES[an].code + Math.floor(Math.random()*899+100); let card = document.createElement('div'); card.className = 'flight-card'; card.innerHTML = `<div class="fc-header"><span class="fc-airline">${an}</span><span style="font-weight:bold;color:#05164d;">${fn}</span></div><div class="fc-route">${hub} ➝ ${dest.code}</div><div class="fc-time">⏱ ${dest.h}h</div><div class="fc-details"><span class="fc-ac">${ac}</span><button class="btn-dash btn-dash-yellow" onclick="selectSpecificFlight('${hub}', '${dest.code}', '${ac}', ${dest.h}, '${fn}')">${t.select}</button></div>`; grid.appendChild(card); } } }); });
-            if(grid.innerHTML==="") grid.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:20px;color:#999;'>No flights found.</div>";
-        }
         function selectSpecificFlight(dep, arr, ac, h, num) { prepareFlightData(dep, arr, ac, h, num); showBriefing(generatedFlightTemp); }
-        function generateFlight() {
-            const an = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub').value; if(!an || !h) { alert("Select Airline & Hub"); return; } let dests = REAL_ROUTES[an] || []; if(dests.length===0) dests = [{code:"KJFK", h:8.5}]; const dest = dests[Math.floor(Math.random()*dests.length)]; const suitable = FLEET.filter(ac => ac.operators.includes(an) && ac.maxHours >= dest.h); const ac = suitable[Math.floor(Math.random()*suitable.length)].type; const fn = AIRLINES[an].code + Math.floor(Math.random()*899+100); prepareFlightData(h.split(' ')[0], dest.code, ac, dest.h, fn); showBriefing(generatedFlightTemp);
-        }
+        function generateFlight() { const an = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub').value; if(!an || !h) { alert("Select Airline & Hub"); return; } let dests = REAL_ROUTES[an] || []; if(dests.length===0) dests = [{code:"KJFK", h:8.5}]; const dest = dests[Math.floor(Math.random()*dests.length)]; const suitable = FLEET.filter(ac => ac.operators.includes(an) && ac.maxHours >= dest.h); const ac = suitable[Math.floor(Math.random()*suitable.length)].type; const fn = AIRLINES[an].code + Math.floor(Math.random()*899+100); prepareFlightData(h.split(' ')[0], dest.code, ac, dest.h, fn); showBriefing(generatedFlightTemp); }
         function prepareFlightData(dep, arr, acType, h, num) { const acInfo = FLEET.find(a => a.type === acType); generatedFlightTemp = { dep: dep, arr: arr, ac: acType, time: parseFloat(h), num: num, fl: "FL" + (Math.floor(Math.random()*4)*20+320), depLat: COORDS[dep]?COORDS[dep][0]:0, depLon: COORDS[dep]?COORDS[dep][1]:0, arrLat: COORDS[arr]?COORDS[arr][0]:0, arrLon: COORDS[arr]?COORDS[arr][1]:0, pax: Math.floor(acInfo.seats*(0.7+Math.random()*0.2)), zfw: 45000 }; }
-        function showBriefing(f) {
-            document.getElementById('br-dep').innerText = f.dep; document.getElementById('br-arr').innerText = f.arr; document.getElementById('br-ac').innerText = f.ac; document.getElementById('br-flight-num').innerText = f.num; document.getElementById('br-time').innerText = f.time+"h"; document.getElementById('br-fl').innerText = f.fl; document.getElementById('br-pax').innerText = f.pax; document.getElementById('br-zfw').innerText = (f.zfw/1000).toFixed(1)+"T"; document.getElementById('br-gate-dep').innerText = generateGate(f.dep); document.getElementById('br-gate-arr').innerText = generateGate(f.arr); document.getElementById('briefing-modal').classList.remove('hidden');
-            setTimeout(() => { if(mapObject) { mapObject.off(); mapObject.remove(); } let center = [50, 10]; if(f.depLat !== 0) center = [f.depLat, f.depLon]; mapObject = L.map('map').setView(center, 4); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(mapObject); if(f.depLat !== 0 && f.arrLat !== 0) { const line = L.polyline([[f.depLat, f.depLon], [f.arrLat, f.arrLon]], { color: '#05164d', weight: 3 }).addTo(mapObject); try { mapObject.fitBounds(line.getBounds(), {padding:[50,50]}); } catch(e){} } mapObject.invalidateSize(); }, 300);
-            ['br-metar-dep', 'br-metar-arr'].forEach(id => { const el = document.getElementById(id); if(el) el.innerText = "Loading..."; const icao = id.includes('dep') ? f.dep : f.arr; fetch(`https://avwx.rest/api/metar/${icao}?format=json`).then(r=>r.json()).then(d=>{ if(document.getElementById(id)) document.getElementById(id).innerText = d.raw || "N/A"; }).catch(()=>{ if(document.getElementById(id)) document.getElementById(id).innerText = "N/A (Offline)"; }); });
-        }
+        function showBriefing(f) { document.getElementById('br-dep').innerText = f.dep; document.getElementById('br-arr').innerText = f.arr; document.getElementById('br-ac').innerText = f.ac; document.getElementById('br-flight-num').innerText = f.num; document.getElementById('br-time').innerText = f.time+"h"; document.getElementById('br-fl').innerText = f.fl; document.getElementById('br-pax').innerText = f.pax; document.getElementById('br-zfw').innerText = (f.zfw/1000).toFixed(1)+"T"; document.getElementById('br-gate-dep').innerText = generateGate(f.dep); document.getElementById('br-gate-arr').innerText = generateGate(f.arr); document.getElementById('briefing-modal').classList.remove('hidden'); setTimeout(() => { if(mapObject) { mapObject.off(); mapObject.remove(); } let center = [50, 10]; if(f.depLat !== 0) center = [f.depLat, f.depLon]; mapObject = L.map('map').setView(center, 4); L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(mapObject); if(f.depLat !== 0 && f.arrLat !== 0) { const line = L.polyline([[f.depLat, f.depLon], [f.arrLat, f.arrLon]], { color: '#05164d', weight: 3 }).addTo(mapObject); try { mapObject.fitBounds(line.getBounds(), {padding:[50,50]}); } catch(e){} } mapObject.invalidateSize(); }, 300); ['br-metar-dep', 'br-metar-arr'].forEach(id => { const el = document.getElementById(id); if(el) el.innerText = "Loading..."; const icao = id.includes('dep') ? f.dep : f.arr; fetch(`https://avwx.rest/api/metar/${icao}?format=json`).then(r=>r.json()).then(d=>{ if(document.getElementById(id)) document.getElementById(id).innerText = d.raw || "N/A"; }).catch(()=>{ if(document.getElementById(id)) document.getElementById(id).innerText = "N/A (Offline)"; }); }); }
         function closeModal() { document.getElementById('briefing-modal').classList.add('hidden'); }
         function confirmBriefing() { closeModal(); generatedFlightTemp.startTime = Date.now(); localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp)); checkActiveFlight(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
     </script>
