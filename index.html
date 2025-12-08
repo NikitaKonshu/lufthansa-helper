@@ -3,306 +3,329 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Group VA | Crew Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <title>Lufthansa Group | Crew Portal</title>
     
     <style>
-        /* --- V6: ULTIMATE GLASS DESIGN --- */
+        /* --- CORPORATE LUFTHANSA STYLE --- */
         :root {
-            --lh-blue-deep: #020617;
-            --lh-blue-accent: #0b247a;
-            --lh-yellow: #FFB100;
-            --lh-yellow-glow: rgba(255, 177, 0, 0.6);
-            
-            --glass-surface: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
-            
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
+            --lh-blue: #05164D;       /* Фирменный темно-синий */
+            --lh-blue-light: #0b225f;
+            --lh-yellow: #FFB100;     /* Фирменный желтый */
+            --lh-grey-bg: #F2F4F7;    /* Светло-серый фон сайта */
+            --lh-grey-text: #666666;
+            --lh-border: #dcdcdc;
+            --white: #ffffff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
         
         body { 
-            background-color: var(--lh-blue-deep);
-            color: var(--text-main); 
-            font-family: 'Montserrat', sans-serif; 
-            overflow-x: hidden; 
-            min-height: 100vh;
-            position: relative;
+            background-color: var(--lh-grey-bg);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        /* --- 1. BACKGROUND (LIQUID + MESH) --- */
-        .liquid-wrapper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;
-            background: radial-gradient(circle at center, #0a1128 0%, #000000 100%);
-        }
-        /* Сетка для техно-эффекта */
-        .grid-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            mask-image: radial-gradient(circle, black 40%, transparent 80%);
-            -webkit-mask-image: radial-gradient(circle, black 40%, transparent 80%);
-        }
-
-        .orb {
-            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5;
-            animation: floatOrb 15s infinite ease-in-out;
-        }
-        .orb-1 {
-            width: 500px; height: 500px; background: radial-gradient(circle, var(--lh-blue-accent), transparent);
-            top: -100px; left: -100px; animation-delay: 0s;
-        }
-        .orb-2 {
-            width: 400px; height: 400px; background: radial-gradient(circle, var(--lh-yellow), transparent);
-            bottom: -50px; right: -50px; opacity: 0.3; animation-delay: -5s; animation-duration: 20s;
-        }
-
-        @keyframes floatOrb {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(30px, -30px) scale(1.1); }
-        }
-
-        /* --- 2. UTILS --- */
+        /* --- UTILITIES --- */
         .hidden { display: none !important; }
-        .fade-up { animation: fadeUpAnim 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; transform: translateY(30px); }
-        @keyframes fadeUpAnim { to { opacity: 1; transform: translateY(0); } }
-
-        /* --- 3. LOGIN SCREEN (REDESIGNED) --- */
-        #login-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000;
-            display: flex; justify-content: center; align-items: center;
-            padding: 20px;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        .login-card-container {
-            position: relative;
-            width: 100%;
-            max-width: 420px;
+        /* Кнопки */
+        .btn {
+            display: inline-block; padding: 12px 24px; font-size: 14px; font-weight: bold;
+            text-transform: uppercase; border: none; cursor: pointer; border-radius: 2px;
+            transition: 0.2s; letter-spacing: 0.5px;
         }
-
-        .login-card {
-            background: rgba(10, 20, 40, 0.6); /* Темнее, но прозрачно */
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 24px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
+        .btn-primary {
+            background-color: var(--lh-blue); color: white;
         }
+        .btn-primary:hover { background-color: var(--lh-blue-light); }
         
-        /* Желтая линия сверху */
-        .login-card::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(90deg, transparent, var(--lh-yellow), transparent);
-            box-shadow: 0 0 15px var(--lh-yellow);
+        .btn-yellow {
+            background-color: var(--lh-yellow); color: var(--lh-blue);
         }
+        .btn-yellow:hover { background-color: #e6a000; }
 
-        .logo-area {
-            font-size: 4rem; color: var(--lh-yellow); 
-            text-shadow: 0 0 25px var(--lh-yellow-glow);
-            margin-bottom: 10px;
-        }
-
-        .login-title {
-            font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: white; margin-bottom: 30px;
-            text-transform: uppercase;
-        }
-
-        .input-group { position: relative; margin-bottom: 20px; }
-        
-        .login-input {
-            width: 100%; padding: 18px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: white; font-family: 'Montserrat'; font-weight: 500; font-size: 1rem;
-            outline: none; transition: 0.3s;
-        }
-        .login-input::placeholder { color: rgba(255,255,255,0.3); }
-        .login-input:focus {
-            background: rgba(0, 0, 0, 0.5);
-            border-color: var(--lh-yellow);
-            box-shadow: 0 0 15px rgba(255, 177, 0, 0.2);
-        }
-
-        /* КНОПКА ВХОДА */
-        .btn-login {
-            width: 100%; padding: 18px;
-            background: var(--lh-yellow);
-            color: #000; font-weight: 900; font-size: 1rem;
-            border: none; border-radius: 12px;
-            cursor: pointer; letter-spacing: 1px;
-            box-shadow: 0 0 20px rgba(255, 177, 0, 0.4);
-            transition: all 0.3s ease; text-transform: uppercase;
-            margin-top: 10px;
-        }
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 40px rgba(255, 177, 0, 0.7);
-            background: #ffc400;
-        }
-        .btn-login:active { transform: scale(0.98); }
-
-        /* --- 4. DASHBOARD STYLES --- */
+        /* Карточки */
         .card {
-            background: var(--glass-surface);
-            backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px; padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: 0.3s;
+            background: var(--white);
+            border: 1px solid var(--lh-border);
+            border-radius: 3px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.05); }
-
-        .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .card h3 { color: var(--lh-blue); margin-bottom: 10px; font-weight: bold; }
         
+        /* Формы */
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: var(--lh-blue); }
+        select, input {
+            width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 2px;
+            margin-bottom: 15px; font-size: 1rem; background: #fff;
+        }
+        select:focus, input:focus { border-color: var(--lh-blue); outline: none; }
+
+        /* --- 1. WELCOME SCREEN (SPLASH) --- */
+        #welcome-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--lh-blue);
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white;
+            transition: opacity 1s ease-out;
+        }
+        .crane-logo-big {
+            font-size: 80px; margin-bottom: 20px;
+            width: 120px; height: 120px; border: 2px solid var(--lh-yellow); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; color: var(--lh-yellow);
+        }
+
+        /* --- 2. LOGIN SCREEN --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop') no-repeat center center/cover;
+            z-index: 8000;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            width: 400px; padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-top: 5px solid var(--lh-yellow);
+        }
+
+        /* --- 3. HEADER & NAV --- */
         header {
+            background-color: var(--lh-blue); color: white;
+            height: 70px; display: flex; align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .header-content {
+            width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 30px; background: rgba(0,0,0,0.3); backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--glass-border); position: sticky; top: 0; z-index: 100;
         }
+        .logo-text { font-size: 1.2rem; font-weight: bold; letter-spacing: 1px; }
         
-        .nav-items { display: flex; gap: 20px; }
-        .nav-link { 
-            cursor: pointer; opacity: 0.6; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; transition: 0.3s; 
-            padding: 5px 10px; border-radius: 8px;
+        nav { display: flex; gap: 20px; }
+        .nav-link {
+            color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem;
+            text-transform: uppercase; cursor: pointer; transition: 0.3s; padding: 22px 0;
+            border-bottom: 3px solid transparent;
         }
-        .nav-link:hover, .nav-link.active { opacity: 1; color: var(--lh-yellow); background: rgba(255,177,0,0.1); }
+        .nav-link:hover, .nav-link.active { color: white; border-bottom-color: var(--lh-yellow); }
 
-        /* Responsive */
+        /* Mobile Nav */
         @media (max-width: 768px) {
-            header { flex-direction: column; align-items: stretch; gap: 15px; }
-            .nav-items { overflow-x: auto; padding-bottom: 10px; }
-            .grid-cards { grid-template-columns: 1fr; }
-            .login-card { padding: 30px 20px; }
+            header { height: auto; padding: 15px 0; }
+            .header-content { flex-direction: column; gap: 15px; }
+            nav { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .nav-link { padding: 5px; }
+            .grid-cards { grid-template-columns: 1fr !important; }
         }
 
-        /* General Elements */
-        .btn { padding: 10px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); color: white; cursor: pointer; font-weight: bold; transition:0.3s; }
-        .btn:hover { background: rgba(255,255,255,0.15); }
-        .btn-yellow-sm { background: var(--lh-yellow); color: black; border:none; box-shadow: 0 0 10px rgba(255,177,0,0.3); }
-        select { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: white; border-radius: 8px; margin-bottom: 10px; }
+        /* --- 4. CONTENT SECTIONS --- */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
         
+        /* Status Bar Widget */
+        .status-widget {
+            background: white; border-left: 5px solid var(--lh-blue);
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Tabs inside Destinations */
+        .filter-tabs { margin-bottom: 20px; border-bottom: 1px solid #ccc; }
+        .filter-tab {
+            display: inline-block; padding: 10px 20px; cursor: pointer;
+            border: 1px solid transparent; border-bottom: none;
+            margin-bottom: -1px; background: transparent;
+        }
+        .filter-tab.active {
+            background: white; border-color: #ccc; border-top: 3px solid var(--lh-blue); font-weight: bold;
+        }
+
+        /* Flight Info Table Style */
+        .flight-detail-row {
+            display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0;
+        }
+        .flight-detail-row span:first-child { color: var(--lh-grey-text); }
+        .flight-detail-row span:last-child { font-weight: bold; color: var(--lh-blue); }
+
     </style>
 </head>
 <body>
 
-    <div class="liquid-wrapper">
-        <div class="grid-overlay"></div> <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
+    <div id="welcome-screen">
+        <div class="crane-logo-big">✈</div>
+        <h1 style="font-weight: 300; letter-spacing: 2px;">LUFTHANSA GROUP</h1>
+        <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">CREW PORTAL LOADING...</p>
     </div>
 
-    <div id="login-screen">
-        <div class="login-card-container fade-up">
-            <div class="login-card">
-                <div class="logo-area">✈</div>
-                <div class="login-title">Crew Access</div>
-                
-                <div class="input-group">
-                    <input type="text" id="callsign" class="login-input" placeholder="Callsign (DLH001)" autocomplete="off">
-                </div>
-                <div class="input-group">
-                    <input type="password" id="password" class="login-input" placeholder="Password">
-                </div>
-                
-                <button class="btn-login" onclick="attemptLogin()">Connect</button>
-                <p id="login-error" style="color: #ff5555; margin-top: 15px; font-size: 0.9rem;" class="hidden">Access Denied</p>
-            </div>
-            <p style="text-align: center; margin-top: 20px; opacity: 0.5; font-size: 0.8rem;">SECURE CONNECTION ESTABLISHED</p>
+    <div id="login-screen" class="hidden">
+        <div class="login-box">
+            <h2 style="color: var(--lh-blue); margin-bottom: 20px;">Crew Login</h2>
+            <p style="color: var(--lh-grey-text); margin-bottom: 20px; font-size: 0.9rem;">Please enter your credentials to access the operations portal.</p>
+            
+            <label>Callsign</label>
+            <input type="text" id="callsign" placeholder="e.g. DLH001">
+            
+            <label>Password</label>
+            <input type="password" id="password">
+            
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="attemptLogin()">Log In</button>
+            <p id="login-error" style="color: #d9534f; margin-top: 15px; font-size: 0.9rem; display: none;">Invalid credentials.</p>
         </div>
     </div>
 
     <div id="dashboard" class="hidden">
         <header>
-            <div style="font-weight: 900; font-size: 1.2rem;">LH GROUP <span style="color: var(--lh-yellow)">VA</span></div>
-            <nav class="nav-items">
-                <span class="nav-link active" onclick="navTo('about', this)">О Нас</span>
-                <span class="nav-link" onclick="navTo('fleet', this)">Флот</span>
-                <span class="nav-link" onclick="navTo('destinations', this)">Полеты</span>
-                <span class="nav-link" onclick="navTo('generator', this)">Генератор</span>
-                <span class="nav-link" onclick="navTo('my-flight', this)">Мой Рейс</span>
-            </nav>
-            <div id="pilot-badge" style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 15px; font-size: 0.8rem;">...</div>
+            <div class="header-content">
+                <div class="logo-text">
+                    <span style="color: var(--lh-yellow); margin-right: 5px;">✈</span> LUFTHANSA GROUP <span style="font-weight:300">PORTAL</span>
+                </div>
+                <nav>
+                    <span class="nav-link active" onclick="navTo('home', this)">Home</span>
+                    <span class="nav-link" onclick="navTo('fleet', this)">Fleet</span>
+                    <span class="nav-link" onclick="navTo('destinations', this)">Flights</span>
+                    <span class="nav-link" onclick="navTo('generator', this)">Dispatch</span>
+                    <span class="nav-link" onclick="navTo('myflight', this)">My Flight</span>
+                </nav>
+            </div>
         </header>
 
         <div class="container">
             
-            <section id="sec-about" class="fade-up">
-                <h2 style="margin-bottom: 20px; border-left: 4px solid var(--lh-yellow); padding-left: 15px;">Добро пожаловать</h2>
+            <div style="margin: 20px 0; display: flex; align-items: center; justify-content: space-between;">
+                <h2 style="color: var(--lh-blue);">Welcome, <span id="pilot-name">Captain</span></h2>
+                <div style="background: white; padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; border: 1px solid #ddd;">
+                    Status: <span style="color: green; font-weight: bold;">● Online</span>
+                </div>
+            </div>
+
+            <div id="active-flight-widget" class="status-widget hidden">
+                <div>
+                    <h4 style="color: var(--lh-grey-text); margin: 0; font-size: 0.8rem; text-transform: uppercase;">Active Duty</h4>
+                    <h2 style="margin: 5px 0; color: var(--lh-blue);"><span id="widget-call">DLH000</span></h2>
+                    <span id="widget-route">FRA - JFK</span>
+                </div>
+                <button class="btn btn-yellow" onclick="navTo('myflight', document.querySelectorAll('.nav-link')[4])">View Flight</button>
+            </div>
+
+            <section id="sec-home">
                 <div class="grid-cards">
                     <div class="card">
-                        <h3 style="color: var(--lh-yellow)">Реализм</h3>
-                        <p style="color: #ccc; margin-top: 10px;">Летай в реальном времени, соблюдай правила и получай удовольствие от симуляции.</p>
+                        <h3>Corporate News</h3>
+                        <p style="color: var(--lh-grey-text);">Welcome to the new Crew Portal. We have integrated all group airlines (Lufthansa, Swiss, Austrian, Eurowings) into a single operational interface.</p>
                     </div>
                     <div class="card">
-                        <h3 style="color: var(--lh-yellow)">Единая Сеть</h3>
-                        <p style="color: #ccc; margin-top: 10px;">Все авиакомпании группы в одном месте: Lufthansa, Swiss, Austrian, Eurowings.</p>
+                        <h3>Operational Guidelines</h3>
+                        <ul style="padding-left: 20px; color: var(--lh-grey-text); font-size: 0.9rem;">
+                            <li>Flights must be conducted in Real Time.</li>
+                            <li>OFP generation is mandatory.</li>
+                            <li>Report submission required post-flight.</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3>Network Status</h3>
+                        <p style="color: green; font-weight: bold;">System Operational</p>
+                        <p style="font-size: 0.9rem; color: #666;">Hubs active: FRA, MUC, ZRH, VIE</p>
                     </div>
                 </div>
             </section>
 
             <section id="sec-fleet" class="hidden">
-                <h2 style="margin-bottom: 20px; border-left: 4px solid var(--lh-yellow); padding-left: 15px;">Наш Флот</h2>
+                <h3 style="color: var(--lh-blue); margin-bottom: 20px; border-bottom: 2px solid var(--lh-yellow); padding-bottom: 10px;">Aircraft Fleet</h3>
                 <div id="fleet-grid" class="grid-cards"></div>
             </section>
 
             <section id="sec-destinations" class="hidden">
-                <h2 style="margin-bottom: 20px; border-left: 4px solid var(--lh-yellow); padding-left: 15px;">Сетка Полетов</h2>
-                <div class="card" style="margin-bottom: 20px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <select id="dest-airline" onchange="updateDestHubs()"><option value="">Выбери а/к</option></select>
-                        <select id="dest-hub" disabled onchange="filterDestinationsBySelect()"><option value="">Сначала а/к</option></select>
+                <h3 style="color: var(--lh-blue); margin-bottom: 20px; border-bottom: 2px solid var(--lh-yellow); padding-bottom: 10px;">Flight Schedule</h3>
+                
+                <div class="card">
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="flex: 1;">
+                            <label>Airline Operator</label>
+                            <select id="dest-airline" onchange="updateDestHubs()">
+                                <option value="">Select Operator...</option>
+                            </select>
+                        </div>
+                        <div style="flex: 1;">
+                            <label>Departure Hub</label>
+                            <select id="dest-hub" disabled onchange="filterDestinations()">
+                                <option value="">Select Hub...</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
-                <div id="dest-grid" class="grid-cards"></div>
+
+                <div id="dest-list">
+                    </div>
             </section>
 
             <section id="sec-generator" class="hidden">
-                <h2 style="margin-bottom: 20px; border-left: 4px solid var(--lh-yellow); padding-left: 15px;">Генератор</h2>
-                <div id="gen-form" class="card">
-                    <input type="text" id="gen-callsign-input" class="login-input" placeholder="Желаемый позывной (необязательно)" style="margin-bottom: 15px;">
-                    <select id="gen-airline" onchange="updateGenHubs()"><option value="">Оператор</option></select>
-                    <select id="gen-hub" disabled><option value="">Хаб</option></select>
-                    <select id="gen-time">
-                        <option value="1-2">1-2 часа</option>
-                        <option value="3-4">3-4 часа</option>
-                        <option value="5-6">5-6 часов</option>
-                        <option value="7-8">7-8 часов</option>
-                        <option value="10+">10+ часов</option>
-                    </select>
-                    <button class="btn-login" style="margin-top: 20px;" onclick="generateFlight()">Сгенерировать</button>
+                <h3 style="color: var(--lh-blue); margin-bottom: 20px; border-bottom: 2px solid var(--lh-yellow); padding-bottom: 10px;">Dispatch Center</h3>
+                
+                <div id="gen-warning" class="card hidden" style="border-left: 5px solid #d9534f;">
+                    <h3 style="color: #d9534f;">Flight Already Active</h3>
+                    <p>You currently have an active flight plan. Please complete it or cancel it before generating a new one.</p>
                 </div>
-                <div id="gen-result" class="card hidden" style="margin-top: 20px; text-align: center;">
-                    <h3 style="color: var(--lh-yellow)">Рейс Готов!</h3>
-                    <div id="gen-data" style="margin: 15px 0;"></div>
-                    <button class="btn btn-yellow-sm" onclick="navTo('my-flight', document.querySelectorAll('.nav-link')[4])">К Рейсу</button>
+
+                <div id="gen-form" class="card" style="max-width: 600px; margin: 0 auto;">
+                    <label>Preferred Callsign (Optional)</label>
+                    <input type="text" id="gen-call" placeholder="e.g. DLH452">
+
+                    <label>Airline Operator</label>
+                    <select id="gen-airline" onchange="updateGenHubs()">
+                        <option value="">Select Operator...</option>
+                    </select>
+
+                    <label>Departure Hub</label>
+                    <select id="gen-hub" disabled>
+                        <option value="">Select Hub...</option>
+                    </select>
+
+                    <label>Flight Duration</label>
+                    <select id="gen-time">
+                        <option value="1-2">Short Haul (1-2h)</option>
+                        <option value="3-4">Medium Haul (3-4h)</option>
+                        <option value="5-6">Long Haul (5-6h)</option>
+                        <option value="7-8">Long Haul (7-8h)</option>
+                        <option value="10+">Ultra Long Haul (10h+)</option>
+                    </select>
+
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="generateFlight()">Generate Flight Plan</button>
                 </div>
             </section>
 
-            <section id="sec-my-flight" class="hidden">
-                <h2 style="margin-bottom: 20px; border-left: 4px solid var(--lh-yellow); padding-left: 15px;">Активный Рейс</h2>
-                <div id="no-flight" class="card" style="text-align: center; padding: 40px;">Нет активного рейса</div>
-                <div id="flight-card" class="card hidden">
-                    <div style="display: flex; justify-content: space-between; align-items: end; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+            <section id="sec-myflight" class="hidden">
+                <h3 style="color: var(--lh-blue); margin-bottom: 20px; border-bottom: 2px solid var(--lh-yellow); padding-bottom: 10px;">Active Flight Plan</h3>
+                
+                <div id="no-flight-msg" class="card" style="text-align: center; padding: 50px;">
+                    <p style="color: #999;">No active flight plan filed.</p>
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="navTo('generator', document.querySelectorAll('.nav-link')[3])">Go to Dispatch</button>
+                </div>
+
+                <div id="flight-detail-card" class="card hidden" style="max-width: 800px; margin: 0 auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
                         <div>
-                            <h1 id="mf-call" style="color: var(--lh-yellow); font-size: 2.5rem;">DLH000</h1>
-                            <div id="mf-route" style="font-size: 1.2rem;">XXX -> XXX</div>
+                            <h1 id="mf-callsign" style="color: var(--lh-blue); margin-bottom: 5px;">DLH---</h1>
+                            <span style="background: var(--lh-yellow); padding: 3px 8px; font-size: 0.8rem; font-weight: bold; border-radius: 2px;">FILED</span>
                         </div>
-                        <div id="mf-time" style="font-size: 1.5rem; font-weight: bold;">0h</div>
+                        <div style="text-align: right;">
+                            <h2 id="mf-route" style="color: #333;">---</h2>
+                        </div>
                     </div>
-                    <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <div><small style="color:gray;">Самолет</small><div id="mf-ac">...</div></div>
-                        <div><small style="color:gray;">Прибытие</small><div id="mf-arr">...</div></div>
+
+                    <div class="flight-detail-row"><span>Aircraft Type</span> <span id="mf-ac">-</span></div>
+                    <div class="flight-detail-row"><span>Operator</span> <span id="mf-airline">-</span></div>
+                    <div class="flight-detail-row"><span>Block Time</span> <span id="mf-time">-</span></div>
+                    <div class="flight-detail-row"><span>Departure (UTC)</span> <span id="mf-dep">-</span></div>
+                    <div class="flight-detail-row"><span>Est. Arrival (Local)</span> <span id="mf-arr">-</span></div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="alert('OFP Downloaded (Simulated)')">Download OFP</button>
+                        <button class="btn" style="flex: 1; background: #d9534f; color: white;" onclick="endFlight()">File Report & Close</button>
                     </div>
-                    <button class="btn" style="width: 100%; margin-top: 20px; background: rgba(255,50,50,0.2); color: #ffaaaa;" onclick="endFlight()">Завершить</button>
                 </div>
             </section>
 
@@ -310,31 +333,58 @@
     </div>
 
     <script>
-        // DATA
+        // --- DATA ---
         const pilots = [ { id: "DLH001", pass: "admin" }, { id: "SWR100", pass: "swiss" } ];
+        
         const airlines = [
             { code: "DLH", name: "Lufthansa", hubs: ["EDDF", "EDDM"] },
             { code: "SWR", name: "Swiss", hubs: ["LSZH"] },
             { code: "AUA", name: "Austrian", hubs: ["LOWW"] },
             { code: "EWG", name: "Eurowings", hubs: ["EDDL", "EDDH"] }
         ];
+
         const fleet = [
-            { type: "A320neo", range: 6 }, { type: "A321", range: 7 }, 
-            { type: "A330-300", range: 11 }, { type: "A350-900", range: 17 }, 
-            { type: "B747-8", range: 15 }, { type: "CRJ-900", range: 4 }
+            { type: "Airbus A320neo", range: 6, reg: "D-AINA" },
+            { type: "Airbus A321", range: 7, reg: "D-AISP" },
+            { type: "Airbus A330-300", range: 11, reg: "D-AIKO" },
+            { type: "Airbus A350-900", range: 17, reg: "D-AIXA" },
+            { type: "Boeing 747-8", range: 15, reg: "D-ABYA" },
+            { type: "Bombardier CRJ-900", range: 4, reg: "D-ACNW" }
         ];
+
         const routes = [
             { d: "EDDF", a: "KJFK", t: 8.5 }, { d: "EDDF", a: "EGLL", t: 1.5 },
-            { d: "EDDM", a: "OMDB", t: 6.0 }, { d: "LSZH", a: "WSSS", t: 12.0 },
+            { d: "EDDF", a: "UUEE", t: 3.5 }, { d: "EDDM", a: "OMDB", t: 6.0 },
+            { d: "LSZH", a: "WSSS", t: 12.0 }, { d: "LSZH", a: "EGLL", t: 1.8 },
             { d: "LOWW", a: "VTBS", t: 10.0 }, { d: "EDDL", a: "LEPA", t: 2.5 }
         ];
 
-        // LOGIC
-        window.onload = () => {
+        // --- INIT ---
+        window.onload = function() {
+            // Intro animation
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('welcome-screen').style.display = 'none';
+                    document.getElementById('login-screen').classList.remove('hidden');
+                }, 1000);
+            }, 2500);
+
             initSelects();
             renderFleet();
             checkState();
         };
+
+        // --- HELPERS ---
+        function navTo(id, el) {
+            // Nav active state
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            if(el) el.classList.add('active');
+
+            // Show section
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('sec-' + id).classList.remove('hidden');
+        }
 
         function initSelects() {
             const gs = document.getElementById('gen-airline');
@@ -345,144 +395,188 @@
             });
         }
 
+        // --- AUTH ---
         function attemptLogin() {
             const c = document.getElementById('callsign').value.toUpperCase();
             const p = document.getElementById('password').value;
             const u = pilots.find(x => x.id === c && x.pass === p);
+            
             if(u) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                document.getElementById('pilot-badge').innerText = c;
+                document.getElementById('pilot-name').innerText = c;
             } else {
-                document.getElementById('login-error').classList.remove('hidden');
+                document.getElementById('login-error').style.display = 'block';
             }
         }
 
-        function navTo(id, el) {
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            if(el) el.classList.add('active');
-            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-            const t = document.getElementById('sec-'+id);
-            t.classList.remove('hidden');
-            t.classList.remove('fade-up');
-            void t.offsetWidth; t.classList.add('fade-up');
-        }
-
+        // --- FLEET ---
         function renderFleet() {
-            const c = document.getElementById('fleet-grid');
-            fleet.forEach(f => {
-                c.innerHTML += `<div class="card"><h3>${f.type}</h3><p>Range: ${f.range}h</p></div>`;
+            const grid = document.getElementById('fleet-grid');
+            fleet.forEach(ac => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <div style="font-weight:bold; color:#05164D; font-size:1.1rem;">${ac.type}</div>
+                        <div style="color:#666; font-size:0.9rem;">Max Range: ${ac.range}h</div>
+                    </div>
+                `;
             });
         }
 
-        function updateDestHubs() {
-            updateHubs('dest-airline', 'dest-hub');
-            document.getElementById('dest-grid').innerHTML = '';
+        // --- FLIGHT LOGIC ---
+        function updateHubs(selectId, targetId) {
+            const code = document.getElementById(selectId).value;
+            const target = document.getElementById(targetId);
+            target.innerHTML = '<option value="">Select Hub...</option>';
+            target.disabled = true;
+
+            if(code) {
+                const al = airlines.find(a => a.code === code);
+                al.hubs.forEach(h => target.add(new Option(h, h)));
+                target.disabled = false;
+            }
         }
+        function updateDestHubs() { updateHubs('dest-airline', 'dest-hub'); }
         function updateGenHubs() { updateHubs('gen-airline', 'gen-hub'); }
 
-        function updateHubs(aid, hid) {
-            const ac = document.getElementById(aid).value;
-            const h = document.getElementById(hid);
-            h.innerHTML = '<option value="">Хаб</option>';
-            h.disabled = !ac;
-            if(ac) airlines.find(x => x.code === ac).hubs.forEach(hb => h.add(new Option(hb, hb)));
-        }
+        function filterDestinations() {
+            const hub = document.getElementById('dest-hub').value;
+            const list = document.getElementById('dest-list');
+            list.innerHTML = '';
+            
+            if(!hub) return;
 
-        function filterDestinationsBySelect() {
-            const h = document.getElementById('dest-hub').value;
-            const g = document.getElementById('dest-grid');
-            g.innerHTML = '';
-            if(!h) return;
-            const res = routes.filter(r => r.d === h);
-            if(!res.length) g.innerHTML = '<p>Нет рейсов</p>';
-            res.forEach(r => {
-                g.innerHTML += `
-                <div class="card">
-                    <h4>${r.d} -> ${r.a}</h4>
-                    <p>${r.t} ч.</p>
-                    <button class="btn btn-yellow-sm" style="width:100%; margin-top:10px" onclick="takeFlight('${r.d}','${r.a}',${r.t},'${document.getElementById('dest-airline').value}')">Взять</button>
-                </div>`;
+            const matches = routes.filter(r => r.d === hub);
+            if(matches.length === 0) {
+                list.innerHTML = '<div class="card">No flights available from this hub in current database.</div>';
+                return;
+            }
+
+            matches.forEach(r => {
+                const airlineCode = document.getElementById('dest-airline').value;
+                list.innerHTML += `
+                    <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:var(--lh-blue);">${r.d} ➝ ${r.a}</div>
+                            <div style="color:#666;">Flight Time: ${r.t}h</div>
+                        </div>
+                        <button class="btn btn-yellow" onclick="takeFlight('${r.d}', '${r.a}', ${r.t}, '${airlineCode}')">Select Flight</button>
+                    </div>
+                `;
             });
         }
 
-        function takeFlight(d, a, t, code) {
-            if(localStorage.getItem('flight')) return alert("У вас уже есть рейс!");
-            const plane = fleet.find(f => f.range >= t);
-            if(!plane) return alert("Нет самолета!");
-            const call = code + Math.floor(Math.random()*899+100);
-            const now = new Date();
-            const arr = new Date(now.getTime() + t*3600000);
+        // --- ACTION: TAKE FLIGHT ---
+        function takeFlight(dep, arr, time, alCode) {
+            if(localStorage.getItem('flight')) {
+                alert("Error: You already have an active flight plan filed.");
+                return;
+            }
             
-            const f = {
-                call: call, route: `${d} -> ${a}`, time: t, ac: plane.type,
-                arr: arr.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-            };
-            localStorage.setItem('flight', JSON.stringify(f));
-            checkState();
-            navTo('my-flight', document.querySelectorAll('.nav-link')[4]);
+            const al = airlines.find(a => a.code === alCode);
+            const plane = fleet.find(f => f.range >= time);
+            
+            if(!plane) { alert("No suitable aircraft found for this duration."); return; }
+
+            const callsign = alCode + Math.floor(Math.random()*899+100);
+            createFlight(callsign, dep, arr, time, plane.type, al.name);
         }
 
         function generateFlight() {
-            if(localStorage.getItem('flight')) return alert("Завершите активный рейс!");
-            const code = document.getElementById('gen-airline').value;
+            if(localStorage.getItem('flight')) { alert("Active flight plan exists."); return; }
+            
+            const alCode = document.getElementById('gen-airline').value;
             const hub = document.getElementById('gen-hub').value;
-            const tv = document.getElementById('gen-time').value;
-            const custom = document.getElementById('gen-callsign-input').value;
-            
-            if(!code || !hub) return alert("Выберите данные");
-            
-            let min, max;
-            if(tv === "10+") { min=10; max=99; } else { const p=tv.split('-'); min=p[0]; max=p[1]; }
-            
-            const match = routes.filter(r => r.d === hub && r.t >= min && r.t <= max);
-            if(!match.length) return alert("Нет маршрутов");
-            
-            const r = match[Math.floor(Math.random()*match.length)];
-            const plane = fleet.find(f => f.range >= r.t);
-            
-            const call = custom || (code + Math.floor(Math.random()*899+100));
-            const now = new Date();
-            const arr = new Date(now.getTime() + r.t*3600000);
+            const timeRange = document.getElementById('gen-time').value;
+            const customCall = document.getElementById('gen-call').value.toUpperCase();
 
-            const f = {
-                call: call, route: `${r.d} -> ${r.a}`, time: r.t, ac: plane.type,
-                arr: arr.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+            if(!alCode || !hub) { alert("Please select Operator and Hub."); return; }
+
+            let min, max;
+            if(timeRange === '10+') { min=10; max=99; }
+            else { const s=timeRange.split('-'); min=Number(s[0]); max=Number(s[1]); }
+
+            const matches = routes.filter(r => r.d === hub && r.t >= min && r.t <= max);
+            
+            if(matches.length === 0) { alert("No routes match your criteria."); return; }
+            
+            const r = matches[Math.floor(Math.random() * matches.length)];
+            const plane = fleet.find(f => f.range >= r.t);
+            const al = airlines.find(a => a.code === alCode);
+            const callsign = customCall || (alCode + Math.floor(Math.random()*899+100));
+
+            createFlight(callsign, r.d, r.a, r.t, plane.type, al.name);
+        }
+
+        function createFlight(call, dep, arr, time, plane, airline) {
+            const now = new Date();
+            const arrival = new Date(now.getTime() + time*3600000);
+            
+            const flight = {
+                call: call,
+                dep: dep, arr: arr,
+                time: time,
+                plane: plane,
+                airline: airline,
+                depTime: now.toISOString().slice(11,16) + ' Z',
+                arrTime: arrival.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             };
-            
-            localStorage.setItem('flight', JSON.stringify(f));
-            
-            document.getElementById('gen-data').innerHTML = `${call} | ${r.d}->${r.a}`;
-            document.getElementById('gen-result').classList.remove('hidden');
+
+            localStorage.setItem('flight', JSON.stringify(flight));
+            alert("Flight Plan Filed Successfully: " + call);
             checkState();
+            navTo('myflight', document.querySelectorAll('.nav-link')[4]);
         }
 
         function endFlight() {
-            if(confirm("Завершить рейс?")) {
+            if(confirm("Confirm: File flight report and close flight plan?")) {
                 localStorage.removeItem('flight');
                 checkState();
+                navTo('home', document.querySelectorAll('.nav-link')[0]);
             }
         }
 
         function checkState() {
-            const d = localStorage.getItem('flight');
-            const no = document.getElementById('no-flight');
-            const yes = document.getElementById('flight-card');
-            if(d) {
-                const f = JSON.parse(d);
-                no.classList.add('hidden');
-                yes.classList.remove('hidden');
-                document.getElementById('mf-call').innerText = f.call;
-                document.getElementById('mf-route').innerText = f.route;
-                document.getElementById('mf-time').innerText = f.time + 'h';
-                document.getElementById('mf-ac').innerText = f.ac;
-                document.getElementById('mf-arr').innerText = f.arr;
+            const data = localStorage.getItem('flight');
+            const widget = document.getElementById('active-flight-widget');
+            const noFlight = document.getElementById('no-flight-msg');
+            const detail = document.getElementById('flight-detail-card');
+            const genWarn = document.getElementById('gen-warning');
+            const genForm = document.getElementById('gen-form');
+
+            if(data) {
+                const f = JSON.parse(data);
+                
+                // Widget
+                widget.classList.remove('hidden');
+                document.getElementById('widget-call').innerText = f.call;
+                document.getElementById('widget-route').innerText = `${f.dep} - ${f.arr}`;
+
+                // Details
+                noFlight.classList.add('hidden');
+                detail.classList.remove('hidden');
+                
+                document.getElementById('mf-callsign').innerText = f.call;
+                document.getElementById('mf-route').innerText = `${f.dep} ➝ ${f.arr}`;
+                document.getElementById('mf-ac').innerText = f.plane;
+                document.getElementById('mf-airline').innerText = f.airline;
+                document.getElementById('mf-time').innerText = f.time + ' hours';
+                document.getElementById('mf-dep').innerText = f.depTime;
+                document.getElementById('mf-arr').innerText = f.arrTime;
+
+                // Generator Lock
+                genWarn.classList.remove('hidden');
+                genForm.classList.add('hidden');
+
             } else {
-                no.classList.remove('hidden');
-                yes.classList.add('hidden');
-                document.getElementById('gen-result').classList.add('hidden');
+                widget.classList.add('hidden');
+                noFlight.classList.remove('hidden');
+                detail.classList.add('hidden');
+                genWarn.classList.add('hidden');
+                genForm.classList.remove('hidden');
             }
         }
+
     </script>
 </body>
 </html>
