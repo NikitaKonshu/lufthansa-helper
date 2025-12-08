@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v30 (Emergency Cancel)</title>
+    <title>Lufthansa Crew Portal - v31 (Button Fixed)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -136,10 +136,16 @@
         body.dark-mode .btn-dash { background-color: #3a3a3a; }
         .btn-dash-yellow { background-color: var(--brand-yellow); color: var(--brand-blue); }
         .btn-dash-yellow:hover { background-color: #e0a100; }
-        .btn-dash:disabled { background-color: #ccc; cursor: not-allowed; color: #666; }
-        
+        /* Fix for disabled state style */
+        .btn-dash:disabled { background-color: #e0e0e0; cursor: not-allowed; color: #999; transform: none !important; }
+
+        /* Cancel button specific */
         .btn-cancel { background-color: var(--brand-red); color: white; margin-left: 10px; }
         .btn-cancel:hover { background-color: #b30000; }
+
+        /* Pulse animation for the Finish button */
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(255, 182, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 182, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 182, 0, 0); } }
+        .pulse-btn { animation: pulse-yellow 2s infinite; }
 
         /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -375,7 +381,7 @@
         function updateStatsUI() { document.getElementById('stat-flights').innerText = pilotStats.flights; document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours); document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer"); }
         function showTab(n, b) { document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(`tab-${n}`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); }
 
-        // --- ACTIVE FLIGHT LOGIC (WITH RESET) ---
+        // --- ACTIVE FLIGHT LOGIC (FIXED BUTTON) ---
         function checkActiveFlight() {
             const af = localStorage.getItem('activeFlight');
             if (af) {
@@ -405,9 +411,7 @@
             const start = parseFloat(flight.startTime);
             const durationHrs = parseFloat(flight.time);
             
-            // Check for NaN corruption
             if(isNaN(start) || isNaN(durationHrs)) {
-                // Instead of crashing, just stop timer. The user will see the Cancel button.
                 document.getElementById('af-timer').innerText = "SYSTEM ERROR - PLEASE CANCEL";
                 if(progressInterval) clearInterval(progressInterval);
                 return;
@@ -420,8 +424,14 @@
             if (pct >= 100) {
                 pct = 100;
                 document.getElementById('af-timer').innerText = "ARRIVED - ON BLOCKS";
-                document.getElementById('btn-pirep').style.display = 'inline-block';
-                // Even when done, we leave Cancel visible just in case logic fails
+                
+                // SHOW AND UNLOCK THE PIREP BUTTON
+                const finishBtn = document.getElementById('btn-pirep');
+                finishBtn.style.display = 'inline-block';
+                finishBtn.disabled = false; // <<< CRITICAL FIX HERE
+                finishBtn.classList.add('pulse-btn');
+                
+                document.getElementById('btn-cancel').style.display = 'none';
                 if(progressInterval) clearInterval(progressInterval);
             } else {
                 const remainMs = totalMs - elapsed;
