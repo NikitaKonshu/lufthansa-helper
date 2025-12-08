@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v23 (Official Look)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>Lufthansa Crew Portal - v24 (Seamless Transition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
@@ -19,199 +19,191 @@
             --input-border: #cccccc;
             --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             --logo-brightness: brightness(0) invert(1);
+            --header-height: 70px; /* Defining a fixed header height */
         }
 
         body.dark-mode {
-            /* Minimal dark mode adjustment for dashboard only */
             --bg-main: #121212; --text-main: #e0e0e0; --text-sub: #a0a0a0;
             --logo-brightness: brightness(0.9);
+            --input-border: #333;
         }
+        /* Dark mode adjustments for login box specifically */
+        body.dark-mode .login-box-official, body.dark-mode .login-input-official {
+            background: #1e1e1e; color: #e0e0e0; border-color: #333;
+        }
+        body.dark-mode .login-instruction { color: #a0a0a0; }
+        body.dark-mode #login-screen-container { background-color: #121212; }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
         body { background-color: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         .hidden { display: none !important; }
         
         /* --- UTILS --- */
-        .fade-out { animation: fadeOut 0.5s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.8s ease-in-out forwards; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- OFFICIAL LH HEADER & FOOTER --- */
-        .lh-header-bar {
+        /* --- GLOBAL PERSISTENT HEADER --- */
+        #global-header {
             background-color: var(--brand-blue);
-            height: 60px;
+            height: var(--header-height);
             display: flex;
+            justify-content: space-between;
             align-items: center;
             padding: 0 5%;
-            position: fixed; width: 100%; top: 0; z-index: 100;
+            position: fixed; /* FIXES THE HEADER */
+            width: 100%;
+            top: 0;
+            z-index: 1000; /* Ensures it's above everything else */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .lh-header-bar img { height: 30px; filter: brightness(0) invert(1); }
+        #global-header .logo-img { height: 32px; filter: brightness(0) invert(1); transition: 0.3s; }
+        
+        /* Header Tools (Hidden on Login, Visible on Dashboard) */
+        .header-right-tools { display: flex; align-items: center; gap: 20px; color: white; opacity: 0; transition: opacity 0.5s ease-in; pointer-events: none; }
+        .header-right-tools.visible { opacity: 1; pointer-events: all; }
+        .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; font-size: 0.9rem; opacity: 0.8; }
+        .theme-toggle { background: none; border: 1px solid rgba(255,255,255,0.3); color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #user-display { font-weight: 600; font-size: 0.9rem; }
 
-        .lh-footer-bar {
-            background-color: var(--brand-blue);
-            color: white;
-            padding: 20px 5%;
-            font-size: 0.8rem;
-            margin-top: auto; /* Pushes to bottom */
-        }
-        .footer-links { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-        .footer-links a { color: white; text-decoration: none; }
-        .footer-links a:hover { text-decoration: underline; }
-        .footer-logos { display: flex; justify-content: space-between; align-items: center; opacity: 0.8; }
-        .footer-logos img { height: 25px; filter: brightness(0) invert(1); }
-
-        /* --- WELCOME SCREEN (Simplified for corporate look) --- */
+        /* --- IMPROVED WELCOME SCREEN --- */
         #welcome-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; 
-            background-color: var(--brand-blue);
+            /* Dark professional background image with overlay */
+            background: linear-gradient(rgba(5, 22, 77, 0.85), rgba(5, 22, 77, 0.95)), url('https://images.unsplash.com/photo-1536639523423-7875998e392f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover no-repeat;
             display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+            backdrop-filter: blur(2px);
         }
-        .loader-spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--brand-yellow); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-top: 30px; }
+        /* The logo in the welcome screen must exactly match the position of the global header logo for a seamless fade */
+        .welcome-logo-container {
+            position: absolute;
+            top: 0;
+            left: 5%; /* Matches header padding */
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+        }
+        .welcome-logo-container img { height: 32px; filter: brightness(0) invert(1); }
+
+        .welcome-content-center {
+            text-align: center;
+            margin-top: -60px; /* Offset slightly upwards */
+        }
+        .welcome-title {
+            font-weight: 300;
+            letter-spacing: 4px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        .loader-spinner { border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--brand-yellow); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        /* --- LOGIN SCREEN (The new design) --- */
-        #login-screen-container {
+        /* --- MAIN CONTENT CONTAINERS --- */
+        /* Crucial: Padding top to prevent content hiding behind fixed header */
+        .main-content-area {
+            padding-top: var(--header-height);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            background-color: #fff; /* Force white background for login area */
-            padding-top: 60px; /* Space for header */
         }
 
+        /* --- LOGIN SCREEN --- */
+        #login-screen-container { background-color: var(--bg-main); }
         .login-content-wrapper {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align towards top like ref */
-            padding-top: 80px; /* Distance from header */
-            padding-bottom: 40px;
+            flex: 1; display: flex; justify-content: center; align-items: flex-start;
+            padding-top: 80px; padding-bottom: 40px; padding-left: 20px; padding-right: 20px;
         }
-
         .login-box-official {
-            background: #ffffff;
-            width: 100%;
-            max-width: 480px; /* Slightly wider like the reference */
-            padding: 40px;
-            border-radius: 4px; /* Minimal rounding */
-            /* Subtle elegant shadow */
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
-            text-align: left;
+            background: #ffffff; width: 100%; max-width: 480px; padding: 40px;
+            border-radius: 4px; box-shadow: 0 2px 15px rgba(0,0,0,0.08); text-align: left;
         }
-
-        .login-box-official h1 {
-            font-weight: 300;
-            font-size: 2rem;
-            color: var(--text-main);
-            margin-bottom: 15px;
-        }
-
-        .login-instruction {
-            color: var(--text-sub);
-            font-size: 1rem;
-            margin-bottom: 35px;
-            line-height: 1.5;
-        }
-
+        .login-box-official h1 { font-weight: 300; font-size: 2rem; color: var(--text-main); margin-bottom: 15px; }
+        .login-instruction { color: var(--text-sub); font-size: 1rem; margin-bottom: 35px; line-height: 1.5; }
         .input-group-official { margin-bottom: 25px; }
         .input-label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; }
-        
         .login-input-official {
-            width: 100%;
-            padding: 14px 12px;
-            font-size: 1rem;
-            color: var(--text-main);
-            border: 1px solid var(--input-border);
-            border-radius: 2px; /* Very squarish */
-            background: #fff;
-            transition: 0.2s;
+            width: 100%; padding: 14px 12px; font-size: 1rem; color: var(--text-main);
+            border: 1px solid var(--input-border); border-radius: 2px; background: var(--bg-main); transition: 0.2s;
         }
-        .login-input-official:focus {
-            outline: none;
-            border-color: var(--brand-yellow);
-            box-shadow: inset 0 0 0 1px var(--brand-yellow);
-        }
-        .login-input-official::placeholder { color: #aaa; }
-
+        .login-input-official:focus { outline: none; border-color: var(--brand-yellow); box-shadow: inset 0 0 0 1px var(--brand-yellow); }
         .btn-official {
-            width: 100%;
-            padding: 15px;
-            background-color: var(--brand-yellow);
-            color: var(--brand-blue);
-            font-size: 1.1rem;
-            font-weight: 700;
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            width: 100%; padding: 15px; background-color: var(--brand-yellow); color: var(--brand-blue);
+            font-size: 1.1rem; font-weight: 700; border: none; border-radius: 2px; cursor: pointer; transition: background-color 0.2s;
         }
         .btn-official:hover { background-color: #e0a100; }
 
-        /* --- DASHBOARD STYLES (Kept mostly same, just slight cleanup) --- */
-        /* Ensure dashboard doesn't use the fixed header of login */
-        #dashboard header { position: sticky; top: 0; z-index: 100; background-color: var(--brand-blue); padding: 15px 0; color: white; }
-        .header-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-white { filter: var(--logo-brightness); }
-        .top-tools { display: flex; align-items: center; gap: 20px; }
-        .zulu-clock { font-family: 'Roboto Mono', monospace; font-weight: 500; }
-        
-        .nav-bar { background: var(--bg-main); border-bottom: 1px solid #e0e0e0; }
-        body.dark-mode .nav-bar { border-color: #333; }
+        .lh-footer-bar { background-color: var(--brand-blue); color: white; padding: 20px 5%; font-size: 0.8rem; margin-top: auto; }
+        .footer-links { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+        .footer-links a { color: white; text-decoration: none; }
+        .footer-logos { display: flex; justify-content: space-between; align-items: center; opacity: 0.8; }
+        .footer-logos img { height: 25px; filter: brightness(0) invert(1); }
+
+        /* --- DASHBOARD STYLES --- */
+        .nav-bar { background: var(--bg-main); border-bottom: 1px solid var(--input-border); position: sticky; top: var(--header-height); z-index: 90; }
         .nav-content { max-width: 1200px; margin: 0 auto; padding: 0 25px; display: flex; overflow-x: auto; }
         .nav-item { padding: 20px 25px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; position: relative; }
         .nav-item.active { color: var(--text-main); }
         .nav-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--brand-yellow); }
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 25px; flex: 1; width: 100%; }
-        .lh-card { background: var(--bg-main); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #eee; }
-        body.dark-mode .lh-card { border-color: #333; background: #1e1e1e; }
+        .lh-card { background: var(--bg-main); padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid var(--input-border); }
+        body.dark-mode .lh-card { background: #1e1e1e; }
         .border-brand { border-top: 4px solid var(--brand-blue); }
+        body.dark-mode .border-brand { border-top-color: #555; }
         
-        h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; }
+        h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--input-border); padding-bottom: 15px; }
 
-        /* Fleet & Inputs in Dashboard */
-        .dashboard-input { width: 100%; padding: 14px 15px; margin: 8px 0 20px 0; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 1rem; background: var(--bg-main); color: var(--text-main); }
+        .dashboard-input { width: 100%; padding: 14px 15px; margin: 8px 0 20px 0; border: 1px solid var(--input-border); border-radius: 4px; font-size: 1rem; background: var(--bg-main); color: var(--text-main); }
         .btn-dash { background-color: var(--brand-blue); color: #fff; border: none; padding: 12px 28px; font-size: 0.9rem; cursor: pointer; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
+        body.dark-mode .btn-dash { background-color: #3a3a3a; }
         .btn-dash-yellow { background-color: var(--brand-yellow); color: var(--brand-blue); }
 
-        /* Fleet Grid */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .aircraft-card h4 { color: var(--text-main); margin-bottom: 10px; }
-        .aircraft-data-box { background: rgba(0,0,0,0.03); border-radius: 4px; margin-bottom: 15px; padding: 15px; }
+        .aircraft-data-box { background: rgba(0,0,0,0.05); border-radius: 4px; margin-bottom: 15px; padding: 15px; }
         .aircraft-data-box p { font-size: 0.9rem; line-height: 1.8; color: var(--text-sub); display: flex; justify-content: space-between; }
         .aircraft-data-box strong { color: var(--text-main); font-weight: 600; }
 
-        /* Modal & Misc */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .briefing-paper { background: var(--bg-main); width: 95%; max-width: 850px; padding: 30px; border-radius: 6px; color: var(--text-main); max-height: 95vh; overflow-y: auto; }
         .briefing-header { display: flex; justify-content: space-between; border-bottom: 3px solid var(--brand-blue); padding-bottom: 10px; margin-bottom: 20px; }
         .briefing-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; font-size: 0.9rem; }
         .data-block label { display: block; font-size: 0.7rem; color: var(--text-sub); font-weight: bold; }
         .data-block span { font-weight: 600; font-family: 'Roboto Mono', monospace; }
-        #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid #e0e0e0; z-index: 1; }
+        #map { width: 100%; height: 250px; margin: 20px 0; border: 1px solid var(--input-border); z-index: 1; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        .stat-box { background: var(--bg-main); padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        body.dark-mode .stat-box { border-color: #333; }
+        .stat-box { background: var(--bg-main); padding: 20px; border-radius: 8px; text-align: center; border: 1px solid var(--input-border); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .stat-val { font-size: 2rem; font-weight: 300; color: var(--text-main); }
         .stat-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); margin-top: 5px; }
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen">
-        <div style="margin-bottom: 30px;">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="LH Logo" width="180" style="filter: brightness(0) invert(1);">
+    <header id="global-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="Lufthansa Logo" class="logo-img">
+        
+        <div id="header-tools" class="header-right-tools">
+            <div class="zulu-clock" id="zulu-clock">00:00 Z</div>
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Night Mode">🌙</button>
+            <div id="user-display">Guest</div>
         </div>
-        <h1 style="font-weight: 300; letter-spacing: 2px; font-size: 1.5rem;">CREW OPS PORTAL</h1>
-        <div class="loader-spinner"></div>
+    </header>
+
+    <div id="welcome-screen">
+        <div class="welcome-logo-container">
+             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="LH Logo">
+        </div>
+        <div class="welcome-content-center">
+            <h1 class="welcome-title">CREW OPS PORTAL</h1>
+            <div class="loader-spinner"></div>
+        </div>
     </div>
 
-    <div id="login-screen-container" class="hidden">
-        <div class="lh-header-bar">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" alt="Lufthansa Logo">
-        </div>
-
+    <div id="login-screen-container" class="main-content-area hidden">
         <div class="login-content-wrapper">
             <div class="login-box-official fade-in">
                 <h1>Login</h1>
@@ -248,17 +240,7 @@
     </div>
 
 
-    <div id="dashboard" class="hidden">
-        <header>
-            <div class="header-content">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white" alt="LH" height="40">
-                <div class="top-tools">
-                    <div class="zulu-clock" id="zulu-clock">00:00 Z</div>
-                    <div id="user-display" style="font-weight: 600;">Guest</div>
-                </div>
-            </div>
-        </header>
-
+    <div id="dashboard" class="main-content-area hidden">
         <nav class="nav-bar">
             <div class="nav-content">
                 <button class="nav-item active" onclick="showTab('about', this)">Dashboard</button>
@@ -359,7 +341,7 @@
     </div>
 
     <script>
-        // --- CONFIG & DATA (Unchanged) ---
+        // --- CONFIG & DATA ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
         const REAL_GATES = { "EDDF": ["A13", "A20", "B24"], "EDDM": ["G08", "H12"], "KJFK": ["4", "8"], "EGLL": ["A10", "B34"], "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"] };
         const AIRLINES = { "Lufthansa": { hubs: ["EDDF (Frankfurt)", "EDDM (Munich)"], code: "DLH" }, "SWISS": { hubs: ["LSZH (Zurich)"], code: "SWR" }, "Austrian Airlines": { hubs: ["LOWW (Vienna)"], code: "AUA" }, "Brussels Airlines": { hubs: ["EBBR (Brussels)"], code: "BEL" }, "Eurowings": { hubs: ["EDDL (Dusseldorf)", "EDDH (Hamburg)"], code: "EWG" }, "Discover Airlines": { hubs: ["EDDF (Frankfurt)"], code: "OCN" }, "Edelweiss Air": { hubs: ["LSZH (Zurich)"], code: "EDW" }, "Lufthansa Cargo": { hubs: ["EDDF (Frankfurt)", "EDDP (Leipzig)"], code: "GEC" }, "Lufthansa CityLine": { hubs: ["EDDM (Munich)"], code: "CLH" }, "Air Dolomiti": { hubs: ["LIPZ (Venice)", "EDDM (Munich)"], code: "DLA" }, "AirBaltic": { hubs: ["EVRA (Riga)", "EETN (Tallinn)"], code: "BTI" }, "SAS": { hubs: ["EKCH (Copenhagen)", "ESSA (Stockholm)"], code: "SAS" } };
@@ -374,28 +356,39 @@
         let currentUser = null; let generatedFlightTemp = null; let pilotStats = { flights: 0, hours: 0 }; let mapObject = null;
 
         window.onload = function() {
+            // Welcome screen transition
             setTimeout(() => {
                 document.getElementById('welcome-screen').classList.add('fade-out');
-                setTimeout(() => { document.getElementById('welcome-screen').classList.add('hidden'); document.getElementById('login-screen-container').classList.remove('hidden'); }, 500);
-            }, 2500);
+                setTimeout(() => { 
+                    document.getElementById('welcome-screen').classList.add('hidden'); 
+                    document.getElementById('login-screen-container').classList.remove('hidden'); 
+                }, 800); // Match fade-out duration
+            }, 3000);
+            
             populateAirlinesSelect(); populateFleetFilter(); populateFleet(); populateHubsInfo(); loadStats(); startClock();
         };
 
         function startClock() { setInterval(() => { const now = new Date(); document.getElementById('zulu-clock').innerText = `${String(now.getUTCHours()).padStart(2,'0')}:${String(now.getUTCMinutes()).padStart(2,'0')} Z`; }, 1000); }
-        
+        function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+
         function login() {
             const c = document.getElementById('callsign').value.toUpperCase();
             const p = document.getElementById('password').value;
             if(USERS.find(u => u.callsign === c && u.pass === p)){ 
-                document.getElementById('user-display').innerText = USERS.find(u => u.callsign === c).name; 
+                document.getElementById('user-display').innerText = USERS.find(u => u.callsign === c).name;
+                
+                // Hide login, show dashboard
                 document.getElementById('login-screen-container').classList.add('hidden'); 
-                document.getElementById('dashboard').classList.remove('hidden'); 
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+                // REVEAL HEADER TOOLS
+                document.getElementById('header-tools').classList.add('visible');
             } else { 
                 document.getElementById('login-error').innerText = "Authentication failed. Please check your credentials."; 
             }
         }
 
-        // --- DASHBOARD FUNCTIONS (Simplified for brevity, functional) ---
+        // --- DASHBOARD FUNCTIONS ---
         function loadStats() { const s = localStorage.getItem('pilotStats'); if(s) pilotStats = JSON.parse(s); updateStatsUI(); }
         function updateStatsUI() { document.getElementById('stat-flights').innerText = pilotStats.flights; document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours); document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer"); }
         function showTab(n, b) { document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(`tab-${n}`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); }
@@ -410,13 +403,13 @@
         function populateHubsInfo() { document.getElementById('hub-list-display').innerHTML = Object.keys(AIRLINES).sort().map(a => `<li><strong>${a}:</strong> ${AIRLINES[a].hubs.join(", ")}</li>`).join(''); }
         function updateHubs() { const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); h.innerHTML = ""; if(!a){ h.disabled=true; return; } h.disabled=false; AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); }); }
 
-        // --- GENERATOR (Simplified) ---
+        // --- GENERATOR ---
         async function generateFlight() {
             const btn = document.getElementById('generate-btn'); btn.disabled = true; btn.innerText = 'Generating...';
             const an = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub').value;
             if(!an || !h) { alert("Select Airline & Hub"); btn.disabled=false; btn.innerText='Generate OFP'; return; }
             
-            const ac = FLEET.find(a => a.operators.includes(an)); // Simple pick first available
+            const ac = FLEET.find(a => a.operators.includes(an));
             const dest = DESTINATIONS[Math.floor(Math.random() * DESTINATIONS.length)];
             const depIcao = h.split(' ')[0];
 
