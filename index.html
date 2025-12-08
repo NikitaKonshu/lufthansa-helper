@@ -1,72 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lufthansa Crew Portal - v42 (Global Static DB)</title>
+    <title>Lufthansa Crew Portal - v43 (Full Features)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
-        /* --- CSS STYLES (DESIGN) --- */
+        /* CONFIG */
         :root {
             --brand-blue: #05164d; --brand-yellow: #ffb600; --brand-red: #d90000;
             --bg-main: #f4f6f8; --card-bg: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
             --input-bg: #ffffff; --input-border: #cbd5e1; --header-height: 60px;
-            --font-main: 'Roboto', sans-serif; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --font-main: 'Roboto', sans-serif;
         }
         body.dark-mode {
             --bg-main: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8;
-            --input-bg: #0f172a; --input-border: #334155; --shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            --input-bg: #0f172a; --input-border: #334155;
         }
+        /* Override specific dark mode elements */
         body.dark-mode .nav-bar, body.dark-mode .login-box { background: var(--card-bg); border-color: var(--input-border); }
         body.dark-mode .nav-item { color: var(--text-sub); } body.dark-mode .nav-item.active { color: var(--text-main); }
-        body.dark-mode .fc-ac, body.dark-mode .hub-code { color: #60a5fa; }
+        body.dark-mode .hub-code, body.dark-mode .fc-ac { color: #60a5fa; }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family:var(--font-main); transition: background 0.3s, color 0.3s; }
         body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
         .hidden { display: none !important; }
 
-        /* Header */
-        header { background: var(--brand-blue); height: var(--header-height); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; position: fixed; width: 100%; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
-        .logo { height: 24px; filter: brightness(0) invert(1); }
-        .tools { display: flex; gap: 15px; align-items: center; opacity: 0; pointer-events: none; transition: 0.5s; color: white; }
-        .tools.visible { opacity: 1; pointer-events: all; }
-        .btn-icon { background:none; border:1px solid rgba(255,255,255,0.2); color:white; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
-        .lang-pill { font-size:0.7rem; font-weight:bold; padding:0 8px; border-radius:12px; }
+        /* INTRO SCREEN (RESTORED) */
+        #intro-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; 
+            background: var(--brand-blue); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+        .intro-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1520437358207-323b43b50729?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover;
+            opacity: 0.4; animation: zoom 10s ease-out forwards;
+        }
+        @keyframes zoom { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .intro-text { position: relative; z-index: 2; color: white; text-align: center; }
+        .intro-sub { letter-spacing: 4px; font-size: 0.8rem; opacity: 0.8; margin-bottom: 5px; }
+        .intro-main { font-size: 2rem; font-weight: 300; text-transform: uppercase; letter-spacing: 2px; }
+        .loader { width: 150px; height: 3px; background: rgba(255,255,255,0.2); margin-top: 30px; border-radius: 2px; overflow: hidden; }
+        .loader-bar { height: 100%; width: 0%; background: var(--brand-yellow); animation: load 2.5s ease-in-out forwards; }
+        @keyframes load { 0% { width:0%; } 100% { width:100%; } }
 
-        /* Login */
-        #login-wrap { padding-top: 80px; display: flex; justify-content: center; align-items: center; min-height: 80vh; }
-        .login-box { background: var(--card-bg); width: 100%; max-width: 380px; padding: 30px; border-radius: 8px; border: 1px solid var(--input-border); box-shadow: var(--shadow); }
+        /* HEADER */
+        header { background: var(--brand-blue); height: var(--header-height); display: flex; justify-content: space-between; align-items: center; padding: 0 15px; position: fixed; width: 100%; top: 0; z-index: 2000; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .logo { height: 26px; filter: brightness(0) invert(1); }
+        .tools { display: flex; gap: 15px; align-items: center; opacity: 0; transition: 0.5s; }
+        .tools.visible { opacity: 1; }
+        .btn-icon { background:none; border:1px solid rgba(255,255,255,0.3); color:white; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; }
         
-        /* Dashboard */
-        #dash { padding-top: var(--header-height); padding-bottom: 40px; }
+        /* LOGIN */
+        #login-wrap { padding-top: 80px; display: flex; justify-content: center; align-items: center; min-height: 90vh; }
+        .login-box { background: var(--card-bg); width: 100%; max-width: 380px; padding: 30px; border-radius: 8px; border: 1px solid var(--input-border); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* DASHBOARD */
+        #dash { padding-top: var(--header-height); padding-bottom: 50px; }
         .nav-bar { background: var(--card-bg); border-bottom: 1px solid var(--input-border); position: sticky; top: var(--header-height); z-index: 90; display: flex; overflow-x: auto; padding: 0 10px; }
-        .nav-item { padding: 15px 20px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; font-size: 0.9rem; }
+        .nav-item { padding: 15px 20px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; }
         .nav-item.active { color: var(--text-main); border-bottom: 3px solid var(--brand-yellow); }
 
         .container { max-width: 1000px; margin: 20px auto; padding: 0 15px; }
-        .card { background: var(--card-bg); padding: 20px; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--input-border); margin-bottom: 20px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--input-border); margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .b-top { border-top: 4px solid var(--brand-blue); }
         .dark-mode .b-top { border-top-color: #3b82f6; }
-        
         h2 { font-weight: 300; font-size: 1.4rem; margin-bottom: 20px; border-bottom: 1px solid var(--input-border); padding-bottom: 10px; }
-        
-        /* Elements */
+
+        /* CONTROLS */
         .inp { width:100%; padding:12px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main); border-radius:4px; margin-bottom:10px; font-size:1rem; }
-        .btn { width:100%; padding:12px; background:var(--brand-blue); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:10px; text-transform:uppercase; font-size:0.9rem; }
+        .btn { width:100%; padding:12px; background:var(--brand-blue); color:white; border:none; border-radius:4px; font-weight:bold; cursor:pointer; margin-top:5px; text-transform:uppercase; font-size:0.9rem; }
         .btn-y { background:var(--brand-yellow); color:var(--brand-blue); }
         .btn-r { background:var(--brand-red); color:white; }
         .btn:disabled { background: var(--input-border); color:var(--text-sub); cursor:not-allowed; }
 
-        /* Active Flight */
+        /* ACTIVE FLIGHT */
         #af-ban { border-left: 5px solid var(--brand-yellow); }
-        .af-btns { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
         .prog { background: var(--input-border); height: 10px; border-radius: 5px; margin-top: 15px; overflow: hidden; }
         .fill { height: 100%; background: var(--brand-yellow); width: 0%; transition: width 0.5s; }
+        .af-btns { margin-top: 15px; display: grid; gap: 10px; } /* Stack buttons nicely */
 
-        /* Grids & Lists */
+        /* LAYOUTS */
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
         .stat { background: var(--card-bg); padding: 15px; border-radius: 8px; text-align: center; border: 1px solid var(--input-border); }
         .stat-v { font-size: 1.5rem; font-weight: 300; } .stat-l { font-size: 0.65rem; color: var(--text-sub); text-transform: uppercase; }
@@ -74,27 +92,35 @@
         .flex-row { display: flex; gap: 20px; } .col-main { flex: 2; } .col-side { flex: 1; min-width: 300px; }
         @media (max-width: 768px) { .flex-row { flex-direction: column; } .col-side { width: 100%; } }
 
+        .grid-box { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px; }
         .news-row { border-bottom: 1px solid var(--input-border); padding: 10px 0; }
         .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; color: white; font-size: 0.65rem; font-weight: bold; margin-bottom: 4px; }
         .t-URG { background: var(--brand-red); } .t-INF { background: var(--brand-blue); } .t-FLT { background: #15803d; }
-        
-        .grid-box { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:15px; }
-        
-        /* Modal */
+
+        /* MODALS */
         .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:flex; justify-content:center; align-items:center; }
         .modal-c { background:var(--card-bg); padding:20px; border-radius:8px; width:95%; max-width:600px; max-height:90vh; overflow-y:auto; }
         #map { height: 250px; background: #eee; margin: 15px 0; }
-        
+
         .footer { text-align: center; margin-top: 40px; padding: 20px; border-top: 1px solid var(--input-border); font-size: 0.75rem; color: var(--text-sub); }
     </style>
 </head>
 <body>
 
+    <div id="intro-screen">
+        <div class="intro-bg"></div>
+        <div class="intro-text">
+            <div class="intro-sub">LUFTHANSA GROUP</div>
+            <div class="intro-main">CREW PORTAL</div>
+            <div class="loader"><div class="loader-bar"></div></div>
+        </div>
+    </div>
+
     <header>
         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo">
         <div id="tools" class="tools">
-            <div id="clock" style="font-family:'Roboto Mono'; font-size:0.8rem;">00:00 Z</div>
-            <button class="btn-icon lang-pill" onclick="toggleLang()" id="btn-lang">EN</button>
+            <div id="clock" style="font-family:'Roboto Mono'; font-size:0.8rem; color:white; margin-right:10px;">00:00 Z</div>
+            <button class="btn-icon" id="btn-lang" onclick="toggleLang()" style="font-size:0.7rem; font-weight:bold; width:auto; padding:0 8px;">EN</button>
             <button class="btn-icon" onclick="toggleTheme()">🌙</button>
         </div>
     </header>
@@ -154,7 +180,7 @@
             </div>
 
             <div id="tab-news" class="hidden card b-top"><h2 data-t="news">News Center</h2><div id="full-news"></div></div>
-            
+
             <div id="tab-fleet" class="hidden card b-top">
                 <h2 data-t="fleet">Fleet Overview</h2>
                 <select id="fl-filter" class="inp" style="margin-bottom:20px;" onchange="renderFleet()"><option value="ALL">ALL OPERATORS</option></select>
@@ -177,7 +203,7 @@
             </div>
 
             <div class="footer">
-                System v42.0 (Global DB) | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Reset</span>
+                System v43.0 (Ultimate Fix) | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Reset</span>
             </div>
         </div>
     </div>
@@ -200,104 +226,69 @@
     <div id="modal-seat" class="modal hidden">
         <div class="modal-c" style="text-align:center;">
             <h3>Seat Map</h3>
-            <img id="seat-img" src="" style="width:100%; height:auto;">
+            <img id="seat-img" src="" style="width:100%; height:auto; margin-top:10px;">
             <button class="btn" style="background:#ccc; color:#333; margin-top:15px;" onclick="document.getElementById('modal-seat').classList.add('hidden')">CLOSE</button>
         </div>
     </div>
 
     <script>
         // ==========================================
-        //  === GLOBAL DATABASE (EDIT HERE!) ===
-        //  Изменяйте этот блок, чтобы данные менялись у всех
+        //  === GLOBAL DATABASE (РЕДАКТИРУЙ ЗДЕСЬ) ===
         // ==========================================
         const DB = {
-            // 1. НАСТРОЙКИ ВХОДА (LOGIN)
-            login: { 
-                callsign: "DLH001", 
-                password: "1234", 
-                name: "Capt. Hans" 
-            },
+            // 1. ВХОД (Логин/Пароль)
+            login: { callsign: "DLH001", password: "1234" },
 
-            // 2. НОВОСТИ (NEWS)
-            // tag: "URG" (Red), "INF" (Blue), "FLT" (Green)
+            // 2. НОВОСТИ
             news: [
-                { 
-                    date: "09 DEC", tag: "URG", 
-                    title_en: "System Maintenance", text_en: "Server update scheduled for 02:00Z.",
-                    title_ru: "Техническое обслуживание", text_ru: "Обновление сервера запланировано на 02:00Z."
-                },
-                { 
-                    date: "08 DEC", tag: "FLT", 
-                    title_en: "A350 Training", text_en: "New modules available in LMS.",
-                    title_ru: "Обучение A350", text_ru: "Новые модули доступны в LMS."
-                },
-                { 
-                    date: "05 DEC", tag: "INF", 
-                    title_en: "Welcome to v42", text_en: "Global static database implemented.",
-                    title_ru: "Добро пожаловать в v42", text_ru: "Внедрена глобальная статическая база данных."
-                }
+                { date: "09 DEC", tag: "URG", title_en: "System Restore", text_en: "Intro and Schedule buttons fixed.", title_ru: "Восстановление системы", text_ru: "Заставка и кнопки расписания восстановлены." },
+                { date: "08 DEC", tag: "FLT", title_en: "Winter Ops", text_en: "Check de-icing.", title_ru: "Зимние операции", text_ru: "Проверьте антиобледенение." }
             ],
 
-            // 3. ФЛОТ (FLEET)
-            // Добавляйте самолеты сюда
+            // 3. ФЛОТ (Самолеты)
             fleet: [
                 { type: "Airbus A320neo", seats: 180, range: 6, operators: ["Lufthansa", "Eurowings", "Austrian", "SAS"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/A320_seat_map.svg/300px-A320_seat_map.svg.png" },
                 { type: "Boeing 747-8", seats: 364, range: 14, operators: ["Lufthansa"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/B747-8_seat_map.svg/300px-B747-8_seat_map.svg.png" },
-                { type: "Airbus A350-900", seats: 293, range: 16, operators: ["Lufthansa", "SAS"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/A350-900_seat_map.svg/300px-A350-900_seat_map.svg.png" },
-                { type: "Airbus A220-300", seats: 145, range: 6.5, operators: ["SWISS", "AirBaltic"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/A220-300_seat_map.svg/300px-A220-300_seat_map.svg.png" },
-                { type: "Boeing 777F", seats: 0, range: 12, operators: ["Lufthansa Cargo"], map: "" }
+                { type: "Airbus A350-900", seats: 293, range: 16, operators: ["Lufthansa", "SAS"], map: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/A350-900_seat_map.svg/300px-A350-900_seat_map.svg.png" }
             ],
 
-            // 4. МАРШРУТЫ И ХАБЫ (ROUTES & HUBS)
-            // Коды авиакомпаний и их хабы
-            hubs: { 
-                "Lufthansa": ["EDDF", "EDDM"], 
-                "SWISS": ["LSZH"], 
-                "Austrian": ["LOWW"],
-                "Eurowings": ["EDDL"],
-                "Lufthansa Cargo": ["EDDF"],
-                "SAS": ["EKCH"],
-                "AirBaltic": ["EVRA"]
-            },
-            // Направления и время полета (в часах)
+            // 4. МАРШРУТЫ
+            hubs: { "Lufthansa": ["EDDF", "EDDM"], "SWISS": ["LSZH"], "Austrian": ["LOWW"], "Eurowings": ["EDDL"] },
             routes: {
                 "Lufthansa": [ {c:"KJFK", t:8.5}, {c:"EGLL", t:1.5}, {c:"KLAX", t:11.5}, {c:"RJTT", t:12.0} ],
-                "SWISS": [ {c:"KJFK", t:8.5}, {c:"ZRH", t:1.0}, {c:"WSSS", t:12.0} ],
-                "Austrian": [ {c:"VIE", t:1.2}, {c:"LIRF", t:1.5}, {c:"EFHK", t:2.4} ],
-                "Eurowings": [ {c:"LEPA", t:2.2}, {c:"EGLL", t:1.4} ],
-                "Lufthansa Cargo": [ {c:"VHHH", t:11.5}, {c:"KORD", t:9.5} ],
-                "SAS": [ {c:"EWR", t:8.8}, {c:"LHR", t:1.9} ],
-                "AirBaltic": [ {c:"LGW", t:2.5}, {c:"DXB", t:6.0} ]
+                "SWISS": [ {c:"KJFK", t:8.5}, {c:"ZRH", t:1.0} ],
+                "Austrian": [ {c:"VIE", t:1.2}, {c:"EGLL", t:2.1} ],
+                "Eurowings": [ {c:"LEPA", t:2.2} ]
             }
         };
 
-        // --- CONSTANTS ---
-        const COORDS = { "EDDF":[50.03,8.57], "EDDM":[48.35,11.78], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "KJFK":[40.64,-73.77], "EGLL":[51.47,-0.46], "KLAX":[33.94,-118.40], "RJTT":[35.54,139.77], "WSSS":[1.36,103.98], "LEPA":[39.55,2.73], "VHHH":[22.30,113.91], "KORD":[41.97,-87.90], "EKCH":[55.61,12.65], "EVRA":[56.92,23.97], "DXB":[25.25,55.36] };
-        
-        // --- TRANSLATIONS ---
+        const COORDS = { "EDDF":[50.03,8.57], "EDDM":[48.35,11.78], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "KJFK":[40.64,-73.77], "EGLL":[51.47,-0.46], "KLAX":[33.94,-118.40] };
         const I18N = {
-            en: { login:"Login", login_sub:"Identify yourself.", next:"Next", home:"Dashboard", news:"News", fleet:"Fleet", routes:"Schedule", dispatch:"Dispatch", pirep:"FILE PIREP", cancel:"CANCEL FLIGHT", legs:"Legs", hours:"Hours", rank:"Rank", notices:"Notices", new_flight:"New Flight", gen:"Generate", accept:"ACCEPT", cancel_m:"CANCEL", seat_btn:"SEAT MAP" },
-            ru: { login:"Вход", login_sub:"Представьтесь.", next:"Далее", home:"Главная", news:"Новости", fleet:"Флот", routes:"Расписание", dispatch:"Диспетчер", pirep:"ОТПРАВИТЬ PIREP", cancel:"ОТМЕНА РЕЙСА", legs:"Рейсов", hours:"Часов", rank:"Ранг", notices:"Уведомления", new_flight:"Новый рейс", gen:"Создать", accept:"ПРИНЯТЬ", cancel_m:"ОТМЕНА", seat_btn:"СХЕМА" }
+            en: { login:"Login", login_sub:"Identify yourself.", next:"Next", home:"Dashboard", news:"News", fleet:"Fleet", routes:"Schedule", dispatch:"Dispatch", pirep:"FILE PIREP", cancel:"CANCEL FLIGHT", legs:"Legs", hours:"Hours", rank:"Rank", notices:"Notices", new_flight:"New Flight", gen:"Generate", accept:"ACCEPT", cancel_m:"CANCEL", seat_btn:"SEAT MAP", select:"SELECT" },
+            ru: { login:"Вход", login_sub:"Представьтесь.", next:"Далее", home:"Главная", news:"Новости", fleet:"Флот", routes:"Расписание", dispatch:"Диспетчер", pirep:"ОТПРАВИТЬ PIREP", cancel:"ОТМЕНА РЕЙСА", legs:"Рейсов", hours:"Часов", rank:"Ранг", notices:"Уведомления", new_flight:"Новый рейс", gen:"Создать", accept:"ПРИНЯТЬ", cancel_m:"ОТМЕНА", seat_btn:"СХЕМА", select:"ВЫБРАТЬ" }
         };
 
-        // --- APP STATE ---
         let lang = localStorage.getItem('lang') || 'en';
         let stats = JSON.parse(localStorage.getItem('stats')) || { fl:0, hr:0 };
         let tempFlight = null;
         let timer = null;
 
         window.onload = () => {
+            // Hide Intro after 2.5s
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                intro.style.opacity = '0';
+                intro.style.visibility = 'hidden';
+            }, 2500);
+
             if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
             applyLang(lang);
             renderUI();
             checkFlight();
-            
-            // Clock
             setInterval(() => { const d = new Date(); document.getElementById('clock').innerText = `${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
         };
 
         function renderUI() {
-            // Dropdowns
             const sA = document.getElementById('sch-airline');
             const sD = document.getElementById('disp-airline');
             const fF = document.getElementById('fl-filter');
@@ -308,17 +299,15 @@
                 sD.add(new Option(a, a));
                 fF.add(new Option(a, a));
             });
-            sA.value = "Lufthansa"; // Default
+            sA.value = "Lufthansa";
 
-            // Stats
             document.getElementById('st-fl').innerText = stats.fl;
             document.getElementById('st-hr').innerText = Math.floor(stats.hr);
-            document.getElementById('st-rk').innerText = stats.fl > 20 ? "Captain" : (stats.fl > 5 ? "First Officer" : "Second Officer");
+            document.getElementById('st-rk').innerText = stats.fl > 20 ? "Captain" : "First Officer";
 
-            // News & Content
             renderNews();
             renderFleet();
-            renderSchedule();
+            renderSchedule(); // Now with button!
         }
 
         function renderNews() {
@@ -343,39 +332,31 @@
             });
         }
 
+        // --- ВОССТАНОВЛЕННАЯ ФУНКЦИЯ РАСПИСАНИЯ ---
         function renderSchedule() {
             const al = document.getElementById('sch-airline').value;
             const grid = document.getElementById('sch-grid');
             if(!DB.routes[al]) { grid.innerHTML = "No routes"; return; }
             
             const hub = DB.hubs[al][0];
+            const btnTxt = I18N[lang].select; // "ВЫБРАТЬ"
+            
             grid.innerHTML = DB.routes[al].map(r => `
                 <div class="card" style="margin:0; border-left:3px solid var(--brand-blue);">
                     <div style="font-weight:bold;color:var(--brand-blue);">Flight ${Math.floor(Math.random()*900)+100}</div>
                     <div style="font-size:1.1rem;">${hub} &rarr; ${r.c}</div>
                     <div style="font-size:0.8rem;color:var(--text-sub);">Time: ${r.t}h</div>
+                    <button class="btn btn-y" style="margin-top:10px;" onclick="preDispatchFlight('${al}', '${hub}', '${r.c}', ${r.t})">${btnTxt}</button>
                 </div>`).join('');
         }
 
-        function updateHubs() {
-            const al = document.getElementById('disp-airline').value;
-            const h = document.getElementById('disp-hub');
-            h.innerHTML = '';
-            if(al) { h.disabled=false; DB.hubs[al].forEach(x => h.add(new Option(x,x))); }
-            else { h.disabled=true; }
-        }
-
-        // --- ACTIONS ---
-        function doLogin() {
-            const c = document.getElementById('callsign').value.toUpperCase();
-            const p = document.getElementById('password').value;
-            if(c === DB.login.callsign && p === DB.login.password) {
-                document.getElementById('login-wrap').classList.add('hidden');
-                document.getElementById('dash').classList.remove('hidden');
-                document.getElementById('tools').classList.add('visible');
-            } else {
-                document.getElementById('login-err').innerText = "Access Denied";
-            }
+        function preDispatchFlight(airline, dep, arr, time) {
+            // Find suitable aircraft
+            const ac = DB.fleet.find(f => f.operators.includes(airline)).type;
+            const num = "FL" + Math.floor(Math.random()*900+100);
+            
+            tempFlight = { dep: dep, arr: arr, ac: ac, t: time, num: num };
+            showBriefing(tempFlight);
         }
 
         function generate() {
@@ -387,20 +368,22 @@
             const ac = DB.fleet.find(f => f.operators.includes(al)).type;
             
             tempFlight = { dep: hub, arr: r.c, ac: ac, t: r.t, num: "FL"+Math.floor(Math.random()*999) };
-            
-            document.getElementById('br-dep').innerText = tempFlight.dep;
-            document.getElementById('br-arr').innerText = tempFlight.arr;
-            document.getElementById('br-ac').innerText = tempFlight.ac;
-            document.getElementById('br-time').innerText = tempFlight.t;
-            
+            showBriefing(tempFlight);
+        }
+
+        function showBriefing(f) {
+            document.getElementById('br-dep').innerText = f.dep;
+            document.getElementById('br-arr').innerText = f.arr;
+            document.getElementById('br-ac').innerText = f.ac;
+            document.getElementById('br-time').innerText = f.t;
             document.getElementById('modal-briefing').classList.remove('hidden');
             
             setTimeout(() => {
                 document.getElementById('map').innerHTML = "";
                 const map = L.map('map').setView([50,10], 3);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-                const c1 = COORDS[tempFlight.dep] || [50,10];
-                const c2 = COORDS[tempFlight.arr] || [40,-74];
+                const c1 = COORDS[f.dep] || [50,10];
+                const c2 = COORDS[f.arr] || [40,-74];
                 L.polyline([c1, c2], {color:'#05164d'}).addTo(map); 
             }, 100);
         }
@@ -427,9 +410,8 @@
             if(timer) clearInterval(timer);
             timer = setInterval(() => {
                 const el = Date.now() - f.start;
-                const tot = f.t * 10 * 1000; // 10 sec/hour sim speed
+                const tot = f.t * 10 * 1000;
                 let pct = (el/tot)*100;
-                
                 if(pct >= 100) {
                     pct = 100;
                     document.getElementById('af-time').innerText = "ARRIVED";
@@ -443,20 +425,26 @@
             }, 1000);
         }
 
-        function finishFlight() {
-            const s = localStorage.getItem('active_flight');
-            if(s) {
-                const f = JSON.parse(s);
-                stats.fl++; stats.hr += f.t;
-                localStorage.setItem('stats', JSON.stringify(stats));
-                renderUI();
-            }
-            localStorage.removeItem('active_flight');
-            checkFlight();
+        function updateHubs() {
+            const al = document.getElementById('disp-airline').value;
+            const h = document.getElementById('disp-hub');
+            h.innerHTML = '';
+            if(al) { h.disabled=false; DB.hubs[al].forEach(x => h.add(new Option(x,x))); }
+            else { h.disabled=true; }
         }
-        function cancelFlight() { localStorage.removeItem('active_flight'); checkFlight(); }
 
-        // System
+        function doLogin() {
+            const c = document.getElementById('callsign').value.toUpperCase();
+            const p = document.getElementById('password').value;
+            if(c === DB.login.callsign && p === DB.login.password) {
+                document.getElementById('login-wrap').classList.add('hidden');
+                document.getElementById('dash').classList.remove('hidden');
+                document.getElementById('tools').classList.add('visible');
+            } else {
+                document.getElementById('login-err').innerText = "Access Denied";
+            }
+        }
+
         function tab(n, btn) {
             document.getElementById('tab-home').classList.add('hidden');
             document.getElementById('tab-news').classList.add('hidden');
@@ -467,27 +455,14 @@
             document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
         }
-        
-        function viewSeat(url) {
-            document.getElementById('seat-img').src = url;
-            document.getElementById('modal-seat').classList.remove('hidden');
-        }
 
-        function toggleLang() {
-            lang = lang === 'en' ? 'ru' : 'en';
-            localStorage.setItem('lang', lang);
-            applyLang(lang);
-            renderUI();
-        }
-        function applyLang(l) {
-            document.querySelectorAll('[data-t]').forEach(e => {
-                const k = e.getAttribute('data-t');
-                if(I18N[l][k]) e.innerText = I18N[l][k];
-            });
-            document.getElementById('btn-lang').innerText = l.toUpperCase();
-        }
+        function viewSeat(url) { document.getElementById('seat-img').src = url; document.getElementById('modal-seat').classList.remove('hidden'); }
+        function toggleLang() { lang = lang === 'en' ? 'ru' : 'en'; localStorage.setItem('lang', lang); applyLang(lang); renderUI(); }
+        function applyLang(l) { document.querySelectorAll('[data-t]').forEach(e => { const k = e.getAttribute('data-t'); if(I18N[l][k]) e.innerText = I18N[l][k]; }); document.getElementById('btn-lang').innerText = l.toUpperCase(); }
         function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); }
         function closeModal() { document.getElementById('modal-briefing').classList.add('hidden'); }
+        function finishFlight() { const s = localStorage.getItem('active_flight'); if(s) { const f = JSON.parse(s); stats.fl++; stats.hr += f.t; localStorage.setItem('stats', JSON.stringify(stats)); renderUI(); } localStorage.removeItem('active_flight'); checkFlight(); }
+        function cancelFlight() { localStorage.removeItem('active_flight'); checkFlight(); }
         function hardReset() { if(confirm("Reset Stats?")) { localStorage.clear(); location.reload(); } }
     </script>
 </body>
