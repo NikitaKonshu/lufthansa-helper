@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lufthansa Crew Portal - v29 (Stable Timer)</title>
+    <title>Lufthansa Crew Portal - v30 (Emergency Cancel)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -13,6 +13,7 @@
         :root {
             --brand-blue: #05164d;
             --brand-yellow: #ffb600;
+            --brand-red: #d90000;
             --text-main: #000000;
             --text-sub: #666666;
             --bg-main: #ffffff;
@@ -92,7 +93,7 @@
         body.dark-mode .border-brand { border-top-color: #555; }
         h2 { color: var(--text-main); font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; border-bottom: 1px solid var(--input-border); padding-bottom: 15px; }
 
-        /* ACTIVE FLIGHT BANNER (FIXED) */
+        /* ACTIVE FLIGHT BANNER */
         #active-flight-banner {
             background: var(--bg-main);
             border-left: 6px solid var(--brand-yellow);
@@ -107,20 +108,15 @@
         .af-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); letter-spacing: 1px; }
         .af-val { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
         
-        /* Animated Progress Bar */
         .progress-container { width: 100%; background: #e0e0e0; height: 10px; border-radius: 5px; margin-top: 20px; overflow: hidden; position: relative; }
         .progress-bar { 
-            height: 100%; 
-            width: 0%; 
-            background-color: var(--brand-yellow);
-            /* Striped Animation */
+            height: 100%; width: 0%; background-color: var(--brand-yellow);
             background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);
             background-size: 1rem 1rem;
             animation: progress-bar-stripes 1s linear infinite;
             transition: width 0.3s linear;
         }
         @keyframes progress-bar-stripes { 0% { background-position: 1rem 0; } 100% { background-position: 0 0; } }
-        
         .af-timer { font-family: 'Roboto Mono', monospace; font-size: 0.9rem; text-align: right; margin-top: 8px; color: var(--text-sub); font-weight: bold; }
 
         /* CARDS */
@@ -141,6 +137,9 @@
         .btn-dash-yellow { background-color: var(--brand-yellow); color: var(--brand-blue); }
         .btn-dash-yellow:hover { background-color: #e0a100; }
         .btn-dash:disabled { background-color: #ccc; cursor: not-allowed; color: #666; }
+        
+        .btn-cancel { background-color: var(--brand-red); color: white; margin-left: 10px; }
+        .btn-cancel:hover { background-color: #b30000; }
 
         /* MODAL */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 5000; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
@@ -154,7 +153,6 @@
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* FLEET & STATS */
         .fleet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .aircraft-data-box { background: rgba(0,0,0,0.05); border-radius: 4px; margin-bottom: 15px; padding: 15px; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
@@ -227,7 +225,7 @@
                     </div>
                     <div style="text-align:right;">
                         <button class="btn-dash btn-dash-yellow" id="btn-pirep" onclick="finishFlight()" style="display:none;">FILE PIREP</button>
-                        <button class="btn-dash" id="btn-cancel" onclick="cancelFlight()" style="background:#d90000; font-size:0.7rem; padding:8px 15px;">CANCEL FLIGHT</button>
+                        <button class="btn-dash btn-cancel" onclick="cancelFlight()">CANCEL FLIGHT</button>
                     </div>
                 </div>
                 <div class="progress-container">
@@ -322,58 +320,15 @@
     </div>
 
     <script>
-        // --- CONSTANTS ---
         const USERS = [{ callsign: "DLH001", pass: "1234", name: "Capt. Hans" }];
-        const SECONDS_PER_FLIGHT_HOUR = 10; // SIMULATION SPEED
+        const SECONDS_PER_FLIGHT_HOUR = 10; 
 
-        const REAL_GATES = { 
-            "EDDF": ["A13", "A20", "B24"], "EDDM": ["G08", "H12"], "KJFK": ["4", "8"], "EGLL": ["A10", "B34"], 
-            "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"], "EBBR": ["A40", "B12"], "RJTT": ["105", "107"], 
-            "FACT": ["A4", "A7"], "KLAX": ["148", "152"], "LIRF": ["E12", "D04"]
-        };
-        const AIRLINES = { 
-            "Lufthansa": { hubs: ["EDDF", "EDDM"], code: "DLH" }, 
-            "SWISS": { hubs: ["LSZH"], code: "SWR" }, 
-            "Austrian": { hubs: ["LOWW"], code: "AUA" }, 
-            "Eurowings": { hubs: ["EDDL", "EDDH"], code: "EWG" },
-            "Brussels": { hubs: ["EBBR"], code: "BEL" },
-            "Air Dolomiti": { hubs: ["LIPZ", "EDDM"], code: "DLA" },
-            "Lufthansa Cargo": { hubs: ["EDDF"], code: "GEC" },
-            "AirBaltic": { hubs: ["EVRA", "EETN"], code: "BTI" },
-            "SAS": { hubs: ["EKCH", "ESSA"], code: "SAS" }
-        };
-        const COORDS = {
-            "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56],
-            "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.99], "EBBR": [50.90, 4.48], "LIPZ": [45.50, 12.35],
-            "EVRA": [56.92, 23.97], "EKCH": [55.61, 12.65], "ESSA": [59.65, 17.92], "EETN": [59.41, 24.83],
-            "KJFK": [40.64, -73.77], "EGLL": [51.47, -0.46], "OMDB": [25.25, 55.36], "RJTT": [35.54, 139.77],
-            "FACT": [-33.97, 18.60], "KLAX": [33.94, -118.40], "KSFO": [37.62, -122.37], "VHHH": [22.30, 113.91],
-            "WSSS": [1.36, 103.98], "LFPG": [49.00, 2.55], "EHAM": [52.31, 4.76], "LIRF": [41.80, 12.24],
-            "LEMD": [40.48, -3.56], "LEBL": [41.29, 2.08], "LPPT": [38.77, -9.13], "EFHK": [60.32, 24.96],
-            "LLBG": [32.00, 34.88], "HECA": [30.11, 31.40], "KBOS": [42.36, -71.00], "KORD": [41.97, -87.90],
-            "LIPE": [44.53, 11.29], "LIPX": [45.39, 10.88], "LGAV": [37.93, 23.94], "LTBA": [40.97, 28.81],
-            "LEPA": [39.55, 2.73]
-        };
-        const REAL_ROUTES = {
-            "Lufthansa": [{code: "KJFK", h: 8.5}, {code: "KLAX", h: 11.5}, {code: "RJTT", h: 12.0}, {code: "FACT", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "LFPG", h: 1.2}],
-            "SWISS": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "WSSS", h: 12.0}],
-            "Austrian": [{code: "KJFK", h: 9.0}, {code: "EGLL", h: 2.1}, {code: "LIRF", h: 1.5}, {code: "EFHK", h: 2.4}],
-            "Eurowings": [{code: "LEPA", h: 2.2}, {code: "LEBL", h: 2.1}, {code: "EGLL", h: 1.4}, {code: "LIRF", h: 1.8}],
-            "Air Dolomiti": [{code: "LIPE", h: 0.8}, {code: "LIPX", h: 0.7}, {code: "LIPZ", h: 0.8}, {code: "EDDF", h: 0.9}],
-            "Brussels": [{code: "KJFK", h: 8.2}, {code: "FACT", h: 11.2}, {code: "EGLL", h: 0.9}, {code: "LFPG", h: 0.8}],
-            "AirBaltic": [{code: "EGLL", h: 2.5}, {code: "EDDF", h: 2.0}, {code: "EDDM", h: 1.9}, {code: "EFHK", h: 0.5}],
-            "SAS": [{code: "EGLL", h: 1.8}, {code: "KJFK", h: 8.8}, {code: "KORD", h: 9.2}, {code: "LEPA", h: 3.2}],
-            "Lufthansa Cargo": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "KORD", h: 9.5}, {code: "OMDB", h: 6.2}]
-        };
-        const FLEET = [
-            { type: "Airbus A319", maxHours: 5, seats: 138, operators: ["Lufthansa", "SWISS", "Austrian", "Brussels", "Air Dolomiti"] },
-            { type: "Airbus A320neo", maxHours: 6, seats: 180, operators: ["Lufthansa", "Eurowings", "SAS", "Austrian", "Brussels"] },
-            { type: "Airbus A220-300", maxHours: 6.5, seats: 145, operators: ["SWISS", "AirBaltic"] },
-            { type: "Airbus A330-300", maxHours: 11, seats: 255, operators: ["Lufthansa", "SWISS", "Austrian", "Brussels"] },
-            { type: "Airbus A350-900", maxHours: 16, seats: 293, operators: ["Lufthansa", "SAS"] },
-            { type: "Boeing 747-8", maxHours: 14, seats: 364, operators: ["Lufthansa"] },
-            { type: "Boeing 777F", maxHours: 12, seats: 0, operators: ["Lufthansa Cargo"] }
-        ];
+        // [CONSTANTS: GATES, AIRLINES, COORDS, ROUTES, FLEET remain same as before]
+        const REAL_GATES = { "EDDF": ["A13", "A20", "B24"], "EDDM": ["G08", "H12"], "KJFK": ["4", "8"], "EGLL": ["A10", "B34"], "LOWW": ["F01", "G03"], "LSZH": ["A06", "E18"], "EBBR": ["A40", "B12"], "RJTT": ["105", "107"], "FACT": ["A4", "A7"], "KLAX": ["148", "152"], "LIRF": ["E12", "D04"] };
+        const AIRLINES = { "Lufthansa": { hubs: ["EDDF", "EDDM"], code: "DLH" }, "SWISS": { hubs: ["LSZH"], code: "SWR" }, "Austrian": { hubs: ["LOWW"], code: "AUA" }, "Eurowings": { hubs: ["EDDL", "EDDH"], code: "EWG" }, "Brussels": { hubs: ["EBBR"], code: "BEL" }, "Air Dolomiti": { hubs: ["LIPZ", "EDDM"], code: "DLA" }, "Lufthansa Cargo": { hubs: ["EDDF"], code: "GEC" }, "AirBaltic": { hubs: ["EVRA", "EETN"], code: "BTI" }, "SAS": { hubs: ["EKCH", "ESSA"], code: "SAS" } };
+        const COORDS = { "EDDF": [50.03, 8.57], "EDDM": [48.35, 11.78], "LSZH": [47.45, 8.55], "LOWW": [48.11, 16.56], "EDDL": [51.28, 6.76], "EDDH": [53.63, 9.99], "EBBR": [50.90, 4.48], "LIPZ": [45.50, 12.35], "EVRA": [56.92, 23.97], "EKCH": [55.61, 12.65], "ESSA": [59.65, 17.92], "EETN": [59.41, 24.83], "KJFK": [40.64, -73.77], "EGLL": [51.47, -0.46], "OMDB": [25.25, 55.36], "RJTT": [35.54, 139.77], "FACT": [-33.97, 18.60], "KLAX": [33.94, -118.40], "KSFO": [37.62, -122.37], "VHHH": [22.30, 113.91], "WSSS": [1.36, 103.98], "LFPG": [49.00, 2.55], "EHAM": [52.31, 4.76], "LIRF": [41.80, 12.24], "LEMD": [40.48, -3.56], "LEBL": [41.29, 2.08], "LPPT": [38.77, -9.13], "EFHK": [60.32, 24.96], "LLBG": [32.00, 34.88], "HECA": [30.11, 31.40], "KBOS": [42.36, -71.00], "KORD": [41.97, -87.90], "LIPE": [44.53, 11.29], "LIPX": [45.39, 10.88], "LGAV": [37.93, 23.94], "LTBA": [40.97, 28.81], "LEPA": [39.55, 2.73] };
+        const REAL_ROUTES = { "Lufthansa": [{code: "KJFK", h: 8.5}, {code: "KLAX", h: 11.5}, {code: "RJTT", h: 12.0}, {code: "FACT", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "LFPG", h: 1.2}], "SWISS": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "EGLL", h: 1.5}, {code: "WSSS", h: 12.0}], "Austrian": [{code: "KJFK", h: 9.0}, {code: "EGLL", h: 2.1}, {code: "LIRF", h: 1.5}, {code: "EFHK", h: 2.4}], "Eurowings": [{code: "LEPA", h: 2.2}, {code: "LEBL", h: 2.1}, {code: "EGLL", h: 1.4}, {code: "LIRF", h: 1.8}], "Air Dolomiti": [{code: "LIPE", h: 0.8}, {code: "LIPX", h: 0.7}, {code: "LIPZ", h: 0.8}, {code: "EDDF", h: 0.9}], "Brussels": [{code: "KJFK", h: 8.2}, {code: "FACT", h: 11.2}, {code: "EGLL", h: 0.9}, {code: "LFPG", h: 0.8}], "AirBaltic": [{code: "EGLL", h: 2.5}, {code: "EDDF", h: 2.0}, {code: "EDDM", h: 1.9}, {code: "EFHK", h: 0.5}], "SAS": [{code: "EGLL", h: 1.8}, {code: "KJFK", h: 8.8}, {code: "KORD", h: 9.2}, {code: "LEPA", h: 3.2}], "Lufthansa Cargo": [{code: "KJFK", h: 8.5}, {code: "VHHH", h: 11.5}, {code: "KORD", h: 9.5}, {code: "OMDB", h: 6.2}] };
+        const FLEET = [ { type: "Airbus A319", maxHours: 5, seats: 138, operators: ["Lufthansa", "SWISS", "Austrian", "Brussels", "Air Dolomiti"] }, { type: "Airbus A320neo", maxHours: 6, seats: 180, operators: ["Lufthansa", "Eurowings", "SAS", "Austrian", "Brussels"] }, { type: "Airbus A220-300", maxHours: 6.5, seats: 145, operators: ["SWISS", "AirBaltic"] }, { type: "Airbus A330-300", maxHours: 11, seats: 255, operators: ["Lufthansa", "SWISS", "Austrian", "Brussels"] }, { type: "Airbus A350-900", maxHours: 16, seats: 293, operators: ["Lufthansa", "SAS"] }, { type: "Boeing 747-8", maxHours: 14, seats: 364, operators: ["Lufthansa"] }, { type: "Boeing 777F", maxHours: 12, seats: 0, operators: ["Lufthansa Cargo"] } ];
 
         let generatedFlightTemp = null; 
         let pilotStats = { flights: 0, hours: 0 }; 
@@ -381,18 +336,19 @@
         let progressInterval = null;
 
         window.onload = function() {
-            setTimeout(() => {
-                const ws = document.getElementById('welcome-screen'); ws.style.opacity = '0'; ws.style.visibility = 'hidden';
-            }, 3000);
+            setTimeout(() => { const ws = document.getElementById('welcome-screen'); ws.style.opacity = '0'; ws.style.visibility = 'hidden'; }, 3000);
             populateAirlinesSelect(); populateFleetFilter(); populateFleet(); loadStats(); startClock();
             
-            // Auto-check for existing flight
+            // SELF HEALING ON LOAD
             const af = localStorage.getItem('activeFlight');
             if(af) {
-                 // Try to recover state
                  try {
                      const f = JSON.parse(af);
-                     if(isNaN(f.startTime)) throw "Corrupt";
+                     // If data is corrupt (NaN time), delete it
+                     if(isNaN(f.startTime) || isNaN(f.time)) {
+                         console.log("Corrupt flight data found. Cleaning up.");
+                         localStorage.removeItem('activeFlight');
+                     }
                  } catch(e) {
                      localStorage.removeItem('activeFlight');
                  }
@@ -414,12 +370,12 @@
             } else { document.getElementById('login-error').innerText = "Authentication failed."; }
         }
 
-        // --- CORE FUNCTIONS ---
+        // --- DASHBOARD ---
         function loadStats() { const s = localStorage.getItem('pilotStats'); if(s) pilotStats = JSON.parse(s); updateStatsUI(); }
         function updateStatsUI() { document.getElementById('stat-flights').innerText = pilotStats.flights; document.getElementById('stat-hours').innerText = Math.floor(pilotStats.hours); document.getElementById('stat-rank').innerText = pilotStats.flights > 20 ? "Captain" : (pilotStats.flights > 5 ? "First Officer" : "Second Officer"); }
         function showTab(n, b) { document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden')); document.getElementById(`tab-${n}`).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active')); if(b) b.classList.add('active'); }
 
-        // --- TIMER LOGIC (ROBUST) ---
+        // --- ACTIVE FLIGHT LOGIC (WITH RESET) ---
         function checkActiveFlight() {
             const af = localStorage.getItem('activeFlight');
             if (af) {
@@ -430,12 +386,12 @@
                 document.getElementById('af-ac').innerText = flight.ac;
                 document.getElementById('af-num').innerText = flight.num;
                 
-                // Block new flights
+                // Disable booking buttons
                 document.querySelectorAll('.btn-dash-yellow').forEach(b => b.disabled = true);
                 if(document.getElementById('generate-btn')) document.getElementById('generate-btn').disabled = true;
 
                 if (progressInterval) clearInterval(progressInterval);
-                progressInterval = setInterval(() => updateProgress(flight), 100); // 100ms update for smooth UI
+                progressInterval = setInterval(() => updateProgress(flight), 100);
                 updateProgress(flight);
             } else {
                 document.getElementById('active-flight-banner').classList.add('hidden');
@@ -449,9 +405,11 @@
             const start = parseFloat(flight.startTime);
             const durationHrs = parseFloat(flight.time);
             
-            // Validation
+            // Check for NaN corruption
             if(isNaN(start) || isNaN(durationHrs)) {
-                cancelFlight(); // Corrupt data auto-fix
+                // Instead of crashing, just stop timer. The user will see the Cancel button.
+                document.getElementById('af-timer').innerText = "SYSTEM ERROR - PLEASE CANCEL";
+                if(progressInterval) clearInterval(progressInterval);
                 return;
             }
 
@@ -463,22 +421,22 @@
                 pct = 100;
                 document.getElementById('af-timer').innerText = "ARRIVED - ON BLOCKS";
                 document.getElementById('btn-pirep').style.display = 'inline-block';
-                document.getElementById('btn-cancel').style.display = 'none';
-                document.getElementById('af-progress').style.animation = 'none'; // Stop striped animation when done
-                clearInterval(progressInterval);
+                // Even when done, we leave Cancel visible just in case logic fails
+                if(progressInterval) clearInterval(progressInterval);
             } else {
                 const remainMs = totalMs - elapsed;
                 const min = Math.floor((remainMs / 1000) / 60);
                 const sec = Math.floor((remainMs / 1000) % 60);
                 document.getElementById('af-timer').innerText = `IN FLIGHT (${min}m ${sec}s)`;
                 document.getElementById('btn-pirep').style.display = 'none';
-                document.getElementById('btn-cancel').style.display = 'inline-block';
             }
             document.getElementById('af-progress').style.width = pct + "%";
         }
 
+        // FORCE CANCEL FUNCTION
         function cancelFlight() {
-            if(confirm("Cancel current flight?")) {
+            if(confirm("Are you sure you want to cancel the flight and reset the status?")) {
+                if (progressInterval) clearInterval(progressInterval);
                 localStorage.removeItem('activeFlight');
                 checkActiveFlight();
             }
@@ -495,14 +453,13 @@
             alert("PIREP Filed Successfully!");
         }
 
-        // --- HELPERS ---
+        // --- HELPERS (SAME AS BEFORE) ---
         function populateFleetFilter() { const s = document.getElementById('fleet-filter-airline'); Object.keys(AIRLINES).sort().forEach(a => { let o = document.createElement('option'); o.value = a; o.text = a; s.add(o); }); }
         function populateFleet() { const c = document.getElementById('fleet-container'); const fv = document.getElementById('fleet-filter-airline').value; c.innerHTML = ''; FLEET.filter(ac => fv === "ALL" || ac.operators.includes(fv)).forEach(ac => { c.innerHTML += `<div class="lh-card aircraft-card border-brand"><h4>${ac.type}</h4><div class="aircraft-data-box"><p>Seats: <strong>${ac.seats}</strong></p><p>Range: <strong>${ac.maxHours}h</strong></p></div></div>`; }); }
         function populateAirlinesSelect() { const s = document.getElementById('gen-airline'); const r = document.getElementById('route-airline'); Object.keys(AIRLINES).sort().forEach(a => { let o1 = document.createElement('option'); o1.value=a; o1.text=a; s.add(o1); let o2 = document.createElement('option'); o2.value=a; o2.text=a; r.add(o2); }); r.value = "Lufthansa"; }
         function updateHubs() { const a = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub'); h.innerHTML = ""; if(!a){ h.disabled=true; return; } h.disabled=false; AIRLINES[a].hubs.forEach(x => { let o = document.createElement('option'); o.value=x; o.text=x; h.add(o); }); }
         function generateGate(icao) { if (REAL_GATES[icao]) return REAL_GATES[icao][Math.floor(Math.random() * REAL_GATES[icao].length)]; return 'A' + Math.floor(Math.random()*20+1); }
 
-        // --- SCHEDULE & GENERATION ---
         function populateSchedule() {
             const an = document.getElementById('route-airline').value;
             const tf = document.getElementById('route-time').value;
@@ -510,14 +467,10 @@
             grid.innerHTML = "";
             const hubs = AIRLINES[an].hubs;
             const dests = REAL_ROUTES[an] || [];
-            
             hubs.forEach(hub => {
                 dests.forEach(dest => {
                     let pass = false;
-                    if (tf === "ALL") pass = true;
-                    else if (tf === "9+") { if(dest.h >= 9) pass = true; }
-                    else { let [min, max] = tf.split("-").map(Number); if(dest.h >= min && dest.h < max + 0.9) pass = true; }
-
+                    if (tf === "ALL") pass = true; else if (tf === "9+") { if(dest.h >= 9) pass = true; } else { let [min, max] = tf.split("-").map(Number); if(dest.h >= min && dest.h < max + 0.9) pass = true; }
                     if(pass) {
                         const suitable = FLEET.filter(ac => ac.operators.includes(an) && ac.maxHours >= dest.h);
                         if(suitable.length>0) {
@@ -533,11 +486,7 @@
             if(grid.innerHTML==="") grid.innerHTML="<div style='grid-column:1/-1;text-align:center;padding:20px;color:#999;'>No flights found.</div>";
         }
 
-        function selectSpecificFlight(dep, arr, ac, h, num) {
-            prepareFlightData(dep, arr, ac, h, num);
-            showBriefing(generatedFlightTemp);
-        }
-
+        function selectSpecificFlight(dep, arr, ac, h, num) { prepareFlightData(dep, arr, ac, h, num); showBriefing(generatedFlightTemp); }
         function generateFlight() {
             const an = document.getElementById('gen-airline').value, h = document.getElementById('gen-hub').value;
             if(!an || !h) { alert("Select Airline & Hub"); return; }
@@ -569,13 +518,10 @@
             document.getElementById('br-pax').innerText = f.pax; document.getElementById('br-zfw').innerText = (f.zfw/1000).toFixed(1)+"T";
             document.getElementById('br-gate-dep').innerText = generateGate(f.dep);
             document.getElementById('br-gate-arr').innerText = generateGate(f.arr);
-            
             document.getElementById('briefing-modal').classList.remove('hidden');
-            
             setTimeout(() => {
                 if(mapObject) { mapObject.off(); mapObject.remove(); }
-                let center = [50, 10];
-                if(f.depLat !== 0) center = [f.depLat, f.depLon];
+                let center = [50, 10]; if(f.depLat !== 0) center = [f.depLat, f.depLon];
                 mapObject = L.map('map').setView(center, 4);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: 'OSM' }).addTo(mapObject);
                 if(f.depLat !== 0 && f.arrLat !== 0) {
@@ -584,25 +530,19 @@
                 }
                 mapObject.invalidateSize();
             }, 300);
-
-            // Safe Weather
             ['br-metar-dep', 'br-metar-arr'].forEach(id => {
                 const el = document.getElementById(id); if(el) el.innerText = "Loading...";
                 const icao = id.includes('dep') ? f.dep : f.arr;
-                fetch(`https://avwx.rest/api/metar/${icao}?format=json`).then(r=>r.json())
-                    .then(d=>{ if(document.getElementById(id)) document.getElementById(id).innerText = d.raw || "N/A"; })
-                    .catch(()=>{ if(document.getElementById(id)) document.getElementById(id).innerText = "N/A (Offline)"; });
+                fetch(`https://avwx.rest/api/metar/${icao}?format=json`).then(r=>r.json()).then(d=>{ if(document.getElementById(id)) document.getElementById(id).innerText = d.raw || "N/A"; }).catch(()=>{ if(document.getElementById(id)) document.getElementById(id).innerText = "N/A (Offline)"; });
             });
         }
         
         function closeModal() { document.getElementById('briefing-modal').classList.add('hidden'); }
         function confirmBriefing() {
             closeModal();
-            // Start Timer
             generatedFlightTemp.startTime = Date.now();
             localStorage.setItem('activeFlight', JSON.stringify(generatedFlightTemp));
             checkActiveFlight();
-            // Scroll to top to see banner
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
