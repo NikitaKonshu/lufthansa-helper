@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lufthansa Crew Portal - v53 (Arcade Update)</title>
+    <title>Lufthansa Crew Portal - v54 (Gameplay Fix)</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -287,6 +287,7 @@
                         <canvas id="cvs-plane"></canvas>
                         <div id="overlay-plane" class="game-overlay">
                             <div style="font-size:1.5rem; font-weight:bold; margin-bottom:10px;">SKY AVIATOR</div>
+                            <div style="margin-bottom:15px; font-family:'Roboto Mono'">TAP TO FLY</div>
                             <button class="btn btn-y" style="width:auto; padding:10px 30px;" onclick="startGamePlane()">PLAY</button>
                         </div>
                         <div id="score-plane" class="game-score-display">0</div>
@@ -310,7 +311,7 @@
                 </div>
             </div>
 
-            <div class="footer">System v53.0 | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Factory Reset</span></div>
+            <div class="footer">System v54.0 | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Factory Reset</span></div>
         </div>
     </div>
 
@@ -355,7 +356,7 @@
             login: { callsign: "DLH001", password: "1234" },
             
             news: [
-                { date: "10 DEC", tag: "URG", title_en: "Interactive Update", text_en: "Games added. Precise time filters installed.", title_ru: "Интерактивное обновление", text_ru: "Добавлены игры. Установлены точные фильтры времени." },
+                { date: "10 DEC", tag: "URG", title_en: "Gameplay Fix", text_en: "Physics updated. Plane no longer crashes on start.", title_ru: "Исправление игры", text_ru: "Физика обновлена. Самолет больше не падает на старте." },
                 { date: "09 DEC", tag: "FLT", title_en: "Winter Ops", text_en: "De-icing required below 3°C.", title_ru: "Зимние операции", text_ru: "Обработка обязательна ниже 3°C." }
             ],
 
@@ -368,7 +369,6 @@
 
             hubs: { "Lufthansa": ["EDDF", "EDDM"], "SWISS": ["LSZH"], "Austrian": ["LOWW"], "Eurowings": ["EDDL"], "SAS": ["EKCH"], "AirBaltic": ["EVRA"] },
             
-            // Expanded Route DB for better filtering
             routes: {
                 "Lufthansa": [ {c:"EGLL",t:1.5}, {c:"CDG",t:1.2}, {c:"MAD",t:2.5}, {c:"DXB",t:6.0}, {c:"KJFK",t:8.5}, {c:"KLAX",t:11.5}, {c:"RJTT",t:12.0}, {c:"EZE",t:13.5} ],
                 "SWISS": [ {c:"LHR",t:1.8}, {c:"JFK",t:8.5}, {c:"SIN",t:12.0} ],
@@ -395,8 +395,6 @@
 
         // --- HELPER FUNCTIONS ---
         function generateGate() { const l=['A','B','C','G','Z']; return l[Math.floor(Math.random()*l.length)] + Math.floor(Math.random()*40+1); }
-        
-        // Time Filter Logic
         function checkDuration(t, filter) {
             if(filter === 'ALL') return true;
             if(filter === '1-2' && t >= 1 && t < 3) return true;
@@ -407,15 +405,12 @@
             if(filter === '10+' && t >= 10) return true;
             return false;
         }
-
-        // Smart Fleet Selection
         function getSmartPlane(airline, time) {
             const reqCat = time > 5 ? 'L' : 'S'; 
             let planes = DB.fleet.filter(f => f.operators.includes(airline) && f.cat === reqCat);
             if(planes.length === 0) planes = DB.fleet.filter(f => f.operators.includes(airline)); 
             return planes.length > 0 ? planes[Math.floor(Math.random()*planes.length)] : null;
         }
-
         function generateFakeData(acType) {
             const ac = DB.fleet.find(f => f.type === acType) || { seats: 150 };
             return {
@@ -427,21 +422,40 @@
             };
         }
 
-        // --- GAME ENGINE (CANVAS) ---
-        // PLANE GAME
-        let planeGame = { active:false, ctx:null, w:0, h:0, y:150, v:0, clouds:[], score:0, frame:0 };
+        // --- GAME: SKY AVIATOR (FIXED) ---
+        let planeGame = { active:false, ctx:null, w:0, h:0, y:150, v:0, clouds:[], score:0, frame:0, started:false };
         
         function startGamePlane() {
             const c = document.getElementById('cvs-plane');
             planeGame.ctx = c.getContext('2d');
             planeGame.w = c.width = c.offsetWidth; planeGame.h = c.height = c.offsetHeight;
-            planeGame.y = planeGame.h/2; planeGame.v = 0; planeGame.clouds = []; planeGame.score = 0; planeGame.active = true;
+            
+            // RESET PHYSICS
+            planeGame.y = planeGame.h / 2;
+            planeGame.v = 0;
+            planeGame.clouds = [];
+            planeGame.score = 0;
+            planeGame.active = true;
+            planeGame.started = false; // WAIT FOR TAP
+            
             document.getElementById('overlay-plane').classList.add('hidden');
             document.getElementById('score-plane').innerText = "0";
             
-            // Input
-            c.addEventListener('click', () => planeGame.v = -6);
-            c.addEventListener('touchstart', (e) => { e.preventDefault(); planeGame.v = -6; });
+            // CLEAR OLD LISTENERS TO PREVENT STACKING (Simple method: remove/add)
+            c.replaceWith(c.cloneNode(true));
+            const newC = document.getElementById('cvs-plane');
+            planeGame.ctx = newC.getContext('2d');
+            
+            const jump = (e) => {
+                e.preventDefault();
+                if(!planeGame.active) return;
+                planeGame.started = true; // START GRAVITY
+                planeGame.v = -4.5; // JUMP STRENGTH
+            };
+            
+            newC.addEventListener('click', jump);
+            newC.addEventListener('touchstart', jump);
+            
             loopPlane();
         }
 
@@ -453,32 +467,42 @@
             // Sky
             ctx.fillStyle = "#87CEEB"; ctx.fillRect(0,0,planeGame.w,planeGame.h);
             
-            // Plane
-            planeGame.v += 0.3; // Gravity
-            planeGame.y += planeGame.v;
-            ctx.fillStyle = "#ffb600"; ctx.fillRect(50, planeGame.y, 30, 20); // Plane body
-            ctx.fillStyle = "#05164d"; ctx.fillRect(70, planeGame.y+5, 10, 5); // Cockpit
-            
-            // Clouds/Obstacles
-            if(planeGame.frame % 100 === 0) {
-                planeGame.clouds.push({x:planeGame.w, y:Math.random()*(planeGame.h-100), w:40, h:40, type:'storm'});
+            if (!planeGame.started) {
+                // HOVER EFFECT
+                planeGame.y = (planeGame.h / 2) + Math.sin(Date.now() / 200) * 5;
+                // Text
+                ctx.fillStyle = "white"; ctx.font = "bold 20px Roboto"; ctx.textAlign = "center";
+                ctx.fillText("TAP TO FLY", planeGame.w/2, planeGame.h/2 + 40);
+            } else {
+                // PHYSICS
+                planeGame.v += 0.15; // LIGHT GRAVITY
+                planeGame.y += planeGame.v;
             }
             
-            planeGame.clouds.forEach((c, i) => {
-                c.x -= 3;
-                ctx.fillStyle = c.type==='storm' ? '#d50000' : 'white';
-                ctx.beginPath(); ctx.arc(c.x+20, c.y+20, 20, 0, Math.PI*2); ctx.fill();
-                
-                // Collision
-                if(50 < c.x + c.w && 50 + 30 > c.x && planeGame.y < c.y + c.h && planeGame.y + 20 > c.y) {
-                    endGamePlane();
+            // Plane
+            ctx.fillStyle = "#ffb600"; ctx.fillRect(50, planeGame.y, 30, 20);
+            ctx.fillStyle = "#05164d"; ctx.fillRect(70, planeGame.y+5, 10, 5);
+            
+            if (planeGame.started) {
+                // Clouds
+                if(planeGame.frame % 100 === 0) {
+                    planeGame.clouds.push({x:planeGame.w, y:Math.random()*(planeGame.h-100), w:40, h:40});
                 }
                 
-                if(c.x < -50) { planeGame.clouds.splice(i, 1); planeGame.score++; document.getElementById('score-plane').innerText = planeGame.score; }
-            });
-            
-            // Boundaries
-            if(planeGame.y < 0 || planeGame.y > planeGame.h) endGamePlane();
+                planeGame.clouds.forEach((c, i) => {
+                    c.x -= 3;
+                    ctx.fillStyle = '#d50000';
+                    ctx.beginPath(); ctx.arc(c.x+20, c.y+20, 20, 0, Math.PI*2); ctx.fill();
+                    
+                    // Collision
+                    if(50 < c.x + c.w && 80 > c.x && planeGame.y < c.y + c.h && planeGame.y + 20 > c.y) {
+                        endGamePlane();
+                    }
+                    if(c.x < -50) { planeGame.clouds.splice(i, 1); planeGame.score++; document.getElementById('score-plane').innerText = planeGame.score; }
+                });
+                
+                if(planeGame.y < 0 || planeGame.y > planeGame.h) endGamePlane();
+            }
             
             planeGame.frame++;
             requestAnimationFrame(loopPlane);
@@ -489,7 +513,7 @@
             document.getElementById('overlay-plane').classList.remove('hidden');
         }
 
-        // SNAKE GAME
+        // SNAKE GAME (UNCHANGED)
         let snakeGame = { active:false, ctx:null, w:0, h:0, grid:20, snake:[], food:{}, dx:20, dy:0, score:0 };
         function startGameSnake() {
             const c = document.getElementById('cvs-snake');
@@ -503,7 +527,8 @@
             
             // Inputs
             document.addEventListener('keydown', changeDir);
-            c.addEventListener('click', () => { // Simple touch control: turn right relative to current
+            c.replaceWith(c.cloneNode(true));
+            document.getElementById('cvs-snake').addEventListener('click', () => { 
                if(snakeGame.dx !== 0) { snakeGame.dy = snakeGame.dx > 0 ? 20 : -20; snakeGame.dx = 0; }
                else { snakeGame.dx = snakeGame.dy > 0 ? -20 : 20; snakeGame.dy = 0; }
             });
@@ -522,15 +547,12 @@
 
         function changeDir(e) {
             const k = e.keyCode;
-            const up=38, down=40, left=37, right=39;
-            if(k===left && snakeGame.dx===0) { snakeGame.dx=-20; snakeGame.dy=0; }
-            if(k===up && snakeGame.dy===0) { snakeGame.dy=-20; snakeGame.dx=0; }
-            if(k===right && snakeGame.dx===0) { snakeGame.dx=20; snakeGame.dy=0; }
-            if(k===down && snakeGame.dy===0) { snakeGame.dy=20; snakeGame.dx=0; }
+            if(k===37 && snakeGame.dx===0) { snakeGame.dx=-20; snakeGame.dy=0; }
+            if(k===38 && snakeGame.dy===0) { snakeGame.dy=-20; snakeGame.dx=0; }
+            if(k===39 && snakeGame.dx===0) { snakeGame.dx=20; snakeGame.dy=0; }
+            if(k===40 && snakeGame.dy===0) { snakeGame.dy=20; snakeGame.dx=0; }
         }
-
         function placeFood() { snakeGame.food = {x: Math.floor(Math.random()*(snakeGame.w/20))*20, y: Math.floor(Math.random()*(snakeGame.h/20))*20}; }
-
         function updateSnake() {
             const head = {x: snakeGame.snake[0].x + snakeGame.dx, y: snakeGame.snake[0].y + snakeGame.dy};
             snakeGame.snake.unshift(head);
@@ -538,27 +560,16 @@
                 snakeGame.score++; document.getElementById('score-snake').innerText = snakeGame.score;
                 placeFood();
             } else { snakeGame.snake.pop(); }
-            
-            // Collision wall
             if(head.x < 0 || head.x >= snakeGame.w || head.y < 0 || head.y >= snakeGame.h) endGameSnake();
-            // Collision self
-            for(let i=1; i<snakeGame.snake.length; i++) {
-                if(head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) endGameSnake();
-            }
+            for(let i=1; i<snakeGame.snake.length; i++) { if(head.x === snakeGame.snake[i].x && head.y === snakeGame.snake[i].y) endGameSnake(); }
         }
-
         function drawSnake() {
             snakeGame.ctx.fillStyle = '#1e293b'; snakeGame.ctx.fillRect(0,0,snakeGame.w,snakeGame.h);
-            snakeGame.ctx.fillStyle = '#ffb600'; // Food
-            snakeGame.ctx.fillRect(snakeGame.food.x, snakeGame.food.y, 18, 18);
-            snakeGame.ctx.fillStyle = '#4ade80'; // Snake
-            snakeGame.snake.forEach(part => snakeGame.ctx.fillRect(part.x, part.y, 18, 18));
+            snakeGame.ctx.fillStyle = '#ffb600'; snakeGame.ctx.fillRect(snakeGame.food.x, snakeGame.food.y, 18, 18);
+            snakeGame.ctx.fillStyle = '#4ade80'; snakeGame.snake.forEach(part => snakeGame.ctx.fillRect(part.x, part.y, 18, 18));
         }
+        function endGameSnake() { snakeGame.active = false; document.getElementById('overlay-snake').classList.remove('hidden'); }
 
-        function endGameSnake() {
-            snakeGame.active = false;
-            document.getElementById('overlay-snake').classList.remove('hidden');
-        }
 
         // --- INIT APP ---
         window.onload = () => {
