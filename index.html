@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lufthansa Crew Portal - v51 (Restored Design)</title>
+    <title>Lufthansa Crew Portal - v52 (Games & Fixes)</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
         /* ============================
-           1. PREMIUM DESIGN SYSTEM (RESTORED)
+           1. DESIGN SYSTEM
            ============================ */
         :root {
             --brand-blue: #05164d;
@@ -32,14 +32,23 @@
             --trans: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
+        /* DARK MODE FIXES (High Contrast) */
         body.dark-mode {
-            --bg-main: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-sub: #94a3b8;
-            --input-bg: #0f172a; --input-border: #334155; --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            --bg-main: #0f172a; 
+            --card-bg: #1e293b; 
+            --text-main: #f1f5f9; /* Almost White */
+            --text-sub: #cbd5e1;  /* Light Grey */
+            --input-bg: #0f172a; 
+            --input-border: #475569; 
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
         body.dark-mode .nav-bar-container { background: var(--card-bg); border-color: var(--input-border); }
         body.dark-mode .nav-item { color: var(--text-sub); } 
-        body.dark-mode .nav-item.active { color: var(--text-main); }
+        body.dark-mode .nav-item.active { color: #60a5fa; border-bottom-color: var(--brand-yellow); }
         body.dark-mode .login-box { background: var(--card-bg); border-color: var(--input-border); }
+        /* Fix for inputs in dark mode */
+        body.dark-mode select, body.dark-mode input { color: #fff; background: #0f172a; }
+        body.dark-mode h2, body.dark-mode h3, body.dark-mode h4 { color: #fff; }
 
         * { margin:0; padding:0; box-sizing:border-box; font-family:var(--font-main); -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; transition: background 0.3s ease; }
@@ -58,7 +67,7 @@
         .btn-icon { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; transition: var(--trans); }
         .lang-pill { font-size:0.75rem; font-weight:bold; width: auto; padding: 0 12px; border-radius: 20px; }
 
-        /* INTRO SCREEN (RESTORED) */
+        /* INTRO SCREEN */
         #intro-screen { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; 
             background: var(--brand-blue); display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -71,8 +80,6 @@
         }
         @keyframes zoom { from { transform: scale(1); } to { transform: scale(1.1); } }
         .intro-content { z-index: 2; text-align: center; color: white; }
-        .intro-sub { letter-spacing: 4px; font-size: 0.9rem; margin-bottom: 10px; opacity: 0.9; text-transform: uppercase; }
-        .intro-main { font-size: 2.5rem; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; }
         .loader { width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--brand-yellow); border-radius: 50%; animation: spin 1s infinite linear; margin: 30px auto 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -87,7 +94,6 @@
         /* DASHBOARD LAYOUT */
         #dash { padding-top: var(--header-height); padding-bottom: 60px; }
         
-        /* Navigation Bar - Centered */
         .nav-bar-container { 
             background: var(--card-bg); border-bottom: 1px solid var(--input-border); 
             position: sticky; top: var(--header-height); z-index: 90; 
@@ -100,8 +106,9 @@
             border-bottom: 3px solid transparent; transition: var(--trans); 
         }
         .nav-item.active { color: var(--brand-blue); border-bottom-color: var(--brand-yellow); }
+        /* Special style for Games tab */
+        #nav-games { color: var(--brand-yellow); }
 
-        /* Main Content - Centered */
         .container { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
         
         .card { 
@@ -112,6 +119,7 @@
         @keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
         
         .b-top { border-top: 4px solid var(--brand-blue); }
+        .dark-mode .b-top { border-top-color: #3b82f6; }
         h2 { font-weight: 300; font-size: 1.6rem; margin-bottom: 25px; border-bottom: 1px solid var(--input-border); padding-bottom: 15px; }
 
         /* UI COMPONENTS */
@@ -127,7 +135,13 @@
         .btn-r { background:var(--brand-red); color:white; }
         .btn:disabled { background: var(--input-border); color: var(--text-sub); cursor: not-allowed; }
 
-        /* DAILY MISSION CARD */
+        /* GAMES SECTION */
+        .game-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .game-card { border: 1px solid var(--input-border); border-radius: 8px; padding: 20px; text-align: center; background: var(--bg-main); }
+        .game-score { font-size: 2rem; font-weight: bold; color: var(--brand-blue); margin: 10px 0; }
+        body.dark-mode .game-score { color: #60a5fa; }
+
+        /* MISSION CARD */
         .mission-card { background: linear-gradient(135deg, var(--brand-blue) 0%, #1a3c8a 100%); color: white; border: none; }
         .mission-badge { background: var(--brand-yellow); color: var(--brand-blue); font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
 
@@ -184,6 +198,7 @@
             .grid-box { grid-template-columns: 1fr; }
             .briefing-grid { grid-template-columns: 1fr 1fr; }
             .modal-c { padding: 20px; }
+            .game-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -225,7 +240,8 @@
                 <button class="nav-item" onclick="tab('news', this)" data-t="news">News</button>
                 <button class="nav-item" onclick="tab('fleet', this)" data-t="fleet">Fleet</button>
                 <button class="nav-item" onclick="tab('routes', this)" data-t="routes">Schedule</button>
-                <button class="nav-item" onclick="tab('dispatch', this)" data-t="dispatch">Dispatch</button>
+                <button class="nav-item" onclick="tab('dispatch', this)" data-t="gen_btn">Generator</button>
+                <button class="nav-item hidden" id="nav-games" onclick="tab('games', this)">🎮 Games</button>
             </nav>
         </div>
 
@@ -296,7 +312,7 @@
             </div>
 
             <div id="tab-dispatch" class="tab-content hidden card b-top">
-                <h2 data-t="dispatch">Flight Dispatch</h2>
+                <h2 data-t="gen_title">Random Flight Generator</h2>
                 <label class="label">Operator</label><select id="disp-airline" class="inp" onchange="updateHubs()"></select>
                 <label class="label">Departure Hub</label><select id="disp-hub" class="inp" disabled></select>
                 <label class="label">Duration Preference</label><select id="disp-time" class="inp">
@@ -305,7 +321,25 @@
                 <button class="btn" onclick="generate()" data-t="gen">Generate Flight Plan</button>
             </div>
 
-            <div class="footer">System v51.0 | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Factory Reset</span></div>
+            <div id="tab-games" class="tab-content hidden card b-top">
+                <h2>In-Flight Entertainment</h2>
+                <div class="game-grid">
+                    <div class="game-card">
+                        <h3>☕ Coffee Break</h3>
+                        <p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:10px;">Stay awake!</p>
+                        <div id="coffee-count" class="game-score">0</div>
+                        <button class="btn btn-y" onclick="drinkCoffee()">DRINK</button>
+                    </div>
+                    <div class="game-card">
+                        <h3>⏱️ Reflex Test</h3>
+                        <p style="font-size:0.8rem; color:var(--text-sub); margin-bottom:10px;">Stop exactly at 5.00s</p>
+                        <div id="reflex-timer" class="game-score">0.00</div>
+                        <button class="btn" id="btn-reflex" onclick="toggleReflex()">START</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">System v52.0 | <span style="text-decoration:underline; cursor:pointer;" onclick="hardReset()">Factory Reset</span></div>
         </div>
     </div>
 
@@ -350,7 +384,7 @@
             login: { callsign: "DLH001", password: "1234" },
             
             news: [
-                { date: "10 DEC", tag: "URG", title_en: "Design Restored", text_en: "Rolled back to v49 layout with v50 logic.", title_ru: "Дизайн восстановлен", text_ru: "Откат к дизайну v49 с сохранением логики v50." },
+                { date: "10 DEC", tag: "URG", title_en: "Update v52", text_en: "Games added for active flights. Dark Mode fixed.", title_ru: "Обновление v52", text_ru: "Добавлены игры для активных рейсов. Исправлена темная тема." },
                 { date: "09 DEC", tag: "FLT", title_en: "Winter Ops", text_en: "De-icing required below 3°C.", title_ru: "Зимние операции", text_ru: "Обработка обязательна ниже 3°C." }
             ],
 
@@ -381,8 +415,8 @@
         const COORDS = { "EDDF":[50.03,8.57], "EDDM":[48.35,11.78], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "KJFK":[40.64,-73.77], "EGLL":[51.47,-0.46], "KLAX":[33.94,-118.40], "RJTT":[35.54,139.77], "DXB":[25.25,55.36], "WSSS":[1.36,103.98], "VHHH":[22.30,113.91], "KORD":[41.97,-87.90], "VIE":[48.11,16.56], "CDG":[49.00,2.55] };
         
         const I18N = {
-            en: { login:"Crew Login", login_sub:"Please identify yourself.", next:"Authenticate", home:"Dashboard", news:"News", fleet:"Fleet", routes:"Schedule", dispatch:"Dispatch", pirep:"FILE PIREP", cancel:"CANCEL FLIGHT", legs:"Legs Flown", hours:"Total Hours", rank:"Current Rank", notices:"Operational Notices", new_flight:"Dispatch Flight", gen:"Generate Flight Plan", accept:"ACCEPT FLIGHT", cancel_m:"CANCEL", seat_btn:"SEAT MAP", select:"SELECT", active_flight:"ACTIVE FLIGHT", daily:"DAILY MISSION" },
-            ru: { login:"Вход в систему", login_sub:"Пожалуйста, представьтесь.", next:"Войти", home:"Главная", news:"Новости", fleet:"Флот", routes:"Расписание", dispatch:"Диспетчер", pirep:"ОТПРАВИТЬ PIREP", cancel:"ОТМЕНА РЕЙСА", legs:"Рейсов", hours:"Часов", rank:"Ранг", notices:"Уведомления", new_flight:"Создать Рейс", gen:"Создать План", accept:"ПРИНЯТЬ РЕЙС", cancel_m:"ОТМЕНА", seat_btn:"СХЕМА", select:"ВЫБРАТЬ", active_flight:"АКТИВНЫЙ РЕЙС", daily:"ЕЖЕДНЕВНОЕ ЗАДАНИЕ" }
+            en: { login:"Crew Login", login_sub:"Please identify yourself.", next:"Authenticate", home:"Dashboard", news:"News", fleet:"Fleet", routes:"Schedule", gen_btn:"Generator", gen_title:"Random Flight Generator", pirep:"FILE PIREP", cancel:"CANCEL FLIGHT", legs:"Legs Flown", hours:"Total Hours", rank:"Current Rank", notices:"Operational Notices", new_flight:"Dispatch New Flight", gen:"Generate Flight Plan", accept:"ACCEPT FLIGHT", cancel_m:"CANCEL", seat_btn:"SEAT MAP", select:"SELECT", active_flight:"ACTIVE FLIGHT", daily:"DAILY MISSION" },
+            ru: { login:"Вход в систему", login_sub:"Пожалуйста, представьтесь.", next:"Войти", home:"Главная", news:"Новости", fleet:"Флот", routes:"Расписание", gen_btn:"Генератор", gen_title:"Генератор Рейсов", pirep:"ОТПРАВИТЬ PIREP", cancel:"ОТМЕНА РЕЙСА", legs:"Рейсов", hours:"Часов", rank:"Ранг", notices:"Уведомления", new_flight:"Создать Рейс", gen:"Создать План", accept:"ПРИНЯТЬ РЕЙС", cancel_m:"ОТМЕНА", seat_btn:"СХЕМА", select:"ВЫБРАТЬ", active_flight:"АКТИВНЫЙ РЕЙС", daily:"ЕЖЕДНЕВНОЕ ЗАДАНИЕ" }
         };
 
         let lang = localStorage.getItem('lang') || 'en';
@@ -392,10 +426,16 @@
         let mapObject = null;
         let missionFlight = null;
 
+        // Games State
+        let coffee = 0;
+        let reflexInterval = null;
+        let reflexStart = 0;
+        let reflexRunning = false;
+
         // --- HELPER FUNCTIONS ---
         function generateGate() { const l=['A','B','C','G','Z']; return l[Math.floor(Math.random()*l.length)] + Math.floor(Math.random()*40+1); }
         
-        // Smart Fleet Selection Logic (v50 Logic)
+        // Smart Fleet Selection Logic
         function getSmartPlane(airline, time) {
             const reqCat = time > 5 ? 'L' : 'S'; // Long haul if > 5 hours
             let planes = DB.fleet.filter(f => f.operators.includes(airline) && f.cat === reqCat);
@@ -538,7 +578,6 @@
             if(cands.length === 0) { alert("No routes match criteria."); return; }
             
             const r = cands[Math.floor(Math.random()*cands.length)];
-            // SMART LOGIC APPLIED HERE TOO
             const planeObj = getSmartPlane(al, r.t);
             if(!planeObj) { alert("No aircraft found for this route."); return; }
 
@@ -584,8 +623,15 @@
 
         function checkFlight() {
             const s = localStorage.getItem('active_flight');
-            if(!s) { document.getElementById('af-ban').classList.add('hidden'); document.getElementById('mission-box').classList.remove('hidden'); return; }
+            // GAME VISIBILITY LOGIC
+            if(!s) { 
+                document.getElementById('af-ban').classList.add('hidden'); 
+                document.getElementById('mission-box').classList.remove('hidden');
+                document.getElementById('nav-games').classList.add('hidden'); // Hide Games
+                return; 
+            }
             
+            document.getElementById('nav-games').classList.remove('hidden'); // Show Games
             document.getElementById('mission-box').classList.add('hidden');
             const f = JSON.parse(s);
             document.getElementById('af-ban').classList.remove('hidden');
@@ -622,8 +668,31 @@
             }
             localStorage.removeItem('active_flight');
             checkFlight();
+            tab('home');
         }
-        function cancelFlight() { localStorage.removeItem('active_flight'); checkFlight(); }
+        function cancelFlight() { localStorage.removeItem('active_flight'); checkFlight(); tab('home'); }
+
+        // --- GAMES ---
+        function drinkCoffee() {
+            coffee++;
+            document.getElementById('coffee-count').innerText = coffee;
+        }
+        function toggleReflex() {
+            const btn = document.getElementById('btn-reflex');
+            if(!reflexRunning) {
+                reflexRunning = true;
+                btn.innerText = "STOP";
+                reflexStart = Date.now();
+                reflexInterval = setInterval(() => {
+                    const t = (Date.now() - reflexStart) / 1000;
+                    document.getElementById('reflex-timer').innerText = t.toFixed(2);
+                }, 10);
+            } else {
+                reflexRunning = false;
+                clearInterval(reflexInterval);
+                btn.innerText = "RESET";
+            }
+        }
 
         function doLogin() {
             const c = document.getElementById('callsign').value.toUpperCase();
