@@ -3,240 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lufthansa Crew Portal - v58 (Desktop Pro)</title>
-    
+    <title>Lufthansa Crew Portal - v59 (Restored Logic)</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
-        /* === CONFIG === */
+        /* === CORE STYLES === */
         :root {
-            --lh-blue: #05164d; --lh-blue-light: #1a3c8a;
-            --lh-yellow: #ffb600; --lh-grey: #e6e9ed;
-            --bg-body: #f1f5f9; --bg-card: #ffffff;
-            --text-main: #1e293b; --text-light: #64748b;
-            --nav-h: 60px; --head-h: 70px;
-            --radius: 8px; --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --brand-blue: #05164d; --brand-yellow: #ffb600; --brand-red: #d50000;
+            --bg-main: #f4f6f9; --card-bg: #ffffff; --text-main: #1a202c; --text-sub: #718096;
+            --input-bg: #ffffff; --input-border: #cbd5e0;
+            --header-height: 70px; --font-main: 'Roboto', sans-serif;
+            --radius: 8px; --shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
         }
-
         body.dark-mode {
-            --bg-body: #0f172a; --bg-card: #1e293b;
-            --text-main: #f8fafc; --text-light: #94a3b8;
-            --lh-grey: #334155; --shadow: 0 10px 15px -3px rgba(0,0,0,0.5);
+            --bg-main: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --text-sub: #94a3b8;
+            --input-bg: #0f172a; --input-border: #334155; --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
-        body.dark-mode input, body.dark-mode select { background: #0f172a; color: white; border-color: #334155; }
+        body.dark-mode select, body.dark-mode input { color: #fff; background: #0f172a; border-color: #475569; }
 
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Roboto', sans-serif; }
-        body { background: var(--bg-body); color: var(--text-main); min-height: 100vh; padding-top: calc(var(--head-h) + var(--nav-h)); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:var(--font-main); -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-main); color: var(--text-main); min-height: 100vh; padding-top: var(--header-height); }
         .hidden { display: none !important; }
 
-        /* === INTRO SCREEN === */
-        #intro {
-            position: fixed; top:0; left:0; width:100%; height:100%; 
-            background: var(--lh-blue); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: white; transition: opacity 0.8s ease;
+        /* === INTRO === */
+        #intro-screen { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; 
+            background: var(--brand-blue); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1s ease, visibility 1s;
         }
-        .intro-logo { width: 80px; margin-bottom: 20px; animation: fadeIn 1s ease; }
-        .intro-text { font-size: 2rem; font-weight: 300; letter-spacing: 2px; animation: slideUp 1s ease 0.3s backwards; }
-        .intro-sub { font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; opacity: 0.7; animation: slideUp 1s ease 0.6s backwards; }
-        
-        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-        @keyframes slideUp { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+        .intro-bg { position: absolute; top:0; left:0; width:100%; height:100%; background: url('https://images.unsplash.com/photo-1520437358207-323b43b50729?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover; opacity: 0.3; animation: zoom 10s forwards; }
+        @keyframes zoom { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .intro-content { z-index: 2; text-align: center; color: white; }
+        .intro-main { font-size: 3rem; font-weight: 300; letter-spacing: 2px; text-transform: uppercase; animation: slideIn 1.5s ease forwards; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .loader { width: 40px; height: 40px; border: 2px solid rgba(255,255,255,0.1); border-top: 2px solid var(--brand-yellow); border-radius: 50%; animation: spin 1s infinite linear; margin: 40px auto 0 auto; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* === HEADER === */
-        header {
-            position: fixed; top: 0; left: 0; width: 100%; height: var(--head-h);
-            background: var(--lh-blue); z-index: 2000;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        header { 
+            background: var(--brand-blue); height: var(--header-height); position: fixed; top:0; width:100%; z-index: 2000;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 30px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
         }
-        .logo-img { height: 30px; filter: brightness(0) invert(1); }
-        .user-panel { display: flex; gap: 20px; align-items: center; color: white; font-weight: 500; }
+        .logo { height: 28px; filter: brightness(0) invert(1); }
+        .tools { display: flex; gap: 20px; align-items: center; color: white; opacity: 0; transition: 0.5s; }
+        .tools.visible { opacity: 1; }
 
         /* === NAVIGATION === */
-        .nav-wrap {
-            position: fixed; top: var(--head-h); left: 0; width: 100%; height: var(--nav-h);
-            background: var(--bg-card); border-bottom: 1px solid var(--lh-grey); z-index: 1900;
-            display: flex; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        .nav { display: flex; gap: 10px; height: 100%; align-items: center; max-width: 1200px; width: 100%; padding: 0 20px; overflow-x: auto; }
-        .nav-btn {
-            background: none; border: none; height: 100%; padding: 0 20px;
-            font-size: 0.95rem; font-weight: 600; color: var(--text-light); cursor: pointer;
-            border-bottom: 3px solid transparent; transition: 0.2s; white-space: nowrap;
-        }
-        .nav-btn:hover { color: var(--lh-blue); }
-        .nav-btn.active { color: var(--lh-blue); border-bottom-color: var(--lh-yellow); }
-        body.dark-mode .nav-btn.active { color: #60a5fa; }
+        .nav-bar-container { background: var(--card-bg); border-bottom: 1px solid var(--input-border); position: sticky; top: var(--header-height); z-index: 900; }
+        .nav-bar { max-width: 1200px; margin: 0 auto; display: flex; overflow-x: auto; justify-content: center; padding: 0 10px; }
+        .nav-item { padding: 20px 25px; background: none; border: none; color: var(--text-sub); font-weight: 600; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .nav-item.active { color: var(--brand-blue); border-bottom-color: var(--brand-yellow); }
+        body.dark-mode .nav-item.active { color: #60a5fa; }
+        #nav-games { color: #f59e0b; margin-left: auto; }
 
-        /* === LAYOUT & GRID === */
-        .container {
-            max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%;
-        }
+        /* === LAYOUT GRID === */
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
         
-        /* Desktop Grid for Dashboard */
-        .dash-grid {
-            display: grid; grid-template-columns: 2fr 1fr; gap: 25px;
-        }
+        .dash-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; } /* Desktop Layout */
         
-        .card {
-            background: var(--bg-card); border-radius: var(--radius); padding: 25px;
-            box-shadow: var(--shadow); border: 1px solid var(--lh-grey); margin-bottom: 25px;
-        }
+        .card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--input-border); margin-bottom: 25px; }
+        h2 { font-weight: 300; font-size: 1.6rem; margin-bottom: 20px; border-bottom: 1px solid var(--input-border); padding-bottom: 15px; }
+
+        /* === UI ELEMENTS === */
+        .label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-sub); margin-bottom: 8px; text-transform: uppercase; }
+        .inp { width:100%; padding:12px; border:1px solid var(--input-border); background:var(--input-bg); color:var(--text-main); border-radius:4px; font-size:1rem; outline:none; margin-bottom: 15px; }
+        .btn { width:100%; padding:14px; background:var(--brand-blue); color:white; border:none; border-radius:4px; font-weight:700; cursor:pointer; text-transform:uppercase; transition:0.2s; }
+        .btn:hover { opacity: 0.9; }
+        .btn-y { background:var(--brand-yellow); color:var(--brand-blue); }
+        .btn-r { background:var(--brand-red); color:white; }
+
+        /* === SPECIFIC MODULES === */
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat { background: var(--card-bg); padding: 20px; border-radius: var(--radius); text-align: center; border: 1px solid var(--input-border); }
+        .stat-v { font-size: 2rem; font-weight: 300; } 
         
-        h2 { font-weight: 300; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px solid var(--lh-grey); padding-bottom: 10px; }
+        .af-card { border-left: 5px solid var(--brand-yellow); }
+        .af-head { display:flex; justify-content:space-between; align-items: flex-end; }
+        .af-route { font-size: 1.8rem; font-weight: 300; line-height: 1; }
+        .prog { background: var(--input-border); height: 8px; border-radius: 4px; margin-top: 20px; overflow: hidden; }
+        .fill { height: 100%; background: var(--brand-yellow); width: 0%; transition: width 0.5s linear; }
 
-        /* === MODULES === */
+        .mission-card { background: linear-gradient(135deg, var(--brand-blue) 0%, #1a3c8a 100%); color: white; border: none; }
         
-        /* Stats */
-        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-card { background: var(--bg-card); border: 1px solid var(--lh-grey); padding: 20px; border-radius: var(--radius); text-align: center; }
-        .stat-val { font-size: 2.2rem; font-weight: 300; color: var(--lh-blue); }
-        body.dark-mode .stat-val { color: white; }
-        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: var(--text-light); letter-spacing: 1px; }
-
-        /* Active Flight */
-        .af-card { border-left: 5px solid var(--lh-yellow); }
-        .af-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; }
-        .af-route { font-size: 2rem; line-height: 1; font-weight: 300; }
-        .af-det { font-family: 'Roboto Mono'; color: var(--text-light); margin-top: 5px; }
-        .bar-track { height: 8px; background: var(--lh-grey); border-radius: 4px; overflow: hidden; }
-        .bar-fill { height: 100%; background: var(--lh-yellow); width: 0%; transition: width 1s linear; }
-
-        /* Forms & Buttons */
-        .inp-g { margin-bottom: 15px; }
-        .lbl { display: block; font-size: 0.7rem; font-weight: bold; margin-bottom: 5px; color: var(--text-light); text-transform: uppercase; }
-        .inp { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 1rem; }
-        .btn { width: 100%; padding: 12px; background: var(--lh-blue); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
-        .btn:hover { background: var(--lh-blue-light); }
-        .btn-y { background: var(--lh-yellow); color: var(--lh-blue); }
-        .btn-red { background: #dc2626; color: white; }
-
-        /* Login Screen */
-        #login-wrap {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-body); z-index: 5000;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .login-box {
-            width: 400px; padding: 40px; background: var(--bg-card);
-            border-radius: var(--radius); box-shadow: var(--shadow); text-align: center;
-        }
-
-        /* Lists */
-        .item-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        /* === GAMES CANVAS (RESTORED FROM V56) === */
+        .game-canvas-wrap { position: relative; width: 100%; height: 350px; background: #333; border-radius: 8px; overflow: hidden; margin-top: 15px; touch-action: none; margin-bottom: 10px; }
+        .tetris-wrap { width: 100%; max-width: 300px; height: 500px; margin: 0 auto; background: #111; border-radius: 8px; position: relative; overflow: hidden; border: 2px solid #333; }
+        canvas { display: block; width: 100%; height: 100%; }
+        .game-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; z-index: 10; }
+        .game-ctrl-row { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .g-btn { padding: 10px 15px; background: #e2e8f0; border: none; border-radius: 4px; font-size: 1.2rem; cursor: pointer; }
         
-        /* Modal */
-        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(5,22,77,0.9); z-index: 8000; display:flex; justify-content:center; align-items:center; }
-        .modal-box { width: 700px; max-height: 90vh; background: var(--bg-card); padding: 30px; border-radius: var(--radius); overflow-y: auto; }
-        .brief-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; background: var(--bg-body); padding: 15px; border-radius: 6px; }
-
-        /* Game Area (Minimal) */
-        #game-container { text-align: center; background: #111; padding: 20px; border-radius: 8px; color: white; }
-        canvas { border: 1px solid #333; margin: 10px auto; display: block; }
-        .game-controls { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .g-btn { width: 50px; height: 50px; background: #333; border: 1px solid #555; color: white; border-radius: 8px; font-size: 1.2rem; cursor: pointer; }
-        .g-btn:active { background: #555; }
-
-        /* Mobile Responsive */
+        /* === RESPONSIVE === */
         @media (max-width: 900px) {
-            .dash-grid { grid-template-columns: 1fr; }
-            .brief-grid { grid-template-columns: 1fr 1fr; }
-            .stats-row { grid-template-columns: 1fr; }
-            .stat-card { display: flex; justify-content: space-between; align-items: center; text-align: left; }
-            header { padding: 0 20px; }
+            .dash-layout { grid-template-columns: 1fr; }
+            .nav-bar { justify-content: flex-start; }
         }
+        
+        /* LOGIN */
+        #login-wrap { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-main); z-index: 5000; display: flex; align-items: center; justify-content: center; }
+        .login-box { width: 90%; max-width: 400px; background: var(--card-bg); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); text-align: center; }
+        
+        /* MODAL */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(5, 22, 77, 0.9); z-index:3000; display:flex; justify-content:center; align-items:center; backdrop-filter: blur(5px); }
+        .modal-c { background:var(--card-bg); padding:35px; border-radius:var(--radius); width:95%; max-width:700px; max-height:90vh; overflow-y:auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .briefing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; background: var(--bg-main); padding: 15px; border-radius: 6px; }
+        #map { height: 250px; background: #eee; margin-bottom: 20px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <div id="intro">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="intro-logo" style="filter: brightness(0) invert(1);">
-        <div class="intro-text">Lufthansa Systems</div>
-        <div class="intro-sub">Crew Operations Portal</div>
+    <div id="intro-screen">
+        <div class="intro-bg"></div>
+        <div class="intro-content">
+            <div style="letter-spacing:6px; font-size:0.9rem; margin-bottom:15px;">LUFTHANSA GROUP</div>
+            <div class="intro-main">CREW PORTAL</div>
+            <div class="loader"></div>
+        </div>
     </div>
 
     <div id="login-wrap">
         <div class="login-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Lufthansa_Logo_2018.svg/1200px-Lufthansa_Logo_2018.svg.png" style="height:40px; margin-bottom:20px;">
-            <div class="inp-g"><input type="text" id="user" class="inp" placeholder="Callsign (DLH001)"></div>
-            <div class="inp-g"><input type="password" id="pass" class="inp" placeholder="Password (1234)"></div>
-            <button class="btn" onclick="app.login()">Authenticate</button>
-            <p id="login-err" style="color: red; margin-top: 10px; font-size: 0.9rem;"></p>
+            <h2 style="border:none;">Crew Login</h2>
+            <input type="text" id="callsign" class="inp" placeholder="Callsign">
+            <input type="password" id="password" class="inp" placeholder="Password">
+            <button class="btn" onclick="doLogin()">Enter Portal</button>
+            <p id="login-err" style="color:var(--brand-red); margin-top:15px;"></p>
         </div>
     </div>
 
     <header>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-img">
-        <div class="user-panel">
-            <span id="clock" style="font-family:'Roboto Mono'">00:00 Z</span>
-            <span onclick="app.theme()" style="cursor:pointer; font-size:1.2rem;">🌙</span>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo">
+        <div class="tools">
+            <span id="clock" style="font-family:'Roboto Mono'; margin-right:15px;">00:00 Z</span>
+            <span onclick="toggleTheme()" style="cursor:pointer; font-size:1.2rem;">🌙</span>
         </div>
     </header>
 
-    <div class="nav-wrap hidden" id="nav-bar">
-        <div class="nav">
-            <button class="nav-btn active" onclick="app.tab('dash', this)">Dashboard</button>
-            <button class="nav-btn" onclick="app.tab('fleet', this)">Fleet</button>
-            <button class="nav-btn" onclick="app.tab('schedule', this)">Schedule</button>
-            <button class="nav-btn" onclick="app.tab('dispatch', this)">Generator</button>
-            <button class="nav-btn" onclick="app.tab('rest', this)" style="margin-left:auto; opacity:0.6;">☕ Rest Area</button>
-        </div>
+    <div class="nav-bar-container hidden" id="nav-container">
+        <nav class="nav-bar">
+            <button class="nav-item active" onclick="tab('dash', this)">Dashboard</button>
+            <button class="nav-item" onclick="tab('fleet', this)">Fleet</button>
+            <button class="nav-item" onclick="tab('routes', this)">Schedule</button>
+            <button class="nav-item" onclick="tab('dispatch', this)">Generator</button>
+            <button class="nav-item" id="nav-games" onclick="tab('games', this)">🎮 Rest Area</button>
+        </nav>
     </div>
 
-    <div class="container hidden" id="main-content">
+    <div class="container hidden" id="main-app">
         
         <div id="tab-dash" class="tab-content">
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-lbl">Flights</div>
-                    <div class="stat-val" id="st-fl">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Hours</div>
-                    <div class="stat-val" id="st-hr">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Rank</div>
-                    <div class="stat-val" id="st-rk" style="color:var(--lh-yellow); font-size:1.5rem;">-</div>
-                </div>
+            <div class="stats">
+                <div class="stat"><div class="stat-v" id="st-fl">0</div><div style="font-size:0.8rem; color:var(--text-sub)">FLIGHTS</div></div>
+                <div class="stat"><div class="stat-v" id="st-hr">0</div><div style="font-size:0.8rem; color:var(--text-sub)">HOURS</div></div>
+                <div class="stat"><div class="stat-v" id="st-rk" style="color:var(--brand-yellow)">-</div><div style="font-size:0.8rem; color:var(--text-sub)">RANK</div></div>
             </div>
 
-            <div class="dash-grid">
+            <div class="dash-layout">
                 <div>
-                    <div id="af-card" class="card af-card hidden">
-                        <div class="af-top">
-                            <div>
-                                <div class="lbl" style="color:var(--lh-yellow);">ACTIVE FLIGHT</div>
-                                <div class="af-route"><span id="af-dep"></span> &rarr; <span id="af-arr"></span></div>
-                                <div class="af-det"><span id="af-num"></span> • <span id="af-ac"></span></div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div id="af-timer" style="font-size:1.5rem; font-weight:bold;">00:00</div>
-                                <div class="lbl">REMAINING</div>
-                            </div>
-                        </div>
-                        <div class="bar-track"><div id="af-bar" class="bar-fill"></div></div>
-                        <div style="margin-top:15px; display:flex; gap:10px;">
-                            <button class="btn btn-y hidden" id="btn-pirep" onclick="app.finish()">FILE REPORT</button>
-                            <button class="btn btn-red" onclick="app.cancel()">CANCEL</button>
-                        </div>
-                    </div>
-
-                    <div id="mission-card" class="card" style="background: linear-gradient(135deg, #05164d 0%, #1a3c8a 100%); color:white;">
+                    <div id="mission-box" class="card mission-card">
                         <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                             <span style="background:#ffb600; color:#05164d; font-size:0.7rem; font-weight:bold; padding:2px 6px; border-radius:4px;">DAILY MISSION</span>
                             <span id="mis-date" style="font-size:0.8rem; opacity:0.8;"></span>
                         </div>
                         <div id="mis-txt" style="font-size:1.5rem; font-weight:300;">Loading...</div>
-                        <button class="btn" style="background:rgba(255,255,255,0.2); width:auto; margin-top:15px;" onclick="app.acceptMission()">FLY THIS ROUTE</button>
+                        <button class="btn" style="background:rgba(255,255,255,0.2); width:auto; margin-top:15px;" onclick="acceptMission()">FLY THIS ROUTE</button>
+                    </div>
+
+                    <div id="af-card" class="card af-card hidden">
+                        <div class="af-head">
+                            <div>
+                                <div class="label" style="color:var(--brand-yellow);">ACTIVE FLIGHT</div>
+                                <div class="af-route"><span id="af-dep"></span> &rarr; <span id="af-arr"></span></div>
+                                <div style="font-family:'Roboto Mono'; margin-top:5px;"><span id="af-num"></span> • <span id="af-ac"></span></div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div id="af-timer" style="font-size:1.5rem; font-weight:bold;">00:00</div>
+                                <div class="label">REMAINING</div>
+                            </div>
+                        </div>
+                        <div class="prog"><div id="af-bar" class="fill"></div></div>
+                        <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <button class="btn btn-y hidden" id="btn-pirep" onclick="finishFlight()">FILE REPORT</button>
+                            <button class="btn btn-r" onclick="cancelFlight()">CANCEL</button>
+                        </div>
                     </div>
                 </div>
 
                 <div class="card">
-                    <h2>News Center</h2>
+                    <h2>Operational News</h2>
                     <div id="news-list"></div>
                 </div>
             </div>
@@ -245,302 +202,305 @@
         <div id="tab-fleet" class="tab-content hidden">
             <div class="card">
                 <h2>Fleet Overview</h2>
-                <div class="item-list" id="fleet-list"></div>
+                <div style="margin-bottom:20px;"><span class="label">Filter Operator</span><select id="fl-filter" class="inp" onchange="renderFleet()"><option value="ALL">ALL</option></select></div>
+                <div id="fleet-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:20px;"></div>
             </div>
         </div>
 
-        <div id="tab-schedule" class="tab-content hidden">
+        <div id="tab-routes" class="tab-content hidden">
             <div class="card">
                 <h2>Flight Schedule</h2>
-                <div style="display:flex; gap:15px; margin-bottom:20px;">
-                    <div style="flex:1;"><span class="lbl">Airline</span><select id="sch-al" class="inp" onchange="app.renderSch()"></select></div>
-                    <div style="flex:1;"><span class="lbl">Duration</span><select id="sch-tm" class="inp" onchange="app.renderSch()">
-                        <option value="ALL">All</option>
-                        <option value="1-2">Short (1-2h)</option>
-                        <option value="3-4">Medium (3-4h)</option>
-                        <option value="5-6">Long (5-6h)</option>
-                        <option value="7-8">Extended (7-8h)</option>
-                        <option value="9-10">Ultra (9-10h)</option>
-                        <option value="10+">Max (10h+)</option>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+                    <div><span class="label">Airline</span><select id="sch-al" class="inp" onchange="renderSchedule()"></select></div>
+                    <div><span class="label">Duration</span><select id="sch-tm" class="inp" onchange="renderSchedule()">
+                        <option value="ALL">All Durations</option>
+                        <option value="1-2">Short (1-2 Hours)</option>
+                        <option value="3-4">Medium (3-4 Hours)</option>
+                        <option value="5-6">Long (5-6 Hours)</option>
+                        <option value="7-8">Extended (7-8 Hours)</option>
+                        <option value="9-10">Ultra (9-10 Hours)</option>
+                        <option value="10+">Max Range (10+ Hours)</option>
                     </select></div>
                 </div>
-                <div class="item-list" id="sch-list"></div>
+                <div id="sch-list" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:20px;"></div>
             </div>
         </div>
 
         <div id="tab-dispatch" class="tab-content hidden">
             <div class="card" style="max-width:600px; margin:0 auto;">
-                <h2>Flight Dispatch Generator</h2>
-                <div class="inp-g"><span class="lbl">Operator</span><select id="gen-al" class="inp" onchange="app.updHub()"></select></div>
-                <div class="inp-g"><span class="lbl">Departure Hub</span><select id="gen-hub" class="inp" disabled></select></div>
-                <div class="inp-g"><span class="lbl">Target Duration</span><select id="gen-tm" class="inp">
+                <h2>Flight Dispatch</h2>
+                <div class="label">Operator</div><select id="gen-al" class="inp" onchange="updateHubs()"></select>
+                <div class="label">Departure Hub</div><select id="gen-hub" class="inp" disabled></select>
+                <div class="label">Duration Target</div><select id="gen-tm" class="inp">
                     <option value="ALL">Random</option>
-                    <option value="1-2">1-2 Hours</option>
-                    <option value="3-4">3-4 Hours</option>
-                    <option value="5-6">5-6 Hours</option>
-                    <option value="10+">10+ Hours</option>
-                </select></div>
-                <button class="btn" onclick="app.gen()">Generate Flight Plan</button>
+                    <option value="1-2">Short (1-2 Hours)</option>
+                    <option value="3-4">Medium (3-4 Hours)</option>
+                    <option value="5-6">Long (5-6 Hours)</option>
+                    <option value="10+">Ultra Long (10+ Hours)</option>
+                </select>
+                <button class="btn" onclick="generate()">Generate Flight Plan</button>
             </div>
         </div>
 
-        <div id="tab-rest" class="tab-content hidden">
-            <div class="card" style="max-width:500px; margin:0 auto;">
+        <div id="tab-games" class="tab-content hidden">
+            <div class="card" style="max-width:800px; margin:0 auto;">
                 <h2>Crew Rest Area</h2>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <button class="btn" onclick="game.start('snake')">Snake</button>
-                    <button class="btn" onclick="game.start('tetris')">Tetris</button>
-                </div>
-                <div id="game-container" class="hidden">
-                    <div id="g-score" style="font-size:1.5rem; color:var(--lh-yellow); font-weight:bold;">0</div>
-                    <canvas id="cvs"></canvas>
-                    <div class="game-controls">
-                        <button class="g-btn" onclick="game.input('l')">←</button>
-                        <button class="g-btn" onclick="game.input('d')">↓</button>
-                        <button class="g-btn" onclick="game.input('r')">→</button>
-                        <button class="g-btn" style="background:var(--lh-yellow); color:black;" onclick="game.input('rot')">⟳</button>
+                
+                <div style="margin-bottom:40px;">
+                    <div style="display:flex; justify-content:space-between;"><h3>✈️ Sky Aviator</h3><div>Physics Enabled</div></div>
+                    <div class="game-canvas-wrap">
+                        <canvas id="cvs-plane"></canvas>
+                        <div id="overlay-plane" class="game-overlay"><div style="font-size:1.5rem; font-weight:bold; margin-bottom:10px;">SKY AVIATOR</div><button class="btn btn-y" style="width:auto; padding:10px 30px;" onclick="startGamePlane()">FLY</button></div>
+                        <div id="score-plane" style="position:absolute; top:10px; right:15px; color:white; font-size:1.2rem; font-weight:bold; z-index:5;">0</div>
                     </div>
-                    <button class="btn" style="background:#333; margin-top:20px;" onclick="game.stop()">Quit Game</button>
                 </div>
+
+                <div style="margin-bottom:40px;">
+                    <div style="display:flex; justify-content:space-between;"><h3>🐍 Runway Snake</h3><div>Fixed Controls</div></div>
+                    <div class="game-canvas-wrap">
+                        <canvas id="cvs-snake"></canvas>
+                        <div id="overlay-snake" class="game-overlay"><div style="font-size:1.5rem; font-weight:bold; margin-bottom:10px;">SNAKE</div><button class="btn btn-y" style="width:auto; padding:10px 30px;" onclick="startGameSnake()">PLAY</button></div>
+                        <div id="score-snake" style="position:absolute; top:10px; right:15px; color:white; font-size:1.2rem; font-weight:bold; z-index:5;">0</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="display:flex; justify-content:space-between;"><h3>📦 Cargo Loader</h3><div>Fixed Layout</div></div>
+                    <div class="tetris-wrap">
+                        <canvas id="cvs-tetris"></canvas>
+                        <div id="overlay-tetris" class="game-overlay"><div style="font-size:1.5rem; font-weight:bold; margin-bottom:10px;">TETRIS</div><button class="btn btn-y" style="width:auto; padding:10px 30px;" onclick="startGameTetris()">START</button></div>
+                        <div id="score-tetris" style="position:absolute; top:10px; right:15px; color:white; font-size:1.2rem; font-weight:bold; z-index:5;">0</div>
+                    </div>
+                    <div class="game-ctrl-row">
+                        <button class="g-btn" onclick="tetrisInput('l')">←</button>
+                        <button class="g-btn" onclick="tetrisInput('d')">↓</button>
+                        <button class="g-btn" onclick="tetrisInput('r')">→</button>
+                        <button class="g-btn" style="background:var(--brand-yellow); border:none;" onclick="tetrisInput('rot')">⟳</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 
     </div>
 
-    <div id="mod-brief" class="modal hidden">
-        <div class="modal-box">
-            <div style="display:flex; justify-content:space-between; border-bottom:2px solid var(--lh-blue); padding-bottom:10px;">
-                <h3>OFP BRIEFING</h3>
-                <h3 style="color:var(--lh-blue);" id="br-num"></h3>
+    <div id="modal-brief" class="modal hidden">
+        <div class="modal-c">
+            <div style="border-bottom:2px solid var(--brand-blue); padding-bottom:10px; margin-bottom:15px; display:flex; justify-content:space-between;">
+                <h3>OFP BRIEFING</h3><h3 style="color:var(--brand-blue);" id="br-num"></h3>
             </div>
-            <div class="brief-grid">
-                <div><div class="lbl">ORIGIN</div><span id="br-dep"></span></div>
-                <div><div class="lbl">DEST</div><span id="br-arr"></span></div>
-                <div><div class="lbl">ETE</div><span id="br-time"></span></div>
-                <div><div class="lbl">AIRCRAFT</div><span id="br-ac"></span></div>
-                <div><div class="lbl">PAX</div><span id="br-pax"></span></div>
-                <div><div class="lbl">ZFW</div><span id="br-zfw"></span></div>
-                <div><div class="lbl">GATE</div><span id="br-gate"></span></div>
-                <div><div class="lbl">FL</div><span id="br-fl"></span></div>
+            <div class="briefing-grid">
+                <div><div class="label">DEP</div><span id="br-dep"></span></div>
+                <div><div class="label">ARR</div><span id="br-arr"></span></div>
+                <div><div class="label">ETE</div><span id="br-time"></span></div>
+                <div><div class="label">AC</div><span id="br-ac"></span></div>
+                <div><div class="label">PAX</div><span id="br-pax"></span></div>
+                <div><div class="label">ZFW</div><span id="br-zfw"></span></div>
+                <div><div class="label">GATE</div><span id="br-gate"></span></div>
+                <div><div class="label">FL</div><span id="br-fl"></span></div>
             </div>
-            <div id="map" style="height:250px; background:#ddd; margin-bottom:20px; border-radius:4px;"></div>
+            <div id="map"></div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <button class="btn btn-y" onclick="app.accept()">ACCEPT FLIGHT</button>
-                <button class="btn" style="background:#e5e7eb; color:#333;" onclick="document.getElementById('mod-brief').classList.add('hidden')">DECLINE</button>
+                <button class="btn btn-y" onclick="acceptBriefing()">ACCEPT</button>
+                <button class="btn" style="background:#e2e8f0; color:#333;" onclick="document.getElementById('modal-brief').classList.add('hidden')">DECLINE</button>
             </div>
         </div>
     </div>
 
     <script>
-        const app = {
-            db: {
-                user: {u:"DLH001", p:"1234"},
-                stats: JSON.parse(localStorage.getItem('stats'))||{fl:0, hr:0},
-                hubs: {"Lufthansa":["EDDF","EDDM"],"SWISS":["LSZH"],"Austrian":["LOWW"],"Eurowings":["EDDL"],"SAS":["EKCH"]},
-                fleet: [
-                    {t:"Airbus A320neo", c:"S", s:180, r:6, op:["Lufthansa","Eurowings","Austrian","SAS"]},
-                    {t:"Boeing 747-8", c:"L", s:364, r:14, op:["Lufthansa"]},
-                    {t:"Airbus A350-900", c:"L", s:293, r:16, op:["Lufthansa","SAS"]},
-                    {t:"Airbus A220", c:"S", s:145, r:6, op:["SWISS"]}
-                ],
-                routes: {
-                    "Lufthansa": [{c:"EGLL",t:1.5},{c:"CDG",t:1.2},{c:"MAD",t:2.5},{c:"JFK",t:8.5},{c:"LAX",t:11.5},{c:"HND",t:12.5},{c:"EZE",t:13.8},{c:"DXB",t:6.2}],
-                    "SWISS": [{c:"LHR",t:1.8},{c:"JFK",t:8.5},{c:"SIN",t:12.0}],
-                    "Austrian": [{c:"LHR",t:2.2},{c:"BKK",t:10.5}],
-                    "Eurowings": [{c:"PMI",t:2.2},{c:"LHR",t:1.4}],
-                    "SAS": [{c:"LHR",t:1.9},{c:"EWR",t:8.8}]
-                },
-                news: [
-                    {t:"Update v58.0", d:"Desktop layout optimized. Grid view enabled."},
-                    {t:"Winter Ops", d:"De-icing required below 3°C."}
-                ]
-            },
-            coords: {"EDDF":[50,8],"EDDM":[48,11],"LSZH":[47,8],"LOWW":[48,16],"EGLL":[51,0],"JFK":[40,-73],"LAX":[34,-118],"HND":[35,139],"EZE":[-34,-58]},
-            state: {temp:null, map:null, timer:null, mis:null},
-
-            init: function() {
-                setTimeout(() => { document.getElementById('intro').style.opacity=0; setTimeout(()=>document.getElementById('intro').classList.add('hidden'),800); }, 2000);
-                if(localStorage.getItem('dark')==='1') document.body.classList.add('dark-mode');
-                setInterval(()=>document.getElementById('clock').innerText=new Date().toISOString().substr(11,5)+" Z", 1000);
-                this.render(); this.checkActive(); this.genMis();
-            },
-
-            login: function() {
-                if(document.getElementById('user').value.toUpperCase()===this.db.user.u && document.getElementById('pass').value===this.db.user.p) {
-                    document.getElementById('login-wrap').classList.add('hidden');
-                    document.getElementById('nav-bar').classList.remove('hidden');
-                    document.getElementById('main-content').classList.remove('hidden');
-                } else document.getElementById('login-err').innerText="Invalid Credentials";
-            },
-
-            tab: function(id, btn) {
-                document.querySelectorAll('.tab-content').forEach(e=>e.classList.add('hidden'));
-                document.getElementById('tab-'+id).classList.remove('hidden');
-                document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
-                if(btn) btn.classList.add('active');
-            },
-
-            render: function() {
-                document.getElementById('st-fl').innerText=this.db.stats.fl;
-                document.getElementById('st-hr').innerText=Math.floor(this.db.stats.hr);
-                document.getElementById('st-rk').innerText=this.db.stats.fl>20?"CPT":(this.db.stats.fl>5?"FO":"SO");
-                
-                // News
-                document.getElementById('news-list').innerHTML=this.db.news.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--lh-grey); padding-bottom:10px;"><div style="font-weight:bold; color:var(--lh-blue);">${n.t}</div><div style="font-size:0.9rem; color:var(--text-light);">${n.d}</div></div>`).join('');
-                
-                // Fleet
-                document.getElementById('fleet-list').innerHTML=this.db.fleet.map(f=>`<div class="card" style="margin:0;"><h4>${f.t}</h4><div style="font-size:0.9rem; color:var(--text-light);">${f.s} Pax | ${f.r}h Range</div></div>`).join('');
-                
-                // Selects
-                const s1=document.getElementById('sch-al'), s2=document.getElementById('gen-al');
-                s1.innerHTML=''; s2.innerHTML='<option value="">-- Operator --</option>';
-                Object.keys(this.db.hubs).forEach(k=>{ s1.add(new Option(k,k)); s2.add(new Option(k,k)); });
-                
-                this.renderSch();
-            },
-
-            renderSch: function() {
-                const al=document.getElementById('sch-al').value, tm=document.getElementById('sch-tm').value;
-                if(!this.db.routes[al]) { document.getElementById('sch-list').innerHTML="No routes"; return; }
-                const res = this.db.routes[al].filter(r=>this.chkDur(r.t, tm));
-                document.getElementById('sch-list').innerHTML = res.length ? res.map(r=>`<div class="card" style="margin:0; border-left:4px solid var(--lh-blue); display:flex; justify-content:space-between; align-items:center;"><div><strong>${this.db.hubs[al][0]} &rarr; ${r.c}</strong><br><small>${r.t}h</small></div><button class="btn btn-y" style="width:auto; padding:8px;" onclick="app.prep('${al}','${this.db.hubs[al][0]}','${r.c}',${r.t})">SELECT</button></div>`).join('') : "No flights";
-            },
-
-            chkDur: function(t,f) {
-                if(f==='ALL') return true;
-                const [min,max] = f.includes('+') ? [10,99] : f.split('-').map(Number);
-                return t>=min && t<(max||99);
-            },
-
-            updHub: function() {
-                const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub');
-                h.innerHTML=''; h.disabled=!al;
-                if(al) this.db.hubs[al].forEach(x=>h.add(new Option(x,x)));
-            },
-
-            gen: function() {
-                const al=document.getElementById('gen-al').value, hub=document.getElementById('gen-hub').value, tm=document.getElementById('gen-tm').value;
-                if(!al||!hub)return;
-                const v=this.db.routes[al].filter(r=>this.chkDur(r.t,tm));
-                if(!v.length){alert("No matching routes");return;}
-                const r=v[Math.floor(Math.random()*v.length)];
-                this.prep(al,hub,r.c,r.t);
-            },
-
-            getPl: function(al,t) {
-                const c=t>5?'L':'S';
-                let p=this.db.fleet.filter(f=>f.op.includes(al)&&f.c===c);
-                if(!p.length)p=this.db.fleet.filter(f=>f.op.includes(al));
-                return p.length?p[Math.floor(Math.random()*p.length)]:null;
-            },
-
-            prep: function(al,d,a,t) {
-                const p=this.getPl(al,t); if(!p){alert("No plane");return;}
-                this.state.temp={dep:d,arr:a,time:t,ac:p.t,num:"LH"+Math.floor(Math.random()*8999+1000),pax:Math.floor(p.s*0.8),zfw:(40+Math.random()*20).toFixed(1)+"T",gate:"A"+Math.floor(Math.random()*40),fl:"FL"+(300+Math.floor(Math.random()*10)*10)};
-                
-                ['dep','arr','ac','num','pax','zfw','gate','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.state.temp[k]||this.state.temp[k=='time'?'time':'']);
-                document.getElementById('br-time').innerText=t+"h";
-                document.getElementById('mod-brief').classList.remove('hidden');
-                
-                setTimeout(()=>{
-                    if(this.state.map) this.state.map.remove();
-                    this.state.map=L.map('map').setView([50,10],3);
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.state.map);
-                    const c1=this.coords[d]||[50,10], c2=this.coords[a]||[40,-70];
-                    L.polyline([c1,c2],{color:'#05164d'}).addTo(this.state.map);
-                },200);
-            },
-
-            accept: function() {
-                this.state.temp.start=Date.now();
-                localStorage.setItem('active', JSON.stringify(this.state.temp));
-                document.getElementById('mod-brief').classList.add('hidden');
-                this.checkActive(); this.tab('dash', document.querySelectorAll('.nav-btn')[0]);
-            },
-
-            checkActive: function() {
-                const s=localStorage.getItem('active');
-                if(!s) {
-                    document.getElementById('af-card').classList.add('hidden');
-                    document.getElementById('mission-card').classList.remove('hidden');
-                    return;
-                }
-                const f=JSON.parse(s);
-                document.getElementById('af-card').classList.remove('hidden');
-                document.getElementById('mission-card').classList.add('hidden');
-                ['dep','arr','num','ac'].forEach(k=>document.getElementById('af-'+k).innerText=f[k]);
-                
-                if(this.state.timer) clearInterval(this.state.timer);
-                this.state.timer = setInterval(()=>{
-                    const el=Date.now()-f.start, dur=f.time*10000, pct=Math.min(100,(el/dur)*100); // 1h = 10s
-                    document.getElementById('af-bar').style.width=pct+"%";
-                    document.getElementById('af-timer').innerText = pct>=100?"ARRIVED":"IN FLIGHT";
-                    if(pct>=100) document.getElementById('btn-pirep').classList.remove('hidden');
-                },1000);
-            },
-
-            finish: function() {
-                const f=JSON.parse(localStorage.getItem('active'));
-                this.db.stats.fl++; this.db.stats.hr+=f.time;
-                localStorage.setItem('stats',JSON.stringify(this.db.stats));
-                localStorage.removeItem('active'); this.checkActive(); this.render();
-            },
-            cancel: function(){localStorage.removeItem('active');this.checkActive();},
-            genMis: function(){const s=new Date().getDate(), al="Lufthansa", r=this.db.routes[al][s%this.db.routes[al].length]; this.state.mis={al,dep:this.db.hubs[al][0],arr:r.c,t:r.t}; document.getElementById('mis-date').innerText=new Date().toLocaleDateString(); document.getElementById('mis-txt').innerText=`${this.state.mis.dep} ➝ ${r.c}`;},
-            acceptMission: function(){this.prep(this.state.mis.al,this.state.mis.dep,this.state.mis.arr,this.state.mis.t);},
-            theme: function(){document.body.classList.toggle('dark-mode'); localStorage.setItem('dark',document.body.classList.contains('dark-mode')?'1':'0');}
-        };
-
-        // === MINI GAMES (REST AREA) ===
-        const game = {
-            ctx: null, run: false, type: null, st: {},
-            start: function(t) {
-                const c=document.getElementById('cvs');
-                c.width=200; c.height=400; this.ctx=c.getContext('2d');
-                this.type=t; this.run=true;
-                document.getElementById('game-container').classList.remove('hidden');
-                if(t==='snake') { this.st={s:[{x:5,y:5}],d:{x:0,y:1},f:{x:2,y:8},sc:0}; this.loopS(); }
-                if(t==='tetris') { this.st={bd:Array(20).fill().map(()=>Array(10).fill(0)),cur:this.getT(),sc:0}; this.loopT(); }
-            },
-            stop: function(){this.run=false; document.getElementById('game-container').classList.add('hidden');},
-            loopS: function() {
-                if(!this.run||this.type!=='snake')return;
-                const h={x:this.st.s[0].x+this.st.d.x, y:this.st.s[0].y+this.st.d.y};
-                if(h.x<0||h.x>=10||h.y<0||h.y>=20) return this.stop();
-                this.st.s.unshift(h);
-                if(h.x==this.st.f.x && h.y==this.st.f.y) {this.st.sc++; document.getElementById('g-score').innerText=this.st.sc; this.st.f={x:Math.floor(Math.random()*10),y:Math.floor(Math.random()*20)};}
-                else this.st.s.pop();
-                
-                this.ctx.fillStyle='#222'; this.ctx.fillRect(0,0,200,400);
-                this.ctx.fillStyle='lime'; this.st.s.forEach(p=>this.ctx.fillRect(p.x*20,p.y*20,19,19));
-                this.ctx.fillStyle='red'; this.ctx.fillRect(this.st.f.x*20,this.st.f.y*20,19,19);
-                setTimeout(()=>this.loopS(),200);
-            },
-            // Tetris minimal logic
-            getT: function(){return {m:[[1,1],[1,1]],x:4,y:0};},
-            loopT: function(){
-                if(!this.run||this.type!=='tetris')return;
-                this.st.cur.y++; 
-                if(this.st.cur.y>18) { // Simple ground hit
-                     this.st.cur.y=0; this.st.sc+=10; document.getElementById('g-score').innerText=this.st.sc;
-                }
-                this.ctx.fillStyle='#222'; this.ctx.fillRect(0,0,200,400);
-                this.ctx.fillStyle='cyan'; 
-                this.st.cur.m.forEach((r,dy)=>r.forEach((v,dx)=>{if(v)this.ctx.fillRect((this.st.cur.x+dx)*20,(this.st.cur.y+dy)*20,19,19)}));
-                setTimeout(()=>this.loopT(),300);
-            },
-            input: function(k) {
-                if(this.type==='snake') {
-                    if(k==='l')this.st.d={x:-1,y:0}; if(k==='r')this.st.d={x:1,y:0};
-                    if(k==='rot')this.st.d={x:0,y:-1}; if(k==='d')this.st.d={x:0,y:1};
-                }
-                if(this.type==='tetris') {
-                    if(k==='l')this.st.cur.x--; if(k==='r')this.st.cur.x++;
-                }
+        // === RESTORED V56 DATA & LOGIC ===
+        const DB = {
+            login: { u: "DLH001", p: "1234" },
+            news: [{t:"System Restored v59", d:"Full logic + Desktop layout."}, {t:"Winter Ops", d:"De-icing required < 3°C."}],
+            fleet: [
+                { type: "Airbus A320neo", cat: "S", seats: 180, range: 6, operators: ["Lufthansa", "Eurowings", "Austrian", "SAS"] },
+                { type: "Boeing 747-8", cat: "L", seats: 364, range: 14, operators: ["Lufthansa"] },
+                { type: "Airbus A350-900", cat: "L", seats: 293, range: 16, operators: ["Lufthansa", "SAS"] },
+                { type: "Airbus A220", cat: "S", seats: 145, range: 6, operators: ["SWISS", "AirBaltic"] }
+            ],
+            hubs: { "Lufthansa": ["EDDF", "EDDM"], "SWISS": ["LSZH"], "Austrian": ["LOWW"], "Eurowings": ["EDDL"], "SAS": ["EKCH"], "AirBaltic": ["EVRA"] },
+            routes: {
+                "Lufthansa": [ {c:"EGLL",t:1.5}, {c:"CDG",t:1.2}, {c:"MAD",t:2.5}, {c:"DXB",t:6.0}, {c:"KJFK",t:8.5}, {c:"KLAX",t:11.5}, {c:"RJTT",t:12.0}, {c:"EZE",t:13.5} ],
+                "SWISS": [ {c:"LHR",t:1.8}, {c:"JFK",t:8.5}, {c:"SIN",t:12.0} ],
+                "Austrian": [ {c:"FRA",t:1.1}, {c:"BKK",t:10.5}, {c:"LHR",t:2.2} ],
+                "Eurowings": [ {c:"PMI",t:2.2}, {c:"LHR",t:1.4} ],
+                "SAS": [ {c:"LHR",t:1.9}, {c:"EWR",t:8.8} ],
+                "AirBaltic": [ {c:"HEL",t:0.8}, {c:"DXB",t:6.5} ]
             }
         };
+        const COORDS = { "EDDF":[50,8], "EDDM":[48,11], "LSZH":[47,8], "LOWW":[48,16], "KJFK":[40,-73], "EGLL":[51,-0], "KLAX":[34,-118], "RJTT":[35,139], "DXB":[25,55], "EZE":[-34,-58], "CDG":[49,2], "MAD":[40,-3], "PMI":[39,2], "HEL":[60,24], "SIN":[1,103], "BKK":[13,100] };
 
-        app.init();
+        let stats = JSON.parse(localStorage.getItem('stats')) || { fl:0, hr:0 };
+        let tempFlight=null, mapObject=null, missionFlight=null, timer=null;
+
+        window.onload = () => {
+            setTimeout(() => { document.getElementById('intro-screen').style.opacity=0; setTimeout(()=>document.getElementById('intro-screen').classList.add('hidden'),1000); }, 2000);
+            if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark-mode');
+            setInterval(() => { const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
+            renderUI(); checkFlight(); generateDailyMission();
+            
+            // Global Game Listeners (Prevent Duplication)
+            document.getElementById('cvs-snake').addEventListener('click', (e) => {
+                if(!sg.active) return;
+                const rect=e.target.getBoundingClientRect(), x=e.clientX-rect.left, y=e.clientY-rect.top, w=rect.width, h=rect.height;
+                if(x<w*0.25 && sg.dx===0) {sg.dx=-20; sg.dy=0;} else if(x>w*0.75 && sg.dx===0) {sg.dx=20; sg.dy=0;}
+                else if(y<h*0.25 && sg.dy===0) {sg.dy=-20; sg.dx=0;} else if(y>h*0.75 && sg.dy===0) {sg.dy=20; sg.dx=0;}
+            });
+            const planeCvs = document.getElementById('cvs-plane');
+            const jump = (e) => { e.preventDefault(); if(pg.active) { pg.started=true; pg.v = -3.5; } };
+            planeCvs.addEventListener('click', jump); planeCvs.addEventListener('touchstart', jump);
+        };
+
+        // --- LOGIC FUNCTIONS (RESTORED) ---
+        function generateGate(){return (Math.random()>0.5?'A':'B')+Math.floor(Math.random()*40+1);}
+        function checkDuration(t,f){if(f==='ALL')return true;if(f==='1-2')return t>=1&&t<3;if(f==='3-4')return t>=3&&t<5;if(f==='5-6')return t>=5&&t<7;if(f==='7-8')return t>=7&&t<9;if(f==='9-10')return t>=9&&t<11;if(f==='10+')return t>=10;return false;}
+        function getSmartPlane(al,t){const cat=t>5?'L':'S';let p=DB.fleet.filter(f=>f.operators.includes(al)&&f.cat===cat);if(!p.length)p=DB.fleet.filter(f=>f.operators.includes(al));return p.length?p[Math.floor(Math.random()*p.length)]:null;}
+        
+        function renderUI() {
+            document.getElementById('st-fl').innerText=stats.fl; document.getElementById('st-hr').innerText=Math.floor(stats.hr);
+            document.getElementById('st-rk').innerText=stats.fl>20?"Captain":(stats.fl>5?"FO":"SO");
+            const sA=document.getElementById('sch-al'), sD=document.getElementById('gen-al'), fF=document.getElementById('fl-filter');
+            sA.innerHTML=''; sD.innerHTML='<option value="">-- Operator --</option>'; fF.innerHTML='<option value="ALL">ALL OPERATORS</option>';
+            Object.keys(DB.hubs).forEach(a=>{sA.add(new Option(a,a)); sD.add(new Option(a,a)); fF.add(new Option(a,a));});
+            document.getElementById('news-list').innerHTML=DB.news.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--input-border); padding-bottom:10px;"><div style="color:var(--brand-blue); font-weight:bold;">${n.t}</div><div style="font-size:0.9rem; color:var(--text-sub);">${n.d}</div></div>`).join('');
+            renderFleet(); renderSchedule();
+        }
+
+        function renderFleet() {
+            const v=document.getElementById('fl-filter').value, c=document.getElementById('fleet-list'); c.innerHTML='';
+            DB.fleet.filter(f=>v==='ALL'||f.operators.includes(v)).forEach(f=>c.innerHTML+=`<div class="card" style="margin:0"><h4>${f.type}</h4><div style="font-size:0.9rem; color:var(--text-sub);">${f.seats} Pax | ${f.range}h Range</div></div>`);
+        }
+
+        function renderSchedule() {
+            const al=document.getElementById('sch-al').value, tf=document.getElementById('sch-tm').value, g=document.getElementById('sch-list');
+            if(!DB.routes[al]) { g.innerHTML="No routes"; return; }
+            const res=DB.routes[al].filter(r=>checkDuration(r.t, tf));
+            g.innerHTML=res.length?res.map(r=>`<div class="card" style="margin:0; border-left:4px solid var(--brand-blue); display:flex; justify-content:space-between; align-items:center;"><div><strong>${DB.hubs[al][0]} &rarr; ${r.c}</strong><br><small>${r.t}h</small></div><button class="btn btn-y" style="width:auto; padding:8px 15px;" onclick="prep('${al}','${DB.hubs[al][0]}','${r.c}',${r.t})">SELECT</button></div>`).join(''):"No matches";
+        }
+
+        function prep(al,d,a,t) {
+            const p=getSmartPlane(al,t); if(!p){alert("No aircraft");return;}
+            tempFlight={dep:d,arr:a,time:t,ac:p.type,num:"LH"+Math.floor(Math.random()*8999+1000),pax:Math.floor(p.seats*0.8),zfw:"45T",gate:generateGate(),fl:"FL350"};
+            ['dep','arr','time','ac','num','pax','zfw','gate','fl'].forEach(k=>document.getElementById('br-'+k).innerText=tempFlight[k]||(k=='time'?tempFlight.time+'h':''));
+            document.getElementById('modal-brief').classList.remove('hidden');
+            setTimeout(()=>{
+                if(mapObject)mapObject.remove(); mapObject=L.map('map').setView([50,10],3);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapObject);
+                const c1=COORDS[d]||[50,10], c2=COORDS[a]||[40,-70];
+                L.polyline([c1,c2],{color:'#05164d'}).addTo(mapObject);
+            },200);
+        }
+
+        function generate(){
+            const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub').value, tm=document.getElementById('gen-tm').value;
+            if(!al||!h)return;
+            const r=DB.routes[al].filter(x=>checkDuration(x.t,tm));
+            if(!r.length){alert("No routes");return;}
+            const s=r[Math.floor(Math.random()*r.length)];
+            prep(al,h,s.c,s.t);
+        }
+        function updateHubs(){const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub'); h.innerHTML=''; if(al){h.disabled=false;DB.hubs[al].forEach(x=>h.add(new Option(x,x)));}else h.disabled=true;}
+        function acceptBriefing(){tempFlight.start=Date.now(); localStorage.setItem('active',JSON.stringify(tempFlight)); document.getElementById('modal-brief').classList.add('hidden'); checkFlight(); tab('dash');}
+        
+        function checkFlight(){
+            const s=localStorage.getItem('active');
+            if(!s){document.getElementById('af-card').classList.add('hidden'); document.getElementById('mission-box').classList.remove('hidden'); return;}
+            document.getElementById('af-card').classList.remove('hidden'); document.getElementById('mission-box').classList.add('hidden');
+            const f=JSON.parse(s);
+            ['dep','arr','num','ac'].forEach(k=>document.getElementById('af-'+k).innerText=f[k]);
+            if(timer)clearInterval(timer);
+            timer=setInterval(()=>{
+                const el=Date.now()-f.start, dur=f.time*10000, pct=Math.min(100,(el/dur)*100);
+                document.getElementById('af-bar').style.width=pct+"%";
+                document.getElementById('af-timer').innerText=pct>=100?"ARRIVED":"IN FLIGHT";
+                if(pct>=100) document.getElementById('btn-pirep').classList.remove('hidden');
+            },1000);
+        }
+        function finishFlight(){const f=JSON.parse(localStorage.getItem('active')); stats.fl++; stats.hr+=f.time; localStorage.setItem('stats',JSON.stringify(stats)); localStorage.removeItem('active'); checkFlight(); renderUI();}
+        function cancelFlight(){localStorage.removeItem('active'); checkFlight();}
+        function genMis(){const s=new Date().getDate(), al="Lufthansa", r=DB.routes[al][s%DB.routes[al].length]; missionFlight={al,dep:DB.hubs[al][0],arr:r.c,t:r.t}; document.getElementById('mis-date').innerText=new Date().toLocaleDateString(); document.getElementById('mis-txt').innerText=`${missionFlight.dep} ➝ ${r.c}`;}
+        function acceptMission(){prep(missionFlight.al,missionFlight.dep,missionFlight.arr,missionFlight.t);}
+
+        // === GAMES ENGINE (RESTORED V56) ===
+        // PLANE
+        let pg={active:false,ctx:null,w:0,h:0,y:150,v:0,clouds:[],score:0,started:false};
+        function startGamePlane() {
+            const c=document.getElementById('cvs-plane'); pg.ctx=c.getContext('2d');
+            pg.w=c.width=c.offsetWidth; pg.h=c.height=c.offsetHeight;
+            pg.y=pg.h/2; pg.v=0; pg.clouds=[]; pg.score=0; pg.active=true; pg.started=false;
+            document.getElementById('overlay-plane').classList.add('hidden'); document.getElementById('score-plane').innerText="0"; loopPlane();
+        }
+        function loopPlane() {
+            if(!pg.active)return;
+            const ctx=pg.ctx; ctx.clearRect(0,0,pg.w,pg.h); ctx.fillStyle="#87CEEB"; ctx.fillRect(0,0,pg.w,pg.h);
+            if(!pg.started){ pg.y=(pg.h/2)+Math.sin(Date.now()/300)*5; ctx.fillStyle="white"; ctx.font="20px Roboto"; ctx.textAlign="center"; ctx.fillText("TAP TO FLY",pg.w/2,pg.h/2+40); }
+            else{ pg.v+=0.12; pg.y+=pg.v; if(pg.score%100===0 && Math.random()<0.05)pg.clouds.push({x:pg.w,y:Math.random()*(pg.h-50),w:30,h:30}); }
+            ctx.save(); ctx.translate(65,pg.y+10); ctx.rotate(Math.min(Math.PI/4,Math.max(-Math.PI/4,(pg.v*0.1))));
+            ctx.fillStyle="#ffb600"; ctx.fillRect(-15,-10,30,20); ctx.fillStyle="#05164d"; ctx.fillRect(5,-5,10,5); ctx.restore();
+            if(pg.started){
+                pg.clouds.forEach((c,i)=>{
+                    c.x-=2.5; ctx.fillStyle='#d50000'; ctx.beginPath(); ctx.arc(c.x+15,c.y+15,15,0,Math.PI*2); ctx.fill();
+                    if(65<c.x+c.w && 80>c.x && pg.y<c.y+c.h && pg.y+20>c.y) {pg.active=false; document.getElementById('overlay-plane').classList.remove('hidden');}
+                    if(c.x<-50) {pg.clouds.splice(i,1); pg.score++; document.getElementById('score-plane').innerText=pg.score;}
+                });
+                if(pg.y<0||pg.y>pg.h) {pg.active=false; document.getElementById('overlay-plane').classList.remove('hidden');}
+            }
+            requestAnimationFrame(loopPlane);
+        }
+
+        // SNAKE
+        let sg={active:false,ctx:null,w:0,h:0,snake:[],food:{},dx:20,dy:0,score:0};
+        function startGameSnake() {
+            const c=document.getElementById('cvs-snake'); sg.ctx=c.getContext('2d');
+            sg.w=c.width=c.offsetWidth; sg.h=c.height=c.offsetHeight;
+            sg.snake=[{x:100,y:100},{x:80,y:100}]; sg.dx=20; sg.dy=0; sg.score=0; sg.active=true;
+            snakeFood(); document.getElementById('overlay-snake').classList.add('hidden'); document.getElementById('score-snake').innerText="0"; setTimeout(loopSnake,100);
+        }
+        function loopSnake() {
+            if(!sg.active)return;
+            const h={x:sg.snake[0].x+sg.dx, y:sg.snake[0].y+sg.dy}; sg.snake.unshift(h);
+            if(h.x===sg.food.x && h.y===sg.food.y) {sg.score++; document.getElementById('score-snake').innerText=sg.score; snakeFood();} else sg.snake.pop();
+            if(h.x<0||h.x>=sg.w||h.y<0||h.y>=sg.h || sg.snake.slice(1).some(p=>p.x===h.x&&p.y===h.y)) {sg.active=false; document.getElementById('overlay-snake').classList.remove('hidden'); return;}
+            const ctx=sg.ctx; ctx.fillStyle='#1e293b'; ctx.fillRect(0,0,sg.w,sg.h);
+            ctx.fillStyle='#ffb600'; ctx.fillRect(sg.food.x,sg.food.y,18,18);
+            ctx.fillStyle='#4ade80'; sg.snake.forEach(p=>ctx.fillRect(p.x,p.y,18,18));
+            setTimeout(loopSnake,100);
+        }
+        function snakeFood(){sg.food={x:Math.floor(Math.random()*(sg.w/20))*20, y:Math.floor(Math.random()*(sg.h/20))*20};}
+
+        // TETRIS
+        let tg={active:false,ctx:null,board:[],cur:null,score:0,w:10,h:20,bs:30};
+        const SHAPES=[[[1,1,1,1]],[[1,1,1],[0,1,0]],[[1,1,1],[1,0,0]],[[1,1,1],[0,0,1]],[[1,1],[1,1]],[[1,1,0],[0,1,1]],[[0,1,1],[1,1,0]]];
+        const COLORS=[null,'#ef4444','#f59e0b','#3b82f6','#8b5cf6','#10b981','#ec4899','#6366f1'];
+        function startGameTetris(){
+            const c=document.getElementById('cvs-tetris'); tg.ctx=c.getContext('2d');
+            const r=c.getBoundingClientRect(); c.width=r.width; c.height=r.height; tg.bs=c.width/10;
+            tg.board=Array(20).fill().map(()=>Array(10).fill(0)); tg.score=0; tg.active=true;
+            spawnPiece(); document.getElementById('overlay-tetris').classList.add('hidden'); document.getElementById('score-tetris').innerText="0"; updateTetris();
+        }
+        function spawnPiece(){const id=Math.floor(Math.random()*SHAPES.length); tg.cur={shape:SHAPES[id],x:3,y:0,color:id+1}; if(collide()){tg.active=false; document.getElementById('overlay-tetris').classList.remove('hidden');}}
+        function collide(){for(let y=0;y<tg.cur.shape.length;++y)for(let x=0;x<tg.cur.shape[y].length;++x)if(tg.cur.shape[y][x]!==0 && (tg.board[y+tg.cur.y] && tg.board[y+tg.cur.y][x+tg.cur.x])!==0)return true; return false;}
+        function merge(){tg.cur.shape.forEach((row,y)=>row.forEach((val,x)=>{if(val!==0)tg.board[y+tg.cur.y][x+tg.cur.x]=tg.cur.color;}));}
+        function rotate(m){for(let y=0;y<m.length;++y)for(let x=0;x<y;++x)[m[x][y],m[y][x]]=[m[y][x],m[x][y]]; m.forEach(row=>row.reverse());}
+        function sweep(){for(let y=tg.board.length-1;y>0;--y){let full=true; for(let x=0;x<tg.board[y].length;++x)if(tg.board[y][x]===0)full=false; if(full){tg.board.splice(y,1); tg.board.unshift(Array(10).fill(0)); ++y; tg.score+=10; document.getElementById('score-tetris').innerText=tg.score;}}}
+        function updateTetris(t=0){if(!tg.active)return; if(t-(tg.lastTime||0)>1000){tetrisInput('d'); tg.lastTime=t;} drawTetris(); requestAnimationFrame(updateTetris);}
+        function drawTetris(){
+            tg.ctx.fillStyle='#000'; tg.ctx.fillRect(0,0,tg.bs*10,tg.bs*20);
+            const drawM=(m,ox,oy,c)=>m.forEach((r,y)=>r.forEach((v,x)=>{if(v!==0||(c&&v!==0)){tg.ctx.fillStyle=c?COLORS[c]:COLORS[val]; tg.ctx.fillRect((x+ox)*tg.bs,(y+oy)*tg.bs,tg.bs-1,tg.bs-1);}}));
+            drawM(tg.board,0,0,null); drawM(tg.cur.shape,tg.cur.x,tg.cur.y,tg.cur.color);
+        }
+        function tetrisInput(a){
+            if(!tg.active)return;
+            if(a==='l'){tg.cur.x--; if(collide())tg.cur.x++;}
+            if(a==='r'){tg.cur.x++; if(collide())tg.cur.x--;}
+            if(a==='d'){tg.cur.y++; if(collide()){tg.cur.y--; merge(); spawnPiece(); sweep();}}
+            if(a==='rot'){let cl=JSON.parse(JSON.stringify(tg.cur.shape)); rotate(cl); let sv=tg.cur.shape; tg.cur.shape=cl; if(collide())tg.cur.shape=sv;}
+        }
+
+        // --- AUTH & MISC ---
+        function doLogin(){if(document.getElementById('callsign').value.toUpperCase()===DB.login.u && document.getElementById('password').value===DB.login.p){document.getElementById('login-wrap').classList.add('hidden'); document.getElementById('nav-container').classList.remove('hidden'); document.getElementById('main-app').classList.remove('hidden'); document.querySelector('.tools').classList.add('visible');}else document.getElementById('login-err').innerText="Invalid Credentials";}
+        function tab(n,b){document.querySelectorAll('.tab-content').forEach(x=>x.classList.add('hidden')); document.getElementById('tab-'+n).classList.remove('hidden'); document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active');}
+        function toggleTheme(){document.body.classList.toggle('dark-mode'); localStorage.setItem('theme',document.body.classList.contains('dark-mode')?'dark':'light');}
     </script>
 </body>
 </html>
