@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v68</title>
+    <title>Lufthansa Crew Portal v69</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -22,8 +22,8 @@
             --text-sub: #6b7280;
             --border: #e5e7eb;
             --shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            --radius: 12px; /* Немного мягче для мобилок */
-            --header-h: 60px; /* Компактнее */
+            --radius: 12px;
+            --header-h: 60px;
             --nav-h: 54px;
         }
 
@@ -44,11 +44,11 @@
         body { 
             font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); 
             transition: background 0.4s ease, color 0.4s ease; overflow-x: hidden;
-            padding-top: calc(var(--header-h) + var(--nav-h)); padding-bottom: 40px; /* Safe area bottom */
+            padding-top: calc(var(--header-h) + var(--nav-h)); padding-bottom: 40px;
         }
         .hidden { display: none !important; }
 
-        /* === NEW PRENIUM INTRO === */
+        /* === NEW PREMIUM INTRO === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05164d; z-index: 9999;
@@ -79,12 +79,11 @@
         .logo-img { height: 22px; filter: brightness(0) invert(1); }
         .user-panel { display: flex; align-items: center; gap: 15px; color: white; font-size: 0.85rem; font-weight: 600; }
 
-        /* === NAV BAR (SCROLLABLE ON MOBILE) === */
+        /* === NAV BAR (SCROLLABLE) === */
         .nav-bar {
             position: fixed; top: var(--header-h); left: 0; width: 100%; height: var(--nav-h);
             background: var(--bg-card); border-bottom: 1px solid var(--border); z-index: 1900;
-            overflow-x: auto; /* Scroll horizontally on mobile */
-            white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;
+            overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;
         }
         .nav-bar::-webkit-scrollbar { display: none; }
         .nav-inner { 
@@ -122,6 +121,7 @@
         .af-det { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 8px; }
         .prog-track { height: 6px; background: var(--border); border-radius: 3px; margin: 20px 0; overflow: hidden; }
         .prog-fill { height: 100%; background: var(--lh-yellow); width: 0%; transition: width 1s linear; }
+        .timer-display { font-size: 1.5rem; font-family: 'Roboto Mono', monospace; }
 
         /* Lists & Filters */
         .filter-row { display: flex; gap: 15px; margin-bottom: 20px; }
@@ -157,6 +157,9 @@
             background: var(--bg-body); z-index: 5000; display: flex; flex-direction: column;
         }
         .login-nav { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; }
+        /* UPDATED LOGO SIZE */
+        .login-nav img { height: 32px; } 
+
         .login-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .login-card {
             width: 100%; max-width: 400px; background: var(--bg-card); padding: 30px;
@@ -167,13 +170,13 @@
 
         /* === MOBILE MEDIA QUERIES === */
         @media (max-width: 768px) {
-            .nav-inner { justify-content: flex-start; } /* Allow menu scroll */
-            .grid-3 { grid-template-columns: 1fr; } /* Stack Stats */
-            .dash-layout { grid-template-columns: 1fr; } /* Stack Dash */
-            .ofp-grid { grid-template-columns: 1fr 1fr; } /* Modal Data Stack */
-            .filter-row { flex-direction: column; gap: 10px; } /* Stack Filters */
-            .list-grid { grid-template-columns: 1fr; } /* Stack Lists */
-            .modal-c { height: 100%; border-radius: 0; padding: 20px; } /* Full Screen Modal */
+            .nav-inner { justify-content: flex-start; }
+            .grid-3 { grid-template-columns: 1fr; }
+            .dash-layout { grid-template-columns: 1fr; }
+            .ofp-grid { grid-template-columns: 1fr 1fr; }
+            .filter-row { flex-direction: column; gap: 10px; }
+            .list-grid { grid-template-columns: 1fr; }
+            .modal-c { height: 100%; border-radius: 0; padding: 20px; }
             .af-route { font-size: 1.8rem; }
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -183,41 +186,35 @@
 
 <script>
     const DB = {
-        // Add News Here
         NEWS: [
-            { t: "Mobile Update v68", d: "Fully optimized for smartphone devices." },
-            { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." },
-            { t: "Route Expansion", d: "New Asian sector routes added to the database." }
+            { t: "Final Update v69", d: "Real-time flight tracking and UI adjustments implemented." },
+            { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." }
         ],
-        // Add Aircraft Here
         FLEET: [
             { id: "A320", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, eng: "PW1100G", ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, eng: "GEnx-2B", ceil: "FL430", spd: "M0.85" },
             { id: "A359", t: "Airbus A350-900", op: "Lufthansa", s: 293, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
             { id: "A223", t: "Airbus A220-300", op: "SWISS", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
-            { id: "B77W", t: "Boeing 777-300ER", op: "SWISS", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" },
-            { id: "E195", t: "Embraer 195", op: "Austrian", s: 120, r: 4, eng: "CF34", ceil: "FL410", spd: "M0.78" }
+            { id: "B77W", t: "Boeing 777-300ER", op: "SWISS", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" }
         ],
-        // Add Routes Here (Infinite)
         ROUTES: [
             { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 },
             { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 },
             { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5 },
-            { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2 },
             { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2 },
             { al: "SWISS", d: "LSZH", a: "EGLL", t: 1.8 },
             { al: "SWISS", d: "LSZH", a: "WSSS", t: 12.0 },
             { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5 },
             { al: "SAS", d: "EKCH", a: "KEWR", t: 8.8 }
         ],
-        // Map Coords
         COORDS: {
             "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65],
-            "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "OMDB":[25.25,55.36], "WSSS":[1.36,103.99],
+            "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99],
             "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17]
         }
     };
 </script>
+
 <div id="intro">
     <div class="intro-logo-wrap">
         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="intro-logo">
@@ -228,23 +225,22 @@
 
 <div id="login-wrap">
     <div class="login-nav">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" style="height:22px;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg">
     </div>
     <div class="login-body">
         <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
-            <p style="color:var(--text-sub); margin-bottom:30px; font-size:0.9rem;">Please enter your servicecard or Travel ID.</p>
+            <p style="color:var(--text-sub); margin-bottom:30px; font-size:0.9rem;">Please enter your Travel ID.</p>
             
-            <input type="text" id="user" class="inp-float" placeholder="Travel ID / Servicecard">
+            <input type="text" id="user" class="inp-float" placeholder="Travel ID">
             <input type="password" id="pass" class="inp-float" placeholder="Password">
             
             <button class="btn-main" onclick="app.login()">Next</button>
             <div id="login-msg" style="color:red; margin-top:15px; font-size:0.9rem;"></div>
             
             <div style="margin-top:25px; font-size:0.85rem; color:var(--text-sub);">
-                <div style="margin-bottom:8px; cursor:pointer; text-decoration:underline;">Forgot your PIN?</div>
-                <div style="cursor:pointer;">→ Register for Travel ID</div>
-            </div>
+                <div style="margin-bottom:8px; cursor:pointer; text-decoration:underline;" onclick="alert('Please contact your system administrator to reset your credentials.')">Forgot your PIN or password?</div>
+                </div>
         </div>
     </div>
 </div>
@@ -296,7 +292,7 @@
                             <div class="af-det"><span id="af-n"></span> • <span id="af-ac"></span></div>
                         </div>
                         <div style="text-align:right;">
-                            <div class="af-route" id="af-t" style="font-size:1.8rem;">00:00</div>
+                            <div class="af-route timer-display" id="af-t">00:00</div>
                             <div class="stat-lbl">REMAINING</div>
                         </div>
                     </div>
@@ -327,7 +323,6 @@
                 <option value="1-2">Short (1-2h)</option>
                 <option value="3-4">Medium (3-4h)</option>
                 <option value="5-6">Long (5-6h)</option>
-                <option value="7-8">Extended (7-8h)</option>
                 <option value="10+">Ultra (10h+)</option>
             </select>
         </div>
@@ -360,8 +355,6 @@
                     <option value="1-2">1-2h</option>
                     <option value="3-4">3-4h</option>
                     <option value="5-6">5-6h</option>
-                    <option value="7-8">7-8h</option>
-                    <option value="9-10">9-10h</option>
                     <option value="10+">10h+</option>
                 </select>
             </div>
@@ -377,7 +370,6 @@
             <h3>OFP BRIEFING</h3>
             <h3 id="br-num">LH000</h3>
         </div>
-        
         <div class="ofp-grid">
             <div><div class="ofp-lbl">DEPARTURE</div><div class="ofp-val" id="br-dep"></div></div>
             <div><div class="ofp-lbl">ARRIVAL</div><div class="ofp-val" id="br-arr"></div></div>
@@ -388,10 +380,8 @@
             <div><div class="ofp-lbl">FL</div><div class="ofp-val" id="br-fl"></div></div>
             <div><div class="ofp-lbl">PAX</div><div class="ofp-val" id="br-pax"></div></div>
         </div>
-
         <div id="map"></div>
         <div style="font-size:0.8rem; font-weight:600; color:var(--text-sub); margin-bottom:20px;">METAR: VMC / >10KM / NOSIG</div>
-
         <div style="display:grid; grid-template-columns: 2fr 1fr; gap:15px;">
             <button class="btn-main" onclick="app.accept()">ACCEPT FLIGHT</button>
             <button class="btn-main" style="background:#ddd; color:#333;" onclick="app.closeM()">CANCEL</button>
@@ -402,41 +392,22 @@
 <script>
     const app = {
         data: { stats: {l:0, h:0}, active: null, temp: null, mis: null },
-        dom: {},
         tmr: null, map: null,
 
         init: function() {
-            // Stats Restore
             let s = JSON.parse(localStorage.getItem('stats'));
             if(!s || isNaN(s.l) || isNaN(s.h)) s = {l:0, h:0};
             this.data.stats = s;
-
-            // Theme
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
-
-            // Clock
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
-
-            // Intro Timer
             setTimeout(()=>{ document.getElementById('intro').style.opacity=0; setTimeout(()=>document.getElementById('intro').classList.add('hidden'),800); }, 2500);
 
-            // Populate Lists
             const uq = (k) => [...new Set(DB[k].map(x=>x[k=='ROUTES'?'al':'op']))];
             const ops = uq('ROUTES'), flt = uq('FLEET');
             const fill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
-            
-            fill('flt-al', ops, 'All Airlines');
-            fill('gen-al', ops, 'Select Airline');
-            fill('flt-op', flt, 'All Operators');
-
-            // Static Renders
+            fill('flt-al', ops, 'All Airlines'); fill('gen-al', ops, 'Select Airline'); fill('flt-op', flt, 'All Operators');
             document.getElementById('news-list').innerHTML = DB.NEWS.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:8px;"><b>${n.t}</b><br><span style="color:var(--text-sub); font-size:0.9rem;">${n.d}</span></div>`).join('');
-
-            this.updStats();
-            this.renderR();
-            this.renderF();
-            this.dailyMis();
-            this.chkActive();
+            this.updStats(); this.renderR(); this.renderF(); this.dailyMis(); this.chkActive();
         },
 
         login: function() {
@@ -473,34 +444,14 @@
             const al=document.getElementById('flt-al').value, tm=document.getElementById('flt-tm').value;
             const l=document.getElementById('list-routes'); l.innerHTML="";
             const r=DB.ROUTES.filter(x=>(al=='ALL'||x.al==al) && this.chkTime(x.t, tm));
-            
             if(!r.length) { l.innerHTML="<div class='card'>No flights found.</div>"; return; }
-            r.forEach(x=>{
-                l.innerHTML+=`
-                <div class="list-item">
-                    <div>
-                        <div style="font-size:1.1rem; font-weight:700;">${x.d} &rarr; ${x.a}</div>
-                        <div style="color:var(--text-sub); font-size:0.9rem; margin-top:4px;">${x.t}h • ${x.al}</div>
-                    </div>
-                    <button class="btn-sm" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t})">SELECT</button>
-                </div>`;
-            });
+            r.forEach(x=>{ l.innerHTML+=`<div class="list-item"><div><div style="font-size:1.1rem; font-weight:700;">${x.d} &rarr; ${x.a}</div><div style="color:var(--text-sub); font-size:0.9rem; margin-top:4px;">${x.t}h • ${x.al}</div></div><button class="btn-sm" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t})">SELECT</button></div>`; });
         },
 
         renderF: function() {
             const op=document.getElementById('flt-op').value;
             const l=document.getElementById('list-fleet'); l.innerHTML="";
-            DB.FLEET.filter(f=>op=='ALL'||f.op==op).forEach(f=>{
-                l.innerHTML+=`
-                <div class="list-item" style="display:block; border-left:none;">
-                    <div style="font-weight:700; font-size:1.1rem; margin-bottom:10px;">${f.t}</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; font-size:0.85rem; color:var(--text-sub);">
-                        <span>Seats: <b>${f.s}</b></span> <span>Range: <b>${f.r}h</b></span>
-                        <span>Ceil: <b>${f.ceil}</b></span> <span>Mach: <b>${f.spd}</b></span>
-                        <span style="grid-column:span 2">Eng: ${f.eng}</span>
-                    </div>
-                </div>`;
-            });
+            DB.FLEET.filter(f=>op=='ALL'||f.op==op).forEach(f=>{ l.innerHTML+=`<div class="list-item" style="display:block;"><div style="font-weight:700; font-size:1.1rem; margin-bottom:10px;">${f.t}</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:5px; font-size:0.85rem; color:var(--text-sub);"><span>Seats: <b>${f.s}</b></span> <span>Range: <b>${f.r}h</b></span><span>Ceil: <b>${f.ceil}</b></span> <span>Mach: <b>${f.spd}</b></span><span style="grid-column:span 2">Eng: ${f.eng}</span></div></div>`; });
         },
 
         getAc: function(al, t) {
@@ -510,22 +461,14 @@
 
         prep: function(al, d, a, t) {
             const p = this.getAc(al, t);
-            this.data.temp = {
-                d, a, t, ac: p.t,
-                n: al.substr(0,2).toUpperCase()+Math.floor(Math.random()*8999+1000),
-                gate: "A"+Math.floor(Math.random()*40+1),
-                pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil
-            };
+            this.data.temp = { d, a, t, ac: p.t, n: al.substr(0,2).toUpperCase()+Math.floor(Math.random()*8999+1000), gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil };
             ['dep','arr','ac','gate','time','zfw','pax','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.data.temp[{dep:'d',arr:'a',ac:'ac',gate:'gate',time:'t',zfw:'zfw',pax:'pax',fl:'fl'}[k]]);
-            
             document.getElementById('modal').classList.remove('hidden');
             setTimeout(()=>{
-                if(this.map) this.map.remove();
-                this.map = L.map('map').setView([50,10], 3);
+                if(this.map) this.map.remove(); this.map = L.map('map').setView([50,10], 3);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.map);
                 const c1=DB.COORDS[d]||[50,10], c2=DB.COORDS[a]||[40,-70];
-                L.polyline([c1,c2],{color:'#05164d', weight:3}).addTo(this.map);
-                this.map.fitBounds([c1,c2], {padding:[30,30]});
+                L.polyline([c1,c2],{color:'#05164d', weight:3}).addTo(this.map); this.map.fitBounds([c1,c2], {padding:[30,30]});
             },100);
         },
 
@@ -534,31 +477,35 @@
             localStorage.setItem('active', JSON.stringify(this.data.temp));
             this.closeM(); this.chkActive(); this.tab('dash', document.querySelector('.nav-btn'));
         },
-
         closeM: function() { document.getElementById('modal').classList.add('hidden'); },
 
+        // === REAL-TIME FLIGHT TRACKING ===
         chkActive: function() {
             const s = localStorage.getItem('active');
-            if(!s) {
-                document.getElementById('af-box').classList.add('hidden');
-                document.getElementById('mis-box').classList.remove('hidden');
-                return;
-            }
+            if(!s) { document.getElementById('af-box').classList.add('hidden'); document.getElementById('mis-box').classList.remove('hidden'); return; }
             this.data.active = JSON.parse(s);
-            document.getElementById('af-box').classList.remove('hidden');
-            document.getElementById('mis-box').classList.add('hidden');
+            document.getElementById('af-box').classList.remove('hidden'); document.getElementById('mis-box').classList.add('hidden');
             ['d','a','n','ac'].forEach(k=>document.getElementById('af-'+k).innerText=this.data.active[k]);
 
             if(this.tmr) clearInterval(this.tmr);
             this.tmr = setInterval(()=>{
                 const el = Date.now() - this.data.active.start;
-                const dur = this.data.active.t * 10000; // 1h = 10s
+                // REAL TIME DURATION: hours * 3600s * 1000ms
+                const dur = this.data.active.t * 3600 * 1000; 
                 const pct = Math.min(100, (el/dur)*100);
                 document.getElementById('af-bar').style.width=pct+"%";
+                
                 if(pct>=100) {
                     document.getElementById('af-t').innerText="ARRIVED";
                     document.getElementById('btn-end').classList.remove('hidden');
-                } else document.getElementById('af-t').innerText="IN FLIGHT";
+                } else {
+                    // CALCULATE REMAINING TIME (HH:MM)
+                    const remMs = dur - el;
+                    const remMins = Math.floor((remMs / (1000 * 60)) % 60);
+                    const remHrs = Math.floor((remMs / (1000 * 60 * 60)));
+                    document.getElementById('af-t').innerText = 
+                        `${String(remHrs).padStart(2,'0')}:${String(remMins).padStart(2,'0')}`;
+                }
             }, 1000);
         },
 
@@ -574,28 +521,22 @@
             const h=document.getElementById('gen-hub'); h.innerHTML=""; h.disabled=false;
             [...new Set(DB.ROUTES.filter(r=>r.al==al).map(r=>r.d))].forEach(x=>h.add(new Option(x,x)));
         },
-
         gen: function() {
             const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub').value, tm=document.getElementById('gen-tm').value;
             const r=DB.ROUTES.filter(x=>x.al==al && x.d==h && this.chkTime(x.t, tm));
             if(!r.length) { alert("No routes match."); return; }
-            const s=r[Math.floor(Math.random()*r.length)];
-            this.prep(s.al, s.d, s.a, s.t);
+            const s=r[Math.floor(Math.random()*r.length)]; this.prep(s.al, s.d, s.a, s.t);
         },
-
         dailyMis: function() {
-            const d=new Date().getDate();
-            this.data.mis = DB.ROUTES[d % DB.ROUTES.length];
+            const d=new Date().getDate(); this.data.mis = DB.ROUTES[d % DB.ROUTES.length];
             document.getElementById('mis-txt').innerText = `${this.data.mis.d} → ${this.data.mis.a}`;
         },
         prepMis: function(){ this.prep(this.data.mis.al, this.data.mis.d, this.data.mis.a, this.data.mis.t); },
-
         theme: function() {
             document.body.classList.toggle('dark-mode');
             localStorage.setItem('dark', document.body.classList.contains('dark-mode')?'1':'0');
         }
     };
-
     window.onload = ()=>app.init();
 </script>
 </body>
