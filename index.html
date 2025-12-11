@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v69</title>
+    <title>Lufthansa Crew Portal v70</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -48,21 +48,23 @@
         }
         .hidden { display: none !important; }
 
-        /* === NEW PREMIUM INTRO === */
+        /* === NEW PREMIUM INTRO (UPDATED SIZE) === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05164d; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease, visibility 0.8s;
         }
-        .intro-logo-wrap { position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; }
-        .intro-logo { width: 60px; filter: brightness(0) invert(1); opacity: 0; animation: logoFade 1s ease 0.8s forwards; }
+        /* УВЕЛИЧЕН КОНТЕЙНЕР */
+        .intro-logo-wrap { position: relative; width: 180px; height: 180px; display: flex; align-items: center; justify-content: center; }
+        /* УВЕЛИЧЕН ЛОГОТИП */
+        .intro-logo { width: 100px; filter: brightness(0) invert(1); opacity: 0; animation: logoFade 1s ease 0.8s forwards; }
         .intro-line {
-            position: absolute; bottom: 0; left: 0; height: 2px; background: #ffb600;
+            position: absolute; bottom: 0; left: 0; height: 3px; background: #ffb600;
             width: 0%; animation: lineDraw 1.5s ease-in-out forwards;
         }
         .intro-txt {
-            color: white; font-size: 1.1rem; letter-spacing: 4px; font-weight: 300; margin-top: 20px;
+            color: white; font-size: 1.3rem; letter-spacing: 4px; font-weight: 300; margin-top: 30px;
             opacity: 0; animation: txtUp 1s ease 1s forwards;
         }
         @keyframes lineDraw { 0% { width:0; left:50%; } 100% { width:100%; left:0; } }
@@ -157,7 +159,6 @@
             background: var(--bg-body); z-index: 5000; display: flex; flex-direction: column;
         }
         .login-nav { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; }
-        /* UPDATED LOGO SIZE */
         .login-nav img { height: 32px; } 
 
         .login-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -187,7 +188,7 @@
 <script>
     const DB = {
         NEWS: [
-            { t: "Final Update v69", d: "Real-time flight tracking and UI adjustments implemented." },
+            { t: "Final Update v70", d: "Intro logo size increased for better visibility." },
             { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." }
         ],
         FLEET: [
@@ -240,7 +241,7 @@
             
             <div style="margin-top:25px; font-size:0.85rem; color:var(--text-sub);">
                 <div style="margin-bottom:8px; cursor:pointer; text-decoration:underline;" onclick="alert('Please contact your system administrator to reset your credentials.')">Forgot your PIN or password?</div>
-                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -479,7 +480,6 @@
         },
         closeM: function() { document.getElementById('modal').classList.add('hidden'); },
 
-        // === REAL-TIME FLIGHT TRACKING ===
         chkActive: function() {
             const s = localStorage.getItem('active');
             if(!s) { document.getElementById('af-box').classList.add('hidden'); document.getElementById('mis-box').classList.remove('hidden'); return; }
@@ -499,7 +499,6 @@
                     document.getElementById('af-t').innerText="ARRIVED";
                     document.getElementById('btn-end').classList.remove('hidden');
                 } else {
-                    // CALCULATE REMAINING TIME (HH:MM)
                     const remMs = dur - el;
                     const remMins = Math.floor((remMs / (1000 * 60)) % 60);
                     const remHrs = Math.floor((remMs / (1000 * 60 * 60)));
