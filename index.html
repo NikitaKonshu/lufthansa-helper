@@ -3,626 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lufthansa Systems - Crew Portal v64</title>
+    <title>Lufthansa Systems - Portal v65</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     
     <style>
-        /* === CORPORATE VARIABLES === */
+        /* === LUFTHANSA CORPORATE IDENTITY === */
         :root {
-            --lh-navy: #05164d;
-            --lh-yellow: #ffb600;
-            --lh-yellow-hov: #e0a000;
-            --lh-bg: #f4f5f9;
-            --lh-card: #ffffff;
-            --lh-text: #05164d;
-            --lh-text-sec: #555555;
-            --lh-border: #dcdcdc;
-            --radius: 6px;
+            --lh-blue: #05164d;       /* Main Navy */
+            --lh-yellow: #ffb600;     /* Main Yellow */
+            --lh-yellow-hover: #e0a000;
+            --bg-body: #f2f4f7;
+            --bg-card: #ffffff;
+            --text-main: #05164d;
+            --text-sub: #333333;
+            --border-color: #dcdcdc;
+            --input-bg: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+            --radius: 4px;
         }
-        
-        /* DARK MODE (Refined Palette) */
+
+        /* DARK MODE */
         body.dark-mode {
-            --lh-bg: #0f172a;       /* Dark Slate Blue Background */
-            --lh-card: #1e293b;     /* Card Background */
-            --lh-text: #f1f5f9;     /* Light Text */
-            --lh-text-sec: #94a3b8; /* Secondary Text */
-            --lh-border: #334155;   /* Borders */
-            --lh-navy: #3b82f6;     /* Accent turns lighter blue in dark mode */
+            --lh-blue: #60a5fa;       /* Light blue for text in dark mode */
+            --bg-body: #0f172a;       /* Deep slate background */
+            --bg-card: #1e293b;       /* Card background */
+            --text-main: #f1f5f9;     /* White text */
+            --text-sub: #cbd5e1;      /* Light gray text */
+            --border-color: #334155;
+            --input-bg: #1e293b;
+            --shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
-        /* Special override for header in dark mode to keep brand identity */
-        body.dark-mode header { background: #0b1120; border-bottom: 1px solid #334155; }
-        body.dark-mode .af-card { border-left-color: #fbbf24; }
+        /* Dark mode overrides for header specific to LH branding */
+        body.dark-mode header { background: #020617; border-bottom: 1px solid #334155; }
+        body.dark-mode .nav-bar { background: #1e293b; border-bottom: 1px solid #334155; }
+        body.dark-mode .nav-btn { color: #cbd5e1; }
+        body.dark-mode .nav-btn.active { color: #ffb600; }
 
-        /* === SMOOTH TRANSITIONS === */
-        body, header, .card, .nav-wrap, .inp, .btn, h2, span, div {
-            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
-        }
-
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--lh-bg); color: var(--lh-text); min-height: 100vh; display: flex; flex-direction: column; }
+        /* ANIMATIONS */
+        * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+        body { margin: 0; font-family: 'Roboto', Helvetica, Arial, sans-serif; background: var(--bg-body); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; }
         .hidden { display: none !important; }
 
-        /* === INTRO === */
-        #intro-layer {
+        /* === LOGIN SCREEN (Reference: image_06699d.png) === */
+        #login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #05164d; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            animation: introFadeOut 0.8s ease-in-out 2s forwards;
-            pointer-events: none;
+            background: var(--bg-card); z-index: 9999; display: flex; flex-direction: column;
         }
-        .intro-content { text-align: center; color: white; animation: introFadeIn 1s ease-in-out 0.2s backwards; }
-        .intro-logo { height: 60px; filter: brightness(0) invert(1); margin-bottom: 20px; }
-        @keyframes introFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes introFadeOut { from { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+        .login-header { height: 70px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 10%; }
+        .login-logo { height: 24px; }
+        .login-body { flex: 1; display: flex; justify-content: center; padding-top: 60px; background: var(--bg-body); }
+        .login-card {
+            background: var(--bg-card); width: 100%; max-width: 500px; padding: 40px;
+            border: 1px solid var(--border-color); box-shadow: var(--shadow);
+        }
+        .login-title { font-size: 1.8rem; font-weight: 300; margin-bottom: 10px; color: var(--text-main); }
+        .login-input {
+            width: 100%; padding: 10px 0; border: none; border-bottom: 1px solid #666;
+            font-size: 1rem; margin-bottom: 30px; background: transparent; color: var(--text-main); outline: none;
+        }
+        .login-input:focus { border-bottom: 2px solid var(--lh-yellow); }
+        .btn-login {
+            width: 100%; background: var(--lh-yellow); border: none; padding: 12px;
+            font-weight: bold; color: #000; cursor: pointer; border-radius: 2px;
+        }
+        .btn-login:hover { background: var(--lh-yellow-hover); }
 
-        /* === HEADER === */
+        /* === APP HEADER === */
         header {
-            background: #05164d; height: 60px; width: 100%;
-            display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
-            position: fixed; top: 0; z-index: 2000; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: #05164d; height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 30px;
+            color: white; position: fixed; top: 0; width: 100%; z-index: 1000;
         }
-        .logo { height: 24px; filter: brightness(0) invert(1); }
-        .user-panel { color: white; font-size: 0.9rem; display: flex; gap: 20px; align-items: center; }
+        .logo-white { height: 22px; filter: brightness(0) invert(1); }
+        .header-tools { display: flex; gap: 20px; font-size: 0.9rem; align-items: center; }
 
         /* === NAVIGATION === */
-        .nav-wrap {
-            background: var(--lh-card); width: 100%; height: 50px;
-            position: fixed; top: 60px; z-index: 1900;
-            border-bottom: 1px solid var(--lh-border); box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .nav-bar {
+            background: white; height: 50px; border-bottom: 1px solid #ddd;
+            position: fixed; top: 60px; width: 100%; z-index: 900;
+            display: flex; justify-content: center;
         }
-        .nav-inner { max-width: 1400px; margin: 0 auto; height: 100%; display: flex; align-items: center; padding: 0 20px; overflow-x: auto; }
+        .nav-inner { width: 100%; max-width: 1200px; display: flex; height: 100%; padding: 0 20px; }
         .nav-btn {
-            background: none; border: none; height: 100%; padding: 0 25px;
-            font-size: 0.95rem; font-weight: bold; color: var(--lh-text); cursor: pointer;
-            border-bottom: 4px solid transparent; transition: 0.2s; white-space: nowrap; opacity: 0.7;
+            background: none; border: none; height: 100%; padding: 0 20px;
+            font-weight: bold; color: #05164d; cursor: pointer; border-bottom: 4px solid transparent;
         }
-        .nav-btn:hover { opacity: 1; color: var(--lh-navy); }
-        .nav-btn.active { border-bottom-color: var(--lh-yellow); opacity: 1; color: var(--lh-navy); }
-        body.dark-mode .nav-btn.active { color: #60a5fa; }
+        .nav-btn.active { border-bottom-color: var(--lh-yellow); }
+        .nav-btn:hover { color: #555; }
 
-        /* === LAYOUT === */
-        .container { max-width: 1400px; margin: 140px auto 40px auto; padding: 0 30px; width: 100%; flex: 1; }
-        .dash-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
-        .responsive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        /* === MAIN CONTAINER === */
+        .container { margin: 130px auto 40px auto; max-width: 1200px; padding: 0 20px; width: 100%; }
 
+        /* === CARDS & LAYOUT === */
         .card {
-            background: var(--lh-card); border-radius: var(--radius); padding: 25px;
-            border: 1px solid var(--lh-border); box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-            height: 100%; display: flex; flex-direction: column;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            padding: 25px; margin-bottom: 20px; box-shadow: var(--shadow);
         }
-        
-        h2 { font-weight: 300; font-size: 1.8rem; margin-bottom: 25px; color: var(--lh-text); border-bottom: 1px solid var(--lh-border); padding-bottom: 15px; }
-        
-        /* === UI ELEMENTS === */
-        .label { display: block; font-size: 0.75rem; font-weight: bold; color: var(--lh-text-sec); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .inp {
-            width: 100%; padding: 12px; border: 1px solid var(--lh-border); border-radius: 4px;
-            font-size: 1rem; margin-bottom: 20px; background: var(--lh-card); color: var(--lh-text);
-        }
-        .btn {
-            width: 100%; padding: 12px 20px; border: none; border-radius: 4px;
-            font-size: 0.95rem; font-weight: bold; cursor: pointer; transition: 0.2s;
-            background: var(--lh-navy); color: white; text-align: center; text-transform: uppercase;
-        }
-        .btn:hover { filter: brightness(1.1); }
-        .btn-y { background: var(--lh-yellow); color: #05164d; }
-        .btn-red { background: #d50000; color: white; }
+        h2 { font-weight: 300; font-size: 1.5rem; margin-bottom: 20px; color: var(--text-main); }
+        h3 { font-size: 1.1rem; margin-bottom: 15px; color: var(--text-main); }
 
-        /* === MODAL === */
-        .modal-overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0, 0, 0, 0.85); z-index: 3000;
-            display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(4px); padding: 20px;
+        /* STATS (Reference: image_060c99.png) */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 30px; text-align: center; }
+        .stat-val { font-size: 2.5rem; color: var(--text-main); font-weight: 300; }
+        .stat-label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-top: 5px; font-weight: bold; }
+        body.dark-mode .stat-label { color: #94a3b8; }
+
+        /* ACTIVE FLIGHT (Reference: image_0510dc.png) */
+        .active-flight {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-left: 6px solid var(--lh-yellow); padding: 25px; position: relative;
+        }
+        .af-label { font-size: 0.7rem; color: #888; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .af-route { font-size: 2rem; font-weight: bold; color: var(--text-main); margin-bottom: 5px; }
+        .af-sub { font-size: 1rem; color: var(--lh-yellow); font-weight: bold; }
+        .af-progress { height: 6px; background: #eee; margin-top: 20px; border-radius: 3px; }
+        .af-fill { height: 100%; background: var(--lh-yellow); width: 0%; transition: width 1s linear; }
+        .btn-pirep { position: absolute; right: 25px; top: 25px; padding: 8px 15px; background: #ccc; border: none; font-weight: bold; color: #333; cursor: pointer; }
+
+        /* INPUTS & FILTERS */
+        .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .lh-input {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            background: var(--input-bg); color: var(--text-main); border-radius: 2px;
+        }
+
+        /* SCHEDULE LIST */
+        .flight-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .flight-card {
+            border: 1px solid var(--border-color); padding: 20px; display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-card); border-left: 4px solid #05164d;
+        }
+        body.dark-mode .flight-card { border-left-color: #60a5fa; }
+        .btn-select { background: var(--lh-yellow); color: #000; border: none; padding: 8px 20px; font-weight: bold; cursor: pointer; }
+
+        /* === OFP MODAL (Reference: image_052304.png) === */
+        .modal-wrap {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 5000; display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(2px);
         }
         .modal-box {
-            background: var(--lh-card); width: 100%; max-width: 900px; max-height: 90vh;
-            border-radius: var(--radius); overflow-y: auto; padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: modalPop 0.3s ease-out;
+            background: var(--bg-card); width: 900px; max-width: 95%; max-height: 90vh; overflow-y: auto;
+            padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         }
-        @keyframes modalPop { from { transform: scale(0.98); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .brief-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
-            background: var(--lh-bg); padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--lh-border);
+        .ofp-header {
+            display: flex; justify-content: space-between; border-bottom: 2px solid var(--text-main);
+            padding-bottom: 10px; margin-bottom: 20px; align-items: flex-end;
         }
-        .brief-item label { display: block; font-size: 0.7rem; color: var(--lh-text-sec); font-weight: bold; margin-bottom: 4px; }
-        .brief-item span { font-family: 'Roboto Mono', monospace; font-weight: 600; font-size: 1.1rem; color: var(--lh-text); }
-        #map { height: 350px; background: #eee; border-radius: 4px; margin-bottom: 20px; border: 1px solid var(--lh-border); z-index: 1; }
+        .ofp-title { font-size: 1.5rem; color: var(--text-main); font-weight: 300; }
+        .ofp-flight { font-size: 1.2rem; font-weight: bold; color: var(--text-main); }
+        
+        .ofp-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+        .ofp-item label { display: block; font-size: 0.7rem; font-weight: bold; color: #888; margin-bottom: 3px; }
+        .ofp-item span { display: block; font-weight: bold; font-size: 1rem; color: var(--text-main); font-family: 'Roboto', monospace; }
 
-        /* === LOGIN === */
-        #login-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 5000; background: var(--lh-card); display: flex; flex-direction: column; }
-        .login-header { height: 80px; padding: 0 5%; display: flex; align-items: center; border-bottom: 1px solid var(--lh-border); }
-        .login-body { flex: 1; display: flex; justify-content: center; align-items: flex-start; padding-top: 80px; background: var(--lh-bg); }
-        .login-card { background: var(--lh-card); padding: 50px; width: 100%; max-width: 480px; border: 1px solid var(--lh-border); border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .forgot-link { color: var(--lh-text-sec); cursor: pointer; text-decoration: underline; margin-top: 15px; display: block; font-size: 0.9rem; }
+        #map { height: 300px; background: #ddd; margin-bottom: 20px; border: 1px solid #ccc; }
 
-        /* === ACTIVE FLIGHT === */
-        .af-card { border-left: 8px solid var(--lh-yellow); }
-        .af-route { font-size: 2.5rem; font-weight: 300; color: var(--lh-text); line-height: 1; }
-        .bar-bg { height: 8px; background: var(--lh-bg); margin: 25px 0; border-radius: 4px; border: 1px solid var(--lh-border); }
-        .bar-fill { height: 100%; background: var(--lh-yellow); width: 0%; transition: width 1s linear; }
+        .btn-block-yellow { width: 100%; background: var(--lh-yellow); padding: 15px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; margin-bottom: 10px; color: black; }
+        .btn-block-grey { width: 100%; background: #ccc; padding: 15px; border: none; font-weight: bold; font-size: 1rem; cursor: pointer; color: #333; }
 
-        /* RESPONSIVE */
-        @media (max-width: 1000px) {
-            .dash-grid { grid-template-columns: 1fr; }
-            .brief-grid { grid-template-columns: repeat(2, 1fr); }
-            .stats-row { grid-template-columns: 1fr; }
+        /* FOOTER (Reference: image_05945b.png) */
+        footer {
+            background: #05164d; color: white; padding: 30px 10%; margin-top: auto;
+        }
+        .footer-links { display: flex; gap: 30px; font-size: 0.9rem; font-weight: bold; }
+        .footer-copy { margin-top: 15px; font-size: 0.8rem; color: #aaa; }
+
+        @media(max-width: 800px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .ofp-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <script>
-        // ==========================================
-        //         ADMIN CONFIGURATION ZONE
-        // ==========================================
+<script>
+    // ==========================================
+    //           CONFIG DATABASE (EDIT HERE)
+    // ==========================================
+    
+    // 1. NEWS LIST
+    const NEWS = [
+        { t: "Portal Update v65", d: "Design aligned with corporate identity." },
+        { t: "Winter Ops", d: "De-icing mandatory at stations < 3°C." }
+    ];
+
+    // 2. FLEET LIST (You can add more)
+    const FLEET = [
+        { id: "A320", name: "Airbus A320neo", op: "Lufthansa", seats: 180, range: 6 },
+        { id: "B748", name: "Boeing 747-8", op: "Lufthansa", seats: 364, range: 14 },
+        { id: "A359", name: "Airbus A350-900", op: "Lufthansa", seats: 293, range: 16 },
+        { id: "A220", name: "Airbus A220-300", op: "SWISS", seats: 145, range: 6 },
+        { id: "B777", name: "Boeing 777-300ER", op: "SWISS", seats: 340, range: 15 },
+        { id: "E195", name: "Embraer 195", op: "Austrian", seats: 120, range: 4 }
+    ];
+
+    // 3. ROUTES LIST (Paste your 1000+ routes here)
+    const ROUTES = [
+        // LUFTHANSA
+        { al: "Lufthansa", dep: "EDDF", arr: "EGLL", t: 1.5 },
+        { al: "Lufthansa", dep: "EDDF", arr: "KJFK", t: 8.5 },
+        { al: "Lufthansa", dep: "EDDF", arr: "KLAX", t: 11.5 },
+        { al: "Lufthansa", dep: "EDDF", arr: "RJTT", t: 12.0 },
+        { al: "Lufthansa", dep: "EDDM", arr: "LFPG", t: 1.2 },
+        // SWISS
+        { al: "SWISS", dep: "LSZH", arr: "EGLL", t: 1.8 },
+        { al: "SWISS", dep: "LSZH", arr: "KJFK", t: 8.8 },
+        // AUSTRIAN
+        { al: "Austrian", dep: "LOWW", arr: "EGLL", t: 2.2 },
+        { al: "Austrian", dep: "LOWW", arr: "VTBS", t: 10.5 },
+        // SAS
+        { al: "SAS", dep: "EKCH", arr: "EGLL", t: 1.9 },
+        // Add more...
+    ];
+
+    // 4. COORDINATES (For Map)
+    const COORDS = {
+        "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65],
+        "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "LFPG":[49.00,2.55], "RJTT":[35.54,139.77],
+        "VTBS":[13.69,100.75]
+    };
+
+    // ==========================================
+</script>
+
+<div id="login-overlay">
+    <div class="login-header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="login-logo">
+    </div>
+    <div class="login-body">
+        <div class="login-card">
+            <div class="login-title">Login</div>
+            <div style="font-size:0.9rem; color:#666; margin-bottom:30px;">Please enter your servicecard number or Travel ID.</div>
+            
+            <input type="text" id="user" class="login-input" placeholder="Travel ID (email address) / Servicecard number">
+            <input type="password" id="pass" class="login-input" placeholder="Password">
+            
+            <button class="btn-login" onclick="doLogin()">Next</button>
+            
+            <div style="margin-top:20px; font-size:0.9rem; color:#666;">
+                <div style="margin-bottom:10px;">Forgot your PIN or password?</div>
+                <div style="cursor:pointer;" onclick="alert('Contact Admin')">→ Register for Travel ID</div>
+            </div>
+            <div id="login-error" style="color:red; margin-top:10px; font-weight:bold;"></div>
+        </div>
+    </div>
+</div>
+
+<header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-white">
+    <div class="header-tools">
+        <span id="clock" style="font-family:'Roboto Mono'">00:00 Z</span>
+        <span style="font-weight:bold;">Capt. Hans</span>
+        <span onclick="toggleTheme()" style="cursor:pointer; font-size:1.2rem;">◑</span>
+    </div>
+</header>
+
+<div class="nav-bar hidden" id="nav">
+    <div class="nav-inner">
+        <button class="nav-btn active" onclick="showTab('dash', this)">Dashboard</button>
+        <button class="nav-btn" onclick="showTab('routes', this)">Flight Schedule</button>
+        <button class="nav-btn" onclick="showTab('fleet', this)">Fleet</button>
+        <button class="nav-btn" onclick="showTab('dispatch', this)">Dispatch</button>
+    </div>
+</div>
+
+<div class="container hidden" id="app">
+    
+    <div id="tab-dash">
+        <h2>Captain's Logbook</h2>
         
-        // 1. NEWS CONFIGURATION
-        const NEWS_DATA = [
-            { title: "Portal Update v64", date: "Dec 2024", text: "New dark mode engine and fleet database expansion." },
-            { title: "Winter Operations", date: "Nov 2024", text: "De-icing mandatory at stations with temp < 3°C." },
-            { title: "Route Network", date: "Oct 2024", text: "Added 50 new destinations to the Asian sector." }
-        ];
-
-        // 2. FLEET CONFIGURATION (Easy to add/edit)
-        // Format: { id: "Code", name: "Full Name", type: "S/L" (Short/Long), seats: 123, range: 6, speed: "M0.78", ceil: "FL390", ops: ["Airline1", "Airline2"] }
-        const FLEET_DATA = [
-            { id: "A320", name: "Airbus A320neo", type: "S", seats: 180, range: 6, speed: "M0.78", ceil: "FL390", engines:"PW1100G", ops: ["Lufthansa", "Eurowings", "Austrian", "SAS"] },
-            { id: "B748", name: "Boeing 747-8",   type: "L", seats: 364, range: 14, speed: "M0.85", ceil: "FL430", engines:"GEnx-2B", ops: ["Lufthansa"] },
-            { id: "A359", name: "Airbus A350-900",type: "L", seats: 293, range: 16, speed: "M0.85", ceil: "FL410", engines:"Trent XWB", ops: ["Lufthansa", "SAS"] },
-            { id: "A223", name: "Airbus A220-300",type: "S", seats: 145, range: 6,  speed: "M0.78", ceil: "FL410", engines:"PW1500G", ops: ["SWISS", "AirBaltic"] },
-            { id: "B777", name: "Boeing 777-300ER",type: "L", seats: 340, range: 15, speed: "M0.84", ceil: "FL430", engines:"GE90", ops: ["SWISS", "Austrian"] },
-            { id: "E195", name: "Embraer 195",    type: "S", seats: 120, range: 4,  speed: "M0.75", ceil: "FL410", engines:"CF34", ops: ["Austrian", "Lufthansa CityLine"] }
-        ];
-
-        // 3. ROUTES CONFIGURATION (PASTE YOUR 1000+ ROUTES HERE)
-        // Simple format: { al: "Airline", dep: "ICAO", arr: "ICAO", t: Hours }
-        const ROUTES_DATA = [
-            // --- LUFTHANSA ---
-            { al: "Lufthansa", dep: "EDDF", arr: "EGLL", t: 1.5 },
-            { al: "Lufthansa", dep: "EDDF", arr: "KJFK", t: 8.5 },
-            { al: "Lufthansa", dep: "EDDF", arr: "KLAX", t: 11.5 },
-            { al: "Lufthansa", dep: "EDDF", arr: "OMDB", t: 6.2 },
-            { al: "Lufthansa", dep: "EDDF", arr: "RJTT", t: 12.5 },
-            { al: "Lufthansa", dep: "EDDM", arr: "LFPG", t: 1.2 },
-            { al: "Lufthansa", dep: "EDDM", arr: "LEMD", t: 2.5 },
-            // --- SWISS ---
-            { al: "SWISS", dep: "LSZH", arr: "EGLL", t: 1.8 },
-            { al: "SWISS", dep: "LSZH", arr: "KJFK", t: 8.5 },
-            { al: "SWISS", dep: "LSZH", arr: "WSSS", t: 12.0 },
-            // --- AUSTRIAN ---
-            { al: "Austrian", dep: "LOWW", arr: "EGLL", t: 2.2 },
-            { al: "Austrian", dep: "LOWW", arr: "VTBS", t: 10.5 },
-            // --- EUROWINGS ---
-            { al: "Eurowings", dep: "EDDL", arr: "LEPA", t: 2.2 },
-            { al: "Eurowings", dep: "EDDL", arr: "EGLL", t: 1.4 },
-            // --- SAS ---
-            { al: "SAS", dep: "EKCH", arr: "EGLL", t: 1.9 },
-            { al: "SAS", dep: "EKCH", arr: "KEWR", t: 8.8 }
-            // ... Paste more routes here following the pattern ...
-        ];
-
-        // 4. COORDINATES DATABASE (For Map)
-        const COORDS = {
-            "EDDF":[50.0379, 8.5622], "EDDM":[48.3537, 11.7750], "LSZH":[47.4582, 8.5555], "LOWW":[48.1103, 16.5697], 
-            "EDDL":[51.2809, 6.7573], "EKCH":[55.6180, 12.6508], "EGLL":[51.4700, -0.4543], "LFPG":[49.0097, 2.5479], 
-            "LEMD":[40.4719, -3.5626], "KJFK":[40.6413, -73.7781], "KLAX":[33.9416, -118.4085], "OMDB":[25.2532, 55.3657], 
-            "RJTT":[35.5494, 139.7798], "WSSS":[1.3644, 103.9915], "VTBS":[13.6900, 100.7501], "LEPA":[39.5517, 2.7388], 
-            "KEWR":[40.6895, -74.1745]
-        };
-
-        // ==========================================
-        //       END OF CONFIGURATION
-        // ==========================================
-    </script>
-
-    <div id="intro-layer">
-        <div class="intro-content">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="intro-logo">
-            <div style="font-size: 1.5rem; letter-spacing: 2px;">Lufthansa Systems</div>
-            <div style="font-size: 0.9rem; letter-spacing: 4px; opacity: 0.8; margin-top: 8px;">CREW PORTAL</div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-val" id="stat-legs">0</div>
+                <div class="stat-label">Legs Flown</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-hours">0</div>
+                <div class="stat-label">Total Hours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-val" id="stat-rank" style="color:var(--lh-yellow)">-</div>
+                <div class="stat-label">Rank</div>
+            </div>
         </div>
-    </div>
 
-    <div id="login-wrap">
-        <div class="login-header"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Lufthansa_Logo_2018.svg/1200px-Lufthansa_Logo_2018.svg.png" style="height:32px;"></div>
-        <div class="login-body">
-            <div class="login-card">
-                <h2 style="margin:0 0 10px 0; border:none; color:var(--lh-text);">Login</h2>
-                <div style="font-size:0.95rem; margin-bottom:30px; color:var(--lh-text-sec);">Please enter your Servicecard or Travel ID.</div>
-                <input type="text" id="callsign" class="inp" placeholder="Travel ID / Callsign">
-                <input type="password" id="password" class="inp" placeholder="Password">
-                <button class="btn btn-y" onclick="doLogin()">Next</button>
-                <p id="login-err" style="color:#d50000; font-weight:bold; margin-top:15px; font-size:0.9rem;"></p>
-                <span class="forgot-link" onclick="alert('Please contact your system administrator to reset your credentials.')">Forgot your PIN or password?</span>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;">
+            <div>
+                <div id="active-flight-box" class="active-flight hidden">
+                    <div style="display:flex; justify-content:space-between;">
+                        <div>
+                            <div class="af-label">ACTIVE FLIGHT</div>
+                            <div class="af-route"><span id="af-dep"></span> → <span id="af-arr"></span></div>
+                            <div class="af-sub"><span id="af-num"></span></div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="af-sub" id="af-timer" style="color:var(--text-main); font-size:1.5rem;">00:00</div>
+                            <div class="af-label">REMAINING</div>
+                        </div>
+                    </div>
+                    <div class="af-progress"><div id="af-bar" class="af-fill"></div></div>
+                    <button class="btn-pirep hidden" id="btn-finish" onclick="finishFlight()">FILE PIREP</button>
+                </div>
+
+                <div id="mission-box" class="card" style="border-left: 6px solid #05164d;">
+                    <h3>Daily Assignment</h3>
+                    <div style="font-size:1.5rem; margin-bottom:10px;" id="mis-text">Loading...</div>
+                    <button class="btn-select" onclick="acceptMission()">PREPARE FLIGHT</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Operations Center</h3>
+                <div id="news-container"></div>
             </div>
         </div>
     </div>
 
-    <header>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo">
-        <div class="user-panel">
-            <span id="clock" style="font-family:'Roboto Mono'; opacity:0.8;">00:00 Z</span>
-            <span style="font-weight:bold;">Capt. Hans</span>
-            <span onclick="toggleTheme()" style="cursor:pointer; font-size:1.3rem;">◑</span>
-        </div>
-    </header>
-
-    <div class="nav-wrap hidden" id="nav-bar">
-        <div class="nav-inner">
-            <button class="nav-btn active" onclick="tab('dash', this)">Dashboard</button>
-            <button class="nav-btn" onclick="tab('fleet', this)">Fleet Overview</button>
-            <button class="nav-btn" onclick="tab('routes', this)">Flight Schedule</button>
-            <button class="nav-btn" onclick="tab('dispatch', this)">Dispatch Center</button>
-        </div>
-    </div>
-
-    <div class="container hidden" id="main-app">
+    <div id="tab-routes" class="hidden">
+        <h2>Flight Schedule</h2>
         
-        <div id="tab-dash" class="tab-content">
-            <div class="stats-row">
-                <div class="card" style="padding:30px; text-align:center; display:block;">
-                    <div style="font-size:3rem; color:var(--lh-text); font-weight:300; line-height:1;" id="st-fl">0</div>
-                    <div style="font-size:0.8rem; font-weight:bold; color:var(--lh-text-sec); margin-top:10px; letter-spacing:1px;">LEGS FLOWN</div>
-                </div>
-                <div class="card" style="padding:30px; text-align:center; display:block;">
-                    <div style="font-size:3rem; color:var(--lh-text); font-weight:300; line-height:1;" id="st-hr">0</div>
-                    <div style="font-size:0.8rem; font-weight:bold; color:var(--lh-text-sec); margin-top:10px; letter-spacing:1px;">HOURS</div>
-                </div>
-                <div class="card" style="padding:30px; text-align:center; display:block;">
-                    <div style="font-size:3rem; color:var(--lh-yellow); font-weight:300; line-height:1;" id="st-rk">-</div>
-                    <div style="font-size:0.8rem; font-weight:bold; color:var(--lh-text-sec); margin-top:10px; letter-spacing:1px;">RANK</div>
-                </div>
+        <div class="filter-row">
+            <div>
+                <span class="stat-label">Airline</span>
+                <select id="sel-airline" class="lh-input" onchange="renderRoutes()">
+                    <option value="ALL">All Airlines</option>
+                </select>
             </div>
-
-            <div class="dash-grid">
-                <div style="display:flex; flex-direction:column; gap:30px;">
-                    <div id="af-card" class="card af-card hidden">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:10px;">
-                            <div>
-                                <div style="font-size:0.8rem; font-weight:bold; color:var(--lh-text-sec); letter-spacing:1px; margin-bottom:5px;">ACTIVE SECTOR</div>
-                                <div class="af-route"><span id="af-dep"></span> &#8594; <span id="af-arr"></span></div>
-                                <div style="font-family:'Roboto Mono'; font-weight:bold; margin-top:10px; font-size:1.1rem; color:var(--lh-text-sec);"><span id="af-num"></span> &bull; <span id="af-ac"></span></div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div id="af-timer" style="font-size:2.5rem; font-weight:300; color:var(--lh-text);">00:00</div>
-                                <div style="font-size:0.75rem; color:var(--lh-text-sec); font-weight:bold;">REMAINING</div>
-                            </div>
-                        </div>
-                        <div class="bar-bg"><div id="af-bar" class="bar-fill"></div></div>
-                        <div style="display:flex; gap:15px; margin-top:auto;">
-                            <button class="btn btn-y hidden" id="btn-pirep" onclick="finishFlight()">FILE PIREP</button>
-                            <button class="btn btn-red" onclick="cancelFlight()">CANCEL FLIGHT</button>
-                        </div>
-                    </div>
-
-                    <div id="mission-box" class="card" style="background:#05164d; color:white; display:block; border:none;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                            <span style="background:#ffb600; color:#05164d; padding:4px 10px; border-radius:2px; font-weight:bold; font-size:0.8rem;">DAILY MISSION</span>
-                            <span id="mis-date" style="opacity:0.8; font-size:0.9rem;"></span>
-                        </div>
-                        <div id="mis-txt" style="font-size:2rem; font-weight:300; margin-bottom:30px;">Loading...</div>
-                        <button class="btn" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);" onclick="acceptMission()">PREPARE FLIGHT</button>
-                    </div>
-                </div>
-
-                <div class="card" style="display:block;">
-                    <h3 style="margin:0 0 20px 0; color:var(--lh-text); border:none;">Operations Center</h3>
-                    <div id="news-list"></div>
-                </div>
+            <div>
+                <span class="stat-label">Duration</span>
+                <select id="sel-time" class="lh-input" onchange="renderRoutes()">
+                    <option value="ALL">Any Duration</option>
+                    <option value="1-2">1-2 Hours</option>
+                    <option value="3-4">3-4 Hours</option>
+                    <option value="5-6">5-6 Hours</option>
+                    <option value="10+">10+ Hours</option>
+                </select>
             </div>
         </div>
 
-        <div id="tab-fleet" class="tab-content hidden">
-            <div class="card">
-                <h2>Fleet Overview</h2>
-                <div style="margin-bottom:25px; max-width:350px;">
-                    <span class="label">Filter by Operator</span>
-                    <select id="fl-filter" class="inp" onchange="renderFleet()"><option value="ALL">Show All</option></select>
-                </div>
-                <div id="fleet-list" class="responsive-grid"></div>
+        <div id="routes-list" class="flight-list"></div>
+    </div>
+
+    <div id="tab-fleet" class="hidden">
+        <h2>Fleet Overview</h2>
+        <div class="filter-row">
+            <div>
+                <span class="stat-label">Operator</span>
+                <select id="sel-fleet-op" class="lh-input" onchange="renderFleet()">
+                    <option value="ALL">All Operators</option>
+                </select>
             </div>
         </div>
+        <div id="fleet-list" class="flight-list"></div>
+    </div>
 
-        <div id="tab-routes" class="tab-content hidden">
-            <div class="card">
-                <h2>Flight Schedule</h2>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:25px; margin-bottom:25px;">
-                    <div><span class="label">Select Airline</span><select id="sch-al" class="inp" onchange="renderSchedule()"></select></div>
-                    <div><span class="label">Flight Duration</span><select id="sch-tm" class="inp" onchange="renderSchedule()">
-                        <option value="ALL">Show All</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="5-6">Long (5-6h)</option><option value="10+">Ultra (10h+)</option>
-                    </select></div>
-                </div>
-                <div id="sch-list" class="responsive-grid"></div>
+    <div id="tab-dispatch" class="hidden">
+        <div class="card" style="max-width:600px; margin:0 auto;">
+            <h2>Dispatcher</h2>
+            <div style="margin-bottom:20px;">
+                <span class="stat-label">Airline</span>
+                <select id="gen-al" class="lh-input" onchange="updateHubs()"></select>
             </div>
-        </div>
-
-        <div id="tab-dispatch" class="tab-content hidden">
-            <div class="card" style="max-width:700px; margin:0 auto; display:block;">
-                <h2>Flight Dispatcher</h2>
-                <div style="margin-bottom:20px;">
-                    <span class="label">Airline</span><select id="gen-al" class="inp" onchange="updateHubs()"></select>
-                </div>
-                <div style="margin-bottom:20px;">
-                    <span class="label">Departure Hub</span><select id="gen-hub" class="inp" disabled></select>
-                </div>
-                <div style="margin-bottom:30px;">
-                    <span class="label">Target Duration</span><select id="gen-tm" class="inp">
-                        <option value="ALL">Random</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="10+">Ultra (10h+)</option>
-                    </select>
-                </div>
-                <button class="btn btn-y" onclick="generate()">GENERATE FLIGHT PLAN</button>
+            <div style="margin-bottom:20px;">
+                <span class="stat-label">Departure Hub</span>
+                <select id="gen-hub" class="lh-input" disabled></select>
             </div>
+            <div style="margin-bottom:20px;">
+                <span class="stat-label">Duration</span>
+                <select id="gen-time" class="lh-input">
+                    <option value="ALL">Random</option>
+                    <option value="1-2">Short (1-2h)</option>
+                    <option value="10+">Long (10h+)</option>
+                </select>
+            </div>
+            <button class="btn-block-yellow" onclick="generateRandom()">GENERATE OFP</button>
         </div>
     </div>
 
-    <div id="modal-brief" class="modal-overlay hidden">
-        <div class="modal-box">
-            <div class="brief-header">
-                <h3 style="margin:0; color:var(--lh-text); border:none;">OFP GENERATION</h3>
-                <span id="br-num" style="font-weight:bold; font-size:1.3rem; color:var(--lh-text);">LH0000</span>
-            </div>
-            <div class="brief-grid">
-                <div class="brief-item"><label>DEPARTURE</label><span id="br-dep"></span></div>
-                <div class="brief-item"><label>ARRIVAL</label><span id="br-arr"></span></div>
-                <div class="brief-item"><label>AIRCRAFT</label><span id="br-ac"></span></div>
-                <div class="brief-item"><label>GATE (DEP)</label><span id="br-gate"></span></div>
-                <div class="brief-item"><label>ETE</label><span id="br-time"></span></div>
-                <div class="brief-item"><label>PAX</label><span id="br-pax"></span></div>
-                <div class="brief-item"><label>ZFW (EST)</label><span id="br-zfw"></span></div>
-                <div class="brief-item"><label>FLIGHT LEVEL</label><span id="br-fl"></span></div>
-            </div>
-            <div id="map"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div style="font-size:0.8rem; color:var(--lh-text-sec);">METAR: <b>VMC / >10KM</b></div>
-                <div style="display:flex; gap:15px;">
-                    <button class="btn" style="background:var(--lh-border); color:var(--lh-text); width:auto; padding:12px 25px;" onclick="document.getElementById('modal-brief').classList.add('hidden')">CANCEL</button>
-                    <button class="btn btn-y" style="width:auto; padding:12px 30px;" onclick="acceptBriefing()">ACCEPT FLIGHT</button>
-                </div>
-            </div>
-        </div>
+</div>
+
+<footer>
+    <div class="footer-links">
+        <span>Help & Contact</span>
+        <span>Imprint</span>
+        <span>Terms of Use</span>
+        <span>Data Protection</span>
+        <span>Corporate</span>
     </div>
+    <div class="footer-copy">© 2024 Lufthansa Systems. Internal use only.</div>
+</footer>
 
-    <script>
-        // === CORE LOGIC ===
-        const LOGIN = {u:"DLH001", p:"1234"};
-        let stats = JSON.parse(localStorage.getItem('stats')) || {fl:0, hr:0};
-        let tempF=null, map=null, misF=null, tmr=null;
+<div id="ofp-modal" class="modal-wrap hidden">
+    <div class="modal-box">
+        <div class="ofp-header">
+            <div class="ofp-title">OFP GENERATION</div>
+            <div class="ofp-flight" id="ofp-num">LH000</div>
+        </div>
 
-        window.onload = () => {
-            if(localStorage.getItem('theme')==='dark') document.body.classList.add('dark-mode');
-            setInterval(()=>{const d=new Date();document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`},1000);
-            renderUI(); check(); genMis();
-        };
+        <div class="ofp-grid">
+            <div class="ofp-item"><label>DEPARTURE</label><span id="ofp-dep"></span></div>
+            <div class="ofp-item"><label>ARRIVAL</label><span id="ofp-arr"></span></div>
+            <div class="ofp-item"><label>AIRCRAFT</label><span id="ofp-ac"></span></div>
+            <div class="ofp-item"><label>GATE (DEP)</label><span id="ofp-gate"></span></div>
+            <div class="ofp-item"><label>ETE</label><span id="ofp-time"></span></div>
+            <div class="ofp-item"><label>ZFW (EST)</label><span id="ofp-zfw"></span></div>
+            <div class="ofp-item"><label>FLIGHT LEVEL</label><span id="ofp-fl"></span></div>
+            <div class="ofp-item"><label>PAX</label><span id="ofp-pax"></span></div>
+        </div>
 
-        function doLogin(){
-            if(document.getElementById('callsign').value.toUpperCase()===LOGIN.u && document.getElementById('password').value===LOGIN.p){
-                document.getElementById('login-wrap').style.opacity=0;
-                setTimeout(()=>{document.getElementById('login-wrap').classList.add('hidden'); document.getElementById('nav-bar').classList.remove('hidden'); document.getElementById('main-app').classList.remove('hidden');},500);
-            } else document.getElementById('login-err').innerText="Invalid credentials. Please try again.";
+        <div id="map"></div>
+        <div style="font-size:0.8rem; margin-bottom:20px; font-weight:bold;">DEP METAR: VMC / >10KM &nbsp;&nbsp; ARR METAR: VMC / >10KM</div>
+
+        <button class="btn-block-yellow" onclick="confirmFlight()">ACCEPT FLIGHT</button>
+        <button class="btn-block-grey" onclick="closeOfp()">CANCEL</button>
+    </div>
+</div>
+
+<script>
+    // === STATE ===
+    let stats = JSON.parse(localStorage.getItem('stats')) || { legs:0, hours:0 };
+    let activeFlight = null;
+    let tempFlight = null;
+    let mapObj = null;
+    let timerInt = null;
+    let mission = null;
+
+    // === INIT ===
+    window.onload = function() {
+        if(localStorage.getItem('dark')==='1') document.body.classList.add('dark-mode');
+        setInterval(updateClock, 1000);
+        
+        // Init Dropdowns
+        const airlines = [...new Set(ROUTES.map(r => r.al))];
+        const sAl = document.getElementById('sel-airline');
+        const sOp = document.getElementById('sel-fleet-op');
+        const sG = document.getElementById('gen-al');
+        
+        airlines.forEach(a => {
+            sAl.add(new Option(a, a));
+            sOp.add(new Option(a, a));
+            sG.add(new Option(a, a));
+        });
+
+        // Init News
+        document.getElementById('news-container').innerHTML = NEWS.map(n => 
+            `<div style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #eee;">
+                <div style="font-weight:bold; color:var(--text-main);">${n.t}</div>
+                <div style="font-size:0.9rem; color:#666;">${n.d}</div>
+             </div>`
+        ).join('');
+
+        updateStats();
+        checkActive();
+        renderRoutes(); // Load routes immediately
+        renderFleet();
+        dailyMission();
+    };
+
+    function updateClock() {
+        const d = new Date();
+        document.getElementById('clock').innerText = d.getUTCHours().toString().padStart(2,'0') + ":" + d.getUTCMinutes().toString().padStart(2,'0') + " Z";
+    }
+
+    // === LOGIN ===
+    function doLogin() {
+        const u = document.getElementById('user').value.toUpperCase();
+        const p = document.getElementById('pass').value;
+        if(u === "DLH001" && p === "1234") {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('nav').classList.remove('hidden');
+            document.getElementById('app').classList.remove('hidden');
+        } else {
+            document.getElementById('login-error').innerText = "Invalid credentials";
         }
-        function tab(n,b){
-            document.querySelectorAll('.tab-content').forEach(x=>x.classList.add('hidden')); document.getElementById('tab-'+n).classList.remove('hidden');
-            document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active')); if(b)b.classList.add('active');
+    }
+
+    // === NAVIGATION ===
+    function showTab(id, btn) {
+        ['dash','routes','fleet','dispatch'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
+        document.getElementById('tab-'+id).classList.remove('hidden');
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if(id === 'routes') renderRoutes();
+        if(id === 'fleet') renderFleet();
+    }
+
+    // === LOGIC ===
+    function updateStats() {
+        document.getElementById('stat-legs').innerText = stats.legs;
+        document.getElementById('stat-hours').innerText = Math.floor(stats.hours);
+        document.getElementById('stat-rank').innerText = stats.legs > 20 ? "Captain" : (stats.legs > 5 ? "First Officer" : "Second Officer");
+    }
+
+    function renderRoutes() {
+        const al = document.getElementById('sel-airline').value;
+        const tm = document.getElementById('sel-time').value;
+        const list = document.getElementById('routes-list');
+        list.innerHTML = "";
+
+        const filtered = ROUTES.filter(r => (al === "ALL" || r.al === al) && checkTime(r.t, tm));
+
+        if(filtered.length === 0) {
+            list.innerHTML = "<div class='card'>No flights found.</div>";
+            return;
         }
 
-        function getUniqueAirlines() {
-            return [...new Set(ROUTES_DATA.map(item => item.al))];
-        }
-
-        // --- RENDER UI ---
-        function renderUI(){
-            document.getElementById('st-fl').innerText=stats.fl; document.getElementById('st-hr').innerText=Math.floor(stats.hr);
-            document.getElementById('st-rk').innerText=stats.fl>20?"Captain":(stats.fl>5?"First Officer":"Second Officer");
-            
-            // Populate Dropdowns dynamically
-            const sA=document.getElementById('sch-al'), sD=document.getElementById('gen-al'), fF=document.getElementById('fl-filter');
-            sA.innerHTML=''; sD.innerHTML='<option value="">-- Select Operator --</option>'; fF.innerHTML='<option value="ALL">All Operators</option>';
-            
-            const airlines = getUniqueAirlines();
-            airlines.forEach(al => {
-                sA.add(new Option(al, al));
-                sD.add(new Option(al, al));
-                fF.add(new Option(al, al));
-            });
-
-            // News Render
-            document.getElementById('news-list').innerHTML=NEWS_DATA.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--lh-border); padding-bottom:10px;">
-                <div style="font-weight:bold; color:var(--lh-text);">${n.title} <span style="font-size:0.75rem; color:var(--lh-text-sec); font-weight:normal; margin-left:10px;">${n.date}</span></div>
-                <div style="color:var(--lh-text-sec); font-size:0.9rem; margin-top:5px;">${n.text}</div>
-            </div>`).join('');
-            
-            renderFleet(); renderSchedule();
-        }
-
-        // --- ENHANCED FLEET RENDER ---
-        function renderFleet(){
-            const v=document.getElementById('fl-filter').value;
-            const c=document.getElementById('fleet-list'); 
-            c.innerHTML='';
-            
-            FLEET_DATA.filter(f => v==='ALL' || f.ops.includes(v)).forEach(f => {
-                c.innerHTML += `
-                <div class="card" style="margin:0; justify-content:center;">
-                    <div style="font-weight:bold; color:var(--lh-text); font-size:1.1rem; margin-bottom:10px;">${f.name}</div>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.85rem; color:var(--lh-text-sec);">
-                        <div>Seats: <b style="color:var(--lh-text)">${f.seats}</b></div>
-                        <div>Range: <b style="color:var(--lh-text)">${f.range}h</b></div>
-                        <div>Speed: <b style="color:var(--lh-text)">${f.speed}</b></div>
-                        <div>Ceiling: <b style="color:var(--lh-text)">${f.ceil}</b></div>
-                        <div style="grid-column: span 2;">Engines: ${f.engines}</div>
-                    </div>
-                </div>`;
-            });
-        }
-
-        // --- FIXED SCHEDULE LOGIC ---
-        function checkDuration(t,f){if(f==='ALL')return true; if(f==='1-2')return t>=1&&t<3; if(f==='3-4')return t>=3&&t<5; if(f==='5-6')return t>=5&&t<7; if(f==='10+')return t>=10; return false;}
-
-        function renderSchedule(){
-            const al = document.getElementById('sch-al').value;
-            const tf = document.getElementById('sch-time').value;
-            const g = document.getElementById('sch-list');
-            
-            if(!al) { g.innerHTML="<div class='card' style='align-items:center; justify-content:center; color:var(--lh-text-sec);'>Select Airline above to view schedule.</div>"; return; }
-            
-            // Filter global ROUTES_DATA
-            const r = ROUTES_DATA.filter(x => x.al === al && checkDuration(x.t, tf));
-            
-            g.innerHTML = r.length ? r.map(x => `
-            <div class="card" style="margin:0; border-left:5px solid var(--lh-navy); justify-content:space-between;">
+        filtered.forEach(r => {
+            list.innerHTML += `
+            <div class="flight-card">
                 <div>
-                    <div style="font-size:1.2rem; color:var(--lh-text); font-weight:bold;">${x.dep} &#8594; ${x.arr}</div>
-                    <div style="color:var(--lh-text-sec); margin-top:5px; font-size:0.9rem;">Duration: ${x.t}h</div>
+                    <div style="font-size:1.2rem; font-weight:bold; color:var(--text-main);">${r.dep} &rarr; ${r.arr}</div>
+                    <div style="color:#666;">${r.t}h • ${r.al}</div>
                 </div>
-                <button class="btn btn-y" style="margin-top:15px;" onclick="prep('${x.al}','${x.dep}','${x.arr}',${x.t})">SELECT FLIGHT</button>
-            </div>`).join('') : "<div class='card' style='align-items:center; justify-content:center; color:var(--lh-text-sec);'>No flights match your filters.</div>";
-        }
+                <button class="btn-select" onclick="prepareFlight('${r.al}','${r.dep}','${r.arr}',${r.t})">SELECT</button>
+            </div>`;
+        });
+    }
 
-        // --- DISPATCH & BRIEFING ---
-        function getPlane(al, t) {
-            const cat = t > 5 ? 'L' : 'S';
-            let p = FLEET_DATA.filter(f => f.ops.includes(al) && f.type === cat);
-            if(!p.length) p = FLEET_DATA.filter(f => f.ops.includes(al));
-            return p.length ? p[Math.floor(Math.random()*p.length)] : null;
-        }
-
-        function prep(al,d,a,t){
-            const p = getPlane(al, t); 
-            if(!p){alert("No aircraft configured for this operator/range."); return;}
-            
-            tempF = {
-                dep:d, arr:a, time:t, ac:p.name, 
-                num: al.substring(0,2).toUpperCase() + Math.floor(Math.random()*8999+1000), 
-                pax: Math.floor(p.seats * 0.85), 
-                zfw: (p.type=='L'?180:45) + ".5T", 
-                gate: "A"+Math.floor(Math.random()*40+1), 
-                fl: p.ceil
-            };
-            
-            ['dep','arr','ac','num','pax','zfw','gate','fl'].forEach(k => document.getElementById('br-'+k).innerText = tempF[k]);
-            document.getElementById('br-time').innerText = t+"h";
-            document.getElementById('modal-brief').classList.remove('hidden');
-            
-            setTimeout(() => {
-                if(map) map.remove(); 
-                map = L.map('map').setView([50,10], 3);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
-                
-                const c1 = COORDS[d] || [50,10]; 
-                const c2 = COORDS[a] || [40,-70];
-                
-                L.polyline([c1,c2], {color:'#05164d', weight:3}).addTo(map);
-                
-                // Add Markers
-                L.circleMarker(c1, {color:'#05164d', radius:5}).addTo(map).bindPopup(d);
-                L.circleMarker(c2, {color:'#ffb600', radius:5}).addTo(map).bindPopup(a);
-                
-                map.fitBounds([c1,c2], {padding:[50,50]});
-            }, 200);
-        }
-
-        function generate(){
-            const al = document.getElementById('gen-al').value;
-            const h = document.getElementById('gen-hub').value;
-            const tm = document.getElementById('gen-tm').value;
-            
-            if(!al || !h) return;
-            // Filter logic adapted for flat structure
-            const r = ROUTES_DATA.filter(x => x.al === al && x.dep === h && checkDuration(x.t, tm));
-            
-            if(!r.length) { alert("No routes match your criteria."); return; }
-            const s = r[Math.floor(Math.random()*r.length)];
-            prep(s.al, s.dep, s.arr, s.t);
-        }
-
-        function updateHubs(){
-            const al = document.getElementById('gen-al').value;
-            const h = document.getElementById('gen-hub'); 
-            h.innerHTML = '';
-            
-            if(al){
-                h.disabled = false;
-                // Find unique departure airports for this airline in ROUTES_DATA
-                const hubs = [...new Set(ROUTES_DATA.filter(r => r.al === al).map(r => r.dep))];
-                hubs.forEach(x => h.add(new Option(x,x)));
-            } else {
-                h.disabled = true;
-            }
-        }
-
-        function acceptBriefing(){
-            tempF.start = Date.now(); 
-            localStorage.setItem('active', JSON.stringify(tempF));
-            document.getElementById('modal-brief').classList.add('hidden'); 
-            check(); tab('dash');
-        }
-
-        function check(){
-            const s = localStorage.getItem('active');
-            if(!s){
-                document.getElementById('af-card').classList.add('hidden'); 
-                document.getElementById('mission-box').classList.remove('hidden'); 
-                return;
-            }
-            document.getElementById('af-card').classList.remove('hidden'); 
-            document.getElementById('mission-box').classList.add('hidden');
-            
-            const f = JSON.parse(s); 
-            ['dep','arr','num','ac'].forEach(k => document.getElementById('af-'+k).innerText = f[k]);
-            
-            if(tmr) clearInterval(tmr);
-            tmr = setInterval(() => {
-                const el = Date.now() - f.start;
-                const dur = f.time * 10000; // 1 hour = 10 sec for demo
-                const pct = Math.min(100, (el/dur)*100);
-                
-                document.getElementById('af-bar').style.width = pct+"%"; 
-                document.getElementById('af-timer').innerText = pct >= 100 ? "ARRIVED" : "IN FLIGHT";
-                
-                if(pct >= 100) document.getElementById('btn-pirep').classList.remove('hidden');
-            }, 1000);
-        }
-
-        function finishFlight(){
-            const f = JSON.parse(localStorage.getItem('active')); 
-            stats.fl++; 
-            stats.hr += f.time; 
-            localStorage.setItem('stats', JSON.stringify(stats)); 
-            localStorage.removeItem('active'); 
-            check(); renderUI();
-        }
-
-        function cancelFlight(){
-            localStorage.removeItem('active'); 
-            check();
-        }
+    function renderFleet() {
+        const op = document.getElementById('sel-fleet-op').value;
+        const list = document.getElementById('fleet-list');
+        list.innerHTML = "";
         
-        function genMis(){
-            const d = new Date().getDate(); 
-            const al = "Lufthansa";
-            const airlineRoutes = ROUTES_DATA.filter(r => r.al === al);
+        FLEET.filter(f => op === "ALL" || f.op === op).forEach(f => {
+            list.innerHTML += `
+            <div class="flight-card" style="border-left:none; display:block;">
+                <div style="font-weight:bold; font-size:1.1rem; color:var(--text-main);">${f.name}</div>
+                <div style="color:#666; font-size:0.9rem; margin-top:5px;">${f.op} • ${f.seats} Seats • ${f.range}h Range</div>
+            </div>`;
+        });
+    }
+
+    function checkTime(t, f) {
+        if(f==="ALL") return true;
+        if(f==="1-2") return t>=1 && t<3;
+        if(f==="3-4") return t>=3 && t<5;
+        if(f==="5-6") return t>=5 && t<7;
+        if(f==="10+") return t>=10;
+        return false;
+    }
+
+    // === FLIGHT PREP ===
+    function prepareFlight(al, d, a, t) {
+        // Find aircraft
+        let ac = FLEET.find(f => f.op === al && (t > 6 ? f.range > 10 : f.range < 10));
+        if(!ac) ac = FLEET.find(f => f.op === al) || FLEET[0];
+
+        tempFlight = {
+            dep: d, arr: a, time: t, ac: ac.name,
+            num: al.substring(0,2).toUpperCase() + Math.floor(Math.random()*9000+1000),
+            gate: "A" + Math.floor(Math.random()*50),
+            pax: Math.floor(ac.seats * 0.8),
+            zfw: (t>5 ? 150 : 45) + "T",
+            fl: "FL360"
+        };
+
+        // Populate Modal
+        document.getElementById('ofp-num').innerText = tempFlight.num;
+        ['dep','arr','ac','gate','time','zfw','fl','pax'].forEach(k => document.getElementById('ofp-'+k).innerText = tempFlight[k]);
+        document.getElementById('ofp-time').innerText += "h";
+
+        document.getElementById('ofp-modal').classList.remove('hidden');
+
+        setTimeout(() => {
+            if(mapObj) mapObj.remove();
+            mapObj = L.map('map').setView([50,10], 3);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapObj);
+            const c1 = COORDS[d] || [50,10];
+            const c2 = COORDS[a] || [40,-70];
+            L.polyline([c1,c2], {color: '#05164d', weight: 3}).addTo(mapObj);
+            mapObj.fitBounds([c1,c2], {padding:[50,50]});
+        }, 100);
+    }
+
+    function confirmFlight() {
+        tempFlight.start = Date.now();
+        localStorage.setItem('active', JSON.stringify(tempFlight));
+        closeOfp();
+        checkActive();
+        showTab('dash', document.querySelector('.nav-btn'));
+    }
+
+    function closeOfp() { document.getElementById('ofp-modal').classList.add('hidden'); }
+
+    // === ACTIVE FLIGHT ===
+    function checkActive() {
+        const s = localStorage.getItem('active');
+        if(!s) {
+            document.getElementById('active-flight-box').classList.add('hidden');
+            document.getElementById('mission-box').classList.remove('hidden');
+            return;
+        }
+        activeFlight = JSON.parse(s);
+        document.getElementById('active-flight-box').classList.remove('hidden');
+        document.getElementById('mission-box').classList.add('hidden');
+
+        document.getElementById('af-dep').innerText = activeFlight.dep;
+        document.getElementById('af-arr').innerText = activeFlight.arr;
+        document.getElementById('af-num').innerText = activeFlight.num;
+
+        if(timerInt) clearInterval(timerInt);
+        timerInt = setInterval(() => {
+            const el = Date.now() - activeFlight.start;
+            const dur = activeFlight.time * 10000; // 1h = 10s for demo
+            const pct = Math.min(100, (el/dur)*100);
+            document.getElementById('af-bar').style.width = pct + "%";
             
-            if (airlineRoutes.length > 0) {
-                const r = airlineRoutes[d % airlineRoutes.length];
-                misF = {al: r.al, dep: r.dep, arr: r.arr, t: r.t};
-                document.getElementById('mis-date').innerText = new Date().toLocaleDateString(); 
-                document.getElementById('mis-txt').innerText = `${misF.dep} -> ${misF.arr}`;
+            if(pct >= 100) {
+                document.getElementById('af-timer').innerText = "ARRIVED";
+                document.getElementById('btn-finish').classList.remove('hidden');
+            } else {
+                document.getElementById('af-timer').innerText = "IN FLIGHT";
             }
-        }
+        }, 1000);
+    }
 
-        function acceptMission(){ prep(misF.al, misF.dep, misF.arr, misF.t); }
+    function finishFlight() {
+        stats.legs++;
+        stats.hours += activeFlight.time;
+        localStorage.setItem('stats', JSON.stringify(stats));
+        localStorage.removeItem('active');
+        checkActive();
+        updateStats();
+    }
 
-        function toggleTheme(){
-            document.body.classList.toggle('dark-mode'); 
-            localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-        }
-    </script>
+    // === GENERATOR & MISC ===
+    function updateHubs() {
+        const al = document.getElementById('gen-al').value;
+        const h = document.getElementById('gen-hub');
+        h.innerHTML = "";
+        h.disabled = false;
+        const hubs = [...new Set(ROUTES.filter(r => r.al === al).map(r => r.dep))];
+        hubs.forEach(x => h.add(new Option(x,x)));
+    }
+
+    function generateRandom() {
+        const al = document.getElementById('gen-al').value;
+        const h = document.getElementById('gen-hub').value;
+        const tm = document.getElementById('gen-time').value;
+        const r = ROUTES.filter(x => x.al === al && x.dep === h && checkTime(x.t, tm));
+        if(!r.length) { alert("No routes match."); return; }
+        const s = r[Math.floor(Math.random()*r.length)];
+        prepareFlight(s.al, s.dep, s.arr, s.t);
+    }
+
+    function dailyMission() {
+        const d = new Date().getDate();
+        const r = ROUTES[d % ROUTES.length];
+        mission = r;
+        document.getElementById('mis-text').innerText = r.dep + " → " + r.arr;
+    }
+    function acceptMission() { prepareFlight(mission.al, mission.dep, mission.arr, mission.t); }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('dark', document.body.classList.contains('dark-mode') ? '1' : '0');
+    }
+</script>
+
 </body>
 </html>
