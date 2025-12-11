@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+FV<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v71</title>
+    <title>Lufthansa Crew Portal v72</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -48,21 +48,18 @@
         }
         .hidden { display: none !important; }
 
-        /* === ANIMATIONS RESTORED === */
+        /* ANIMATIONS */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
-        /* Применяем анимацию к контенту вкладок */
         .tab-content { animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        /* === INTRO (BIGGER LOGO) === */
+        /* === INTRO === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05164d; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.8s ease, visibility 0.8s;
         }
-        /* УВЕЛИЧЕНО В 2.5 РАЗА */
         .intro-logo-wrap { position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center; }
         .intro-logo { width: 160px; filter: brightness(0) invert(1); opacity: 0; animation: logoFade 1.2s ease 0.5s forwards; }
         .intro-line {
@@ -77,7 +74,7 @@
         @keyframes logoFade { to { opacity: 1; transform: scale(1.1); } }
         @keyframes txtUp { to { opacity: 0.8; transform: translateY(-5px); } }
 
-        /* === HEADER (FIXED) === */
+        /* === HEADER === */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-h);
             background: #05164d; z-index: 2000;
@@ -87,17 +84,14 @@
         .logo-img { height: 22px; filter: brightness(0) invert(1); }
         .user-panel { display: flex; align-items: center; gap: 15px; color: white; font-size: 0.85rem; font-weight: 600; }
 
-        /* === NAV BAR (SCROLLABLE) === */
+        /* === NAV BAR === */
         .nav-bar {
             position: fixed; top: var(--header-h); left: 0; width: 100%; height: var(--nav-h);
             background: var(--bg-card); border-bottom: 1px solid var(--border); z-index: 1900;
             overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;
         }
         .nav-bar::-webkit-scrollbar { display: none; }
-        .nav-inner { 
-            display: flex; height: 100%; margin: 0 auto; max-width: 1200px; padding: 0 10px;
-            width: 100%; justify-content: center; 
-        }
+        .nav-inner { display: flex; height: 100%; margin: 0 auto; max-width: 1200px; padding: 0 10px; width: 100%; justify-content: center; }
         .nav-btn {
             background: none; border: none; height: 100%; padding: 0 20px;
             font-size: 0.9rem; font-weight: 600; color: var(--text-sub);
@@ -107,23 +101,15 @@
 
         /* === LAYOUT === */
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; width: 100%; }
-
-        /* Cards */
-        .card {
-            background: var(--bg-card); border-radius: var(--radius); padding: 25px;
-            border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        .card { background: var(--bg-card); border-radius: var(--radius); padding: 25px; border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px; transition: transform 0.2s ease; }
         h2 { font-weight: 400; font-size: 1.4rem; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; }
 
-        /* Stats Grid */
         .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
         .stat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
         .stat-val { font-size: 2.2rem; font-weight: 300; color: var(--text-main); letter-spacing: -1px; line-height: 1; }
         .stat-lbl { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-top: 8px; }
 
-        /* Active Flight */
         .af-card { border-left: 6px solid var(--lh-yellow); }
         .af-row { display: flex; justify-content: space-between; align-items: flex-end; }
         .af-route { font-size: 2rem; font-weight: 400; color: var(--text-main); line-height: 1; }
@@ -132,30 +118,17 @@
         .prog-fill { height: 100%; background: var(--lh-yellow); width: 0%; transition: width 1s linear; }
         .timer-display { font-size: 1.5rem; font-family: 'Roboto Mono', monospace; }
 
-        /* Lists & Filters */
         .filter-row { display: flex; gap: 15px; margin-bottom: 20px; }
         .inp-sel { flex: 1; padding: 12px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-main); border-radius: var(--radius); font-size: 0.95rem; outline: none; -webkit-appearance: none; }
         
         .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 15px; }
-        .list-item {
-            background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;
-            display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        .list-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .list-item:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
         .btn-sm { padding: 10px 18px; font-size: 0.85rem; font-weight: 600; background: var(--lh-yellow); border: none; border-radius: 6px; cursor: pointer; color: #05164d; white-space: nowrap; transition: 0.2s; }
         .btn-sm:hover { background: var(--lh-yellow-hover); }
 
-        /* Modal (Mobile Friendly) */
-        .modal-wrap {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 6000;
-            display: flex; justify-content: center; align-items: center; padding: 10px;
-        }
-        .modal-c {
-            width: 800px; max-width: 100%; max-height: 100%; overflow-y: auto;
-            background: var(--bg-card); padding: 25px; border-radius: var(--radius);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3); animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .modal-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 6000; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .modal-c { width: 800px; max-width: 100%; max-height: 100%; overflow-y: auto; background: var(--bg-card); padding: 25px; border-radius: var(--radius); box-shadow: 0 20px 40px rgba(0,0,0,0.3); animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .ofp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: var(--bg-body); padding: 15px; border-radius: 8px; margin: 20px 0; border: 1px solid var(--border); }
         .ofp-lbl { font-size: 0.65rem; font-weight: 700; color: var(--text-sub); margin-bottom: 4px; }
         .ofp-val { font-family: 'Roboto Mono', monospace; font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
@@ -163,65 +136,97 @@
         .btn-main { width: 100%; padding: 15px; background: var(--lh-yellow); color: #05164d; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
         .btn-main:hover { background: var(--lh-yellow-hover); }
 
-        /* Login (Fixed & Responsive) */
-        #login-wrap {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: var(--bg-body); z-index: 5000; display: flex; flex-direction: column;
-        }
+        /* Login */
+        #login-wrap { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 5000; display: flex; flex-direction: column; }
         .login-nav { height: 60px; background: var(--bg-card); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 20px; }
         .login-nav img { height: 32px; } 
-
         .login-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card {
-            width: 100%; max-width: 400px; background: var(--bg-card); padding: 30px;
-            border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow);
-            animation: slideUp 0.5s ease-out;
-        }
+        .login-card { width: 100%; max-width: 400px; background: var(--bg-card); padding: 30px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); animation: slideUp 0.5s ease-out; }
         .inp-float { width: 100%; padding: 12px 0; border: none; border-bottom: 1px solid #aaa; background: transparent; color: var(--text-main); font-size: 1rem; margin-bottom: 20px; outline: none; border-radius: 0; transition: border-color 0.3s; }
         .inp-float:focus { border-bottom-color: var(--lh-yellow); }
 
-        /* === MOBILE MEDIA QUERIES === */
         @media (max-width: 768px) {
-            .nav-inner { justify-content: flex-start; }
-            .grid-3 { grid-template-columns: 1fr; }
-            .dash-layout { grid-template-columns: 1fr; }
+            .nav-inner { justify-content: flex-start; } .grid-3, .dash-layout, .ofp-grid, .list-grid { grid-template-columns: 1fr; } 
+            .filter-row { flex-direction: column; gap: 10px; } .modal-c { height: 100%; border-radius: 0; padding: 20px; } .af-route { font-size: 1.8rem; }
             .ofp-grid { grid-template-columns: 1fr 1fr; }
-            .filter-row { flex-direction: column; gap: 10px; }
-            .list-grid { grid-template-columns: 1fr; }
-            .modal-c { height: 100%; border-radius: 0; padding: 20px; }
-            .af-route { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
 
 <script>
+    // === CALLSIGN MAPPING (ICAO/IATA) ===
+    const CODES = {
+        "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT",
+        "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y",
+        "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL",
+        "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN",
+        "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF",
+        "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE",
+        "AeroLogic": "3S", "SunExpress": "XQ"
+    };
+
     const DB = {
         NEWS: [
-            { t: "System Update v71", d: "Enhanced animations and visual improvements." },
+            { t: "Database Update v72", d: "Added all partner airlines and correct callsigns." },
             { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." }
         ],
+        // EXPANDED FLEET
         FLEET: [
-            { id: "A320", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, eng: "PW1100G", ceil: "FL390", spd: "M0.78" },
+            { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, eng: "PW1100G", ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, eng: "GEnx-2B", ceil: "FL430", spd: "M0.85" },
             { id: "A359", t: "Airbus A350-900", op: "Lufthansa", s: 293, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
-            { id: "A223", t: "Airbus A220-300", op: "SWISS", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
-            { id: "B77W", t: "Boeing 777-300ER", op: "SWISS", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" }
+            { id: "B77F", t: "Boeing 777F", op: "Lufthansa Cargo", s: 4, r: 10, eng: "GE90", ceil: "FL430", spd: "M0.84" },
+            { id: "A333", t: "Airbus A330-300", op: "Swiss", s: 236, r: 10, eng: "Trent 700", ceil: "FL410", spd: "M0.82" },
+            { id: "B77W", t: "Boeing 777-300ER", op: "Swiss", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" },
+            { id: "A223", t: "Airbus A220-300", op: "Swiss", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
+            { id: "B789", t: "Boeing 787-9", op: "Austrian", s: 294, r: 14, eng: "GEnx", ceil: "FL430", spd: "M0.85" },
+            { id: "E195", t: "Embraer 195", op: "Austrian", s: 120, r: 4, eng: "CF34", ceil: "FL410", spd: "M0.78" },
+            { id: "A220B", t: "Airbus A220-300", op: "AirBaltic", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
+            { id: "A320E", t: "Airbus A320", op: "Eurowings", s: 180, r: 5, eng: "CFM56", ceil: "FL390", spd: "M0.78" },
+            { id: "A330D", t: "Airbus A330-300", op: "Discover Airlines", s: 280, r: 10, eng: "Trent 700", ceil: "FL410", spd: "M0.82" },
+            { id: "A350I", t: "Airbus A350-900", op: "ITA Airways", s: 300, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
+            { id: "A330N", t: "Airbus A330neo", op: "Condor", s: 310, r: 12, eng: "Trent 7000", ceil: "FL410", spd: "M0.82" },
+            { id: "B738", t: "Boeing 737-800", op: "Norwegian", s: 189, r: 6, eng: "CFM56", ceil: "FL410", spd: "M0.78" },
+            { id: "A359F", t: "Airbus A350-900", op: "Finnair", s: 297, r: 15, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
+            { id: "A320S", t: "Airbus A320neo", op: "SAS", s: 180, r: 6, eng: "LEAP-1A", ceil: "FL390", spd: "M0.78" },
+            { id: "B77L", t: "Boeing 777F", op: "AeroLogic", s: 2, r: 10, eng: "GE90", ceil: "FL430", spd: "M0.84" },
+            { id: "B738S", t: "Boeing 737-800", op: "SunExpress", s: 189, r: 5, eng: "CFM56", ceil: "FL410", spd: "M0.78" }
         ],
+        // EXPANDED ROUTES
         ROUTES: [
-            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 },
-            { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 },
-            { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5 },
-            { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2 },
-            { al: "SWISS", d: "LSZH", a: "EGLL", t: 1.8 },
-            { al: "SWISS", d: "LSZH", a: "WSSS", t: 12.0 },
-            { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5 },
-            { al: "SAS", d: "EKCH", a: "KEWR", t: 8.8 }
+            // Lufthansa
+            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 }, { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 },
+            { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2 }, { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2 },
+            // Swiss
+            { al: "Swiss", d: "LSZH", a: "EGLL", t: 1.8 }, { al: "Swiss", d: "LSZH", a: "WSSS", t: 12.0 },
+            { al: "Swiss", d: "LSZH", a: "KJFK", t: 8.8 },
+            // Austrian
+            { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5 }, { al: "Austrian", d: "LOWW", a: "EGLL", t: 2.2 },
+            // AirBaltic
+            { al: "AirBaltic", d: "EVRA", a: "EDDL", t: 2.0 }, { al: "AirBaltic", d: "EVRA", a: "EGLL", t: 2.5 },
+            // Eurowings
+            { al: "Eurowings", d: "EDDL", a: "LEPA", t: 2.2 }, { al: "Eurowings", d: "EDDL", a: "EGLL", t: 1.2 },
+            // Discover
+            { al: "Discover Airlines", d: "EDDF", a: "FIMP", t: 11.0 }, { al: "Discover Airlines", d: "EDDF", a: "MCO", t: 10.0 },
+            // Cargo
+            { al: "Lufthansa Cargo", d: "EDDF", a: "VHHH", t: 11.5 }, { al: "AeroLogic", d: "EDDP", a: "KCVG", t: 9.0 },
+            // ITA
+            { al: "ITA Airways", d: "LIRF", a: "KJFK", t: 9.0 }, { al: "ITA Airways", d: "LIRF", a: "EGLL", t: 2.5 },
+            // Nordic
+            { al: "SAS", d: "EKCH", a: "KEWR", t: 8.5 }, { al: "Finnair", d: "EFHK", a: "RJTT", t: 13.0 },
+            { al: "Norwegian", d: "ENGM", a: "LEPA", t: 3.5 },
+            // Others
+            { al: "Condor", d: "EDDF", a: "CUN", t: 11.0 }, { al: "SunExpress", d: "LTAI", a: "EDDL", t: 3.5 },
+            { al: "Air Dolomiti", d: "EDDM", a: "LIPZ", t: 1.0 }, { al: "Brussels Airlines", d: "EBBR", a: "KJFK", t: 8.0 }
         ],
         COORDS: {
             "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65],
             "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99],
-            "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17]
+            "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76],
+            "LEPA":[39.55,2.73], "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23],
+            "KCVG":[39.04,-84.66], "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10],
+            "CUN":[21.04,-86.87], "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48]
         }
     };
 </script>
@@ -242,13 +247,10 @@
         <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
             <p style="color:var(--text-sub); margin-bottom:30px; font-size:0.9rem;">Please enter your Travel ID.</p>
-            
             <input type="text" id="user" class="inp-float" placeholder="Travel ID">
             <input type="password" id="pass" class="inp-float" placeholder="Password">
-            
             <button class="btn-main" onclick="app.login()">Next</button>
             <div id="login-msg" style="color:red; margin-top:15px; font-size:0.9rem;"></div>
-            
             <div style="margin-top:25px; font-size:0.85rem; color:var(--text-sub);">
                 <div style="margin-bottom:8px; cursor:pointer; text-decoration:underline;" onclick="alert('Please contact your system administrator to reset your credentials.')">Forgot your PIN or password?</div>
             </div>
@@ -277,51 +279,27 @@
 
     <div id="tab-dash" class="tab-content">
         <h2>Captain's Logbook</h2>
-        
         <div class="grid-3">
-            <div class="stat-box">
-                <div class="stat-val" id="st-l">0</div>
-                <div class="stat-lbl">Legs Flown</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-val" id="st-h">0</div>
-                <div class="stat-lbl">Total Hours</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-val" id="st-r" style="color:var(--lh-yellow)">-</div>
-                <div class="stat-lbl">Rank</div>
-            </div>
+            <div class="stat-box"><div class="stat-val" id="st-l">0</div><div class="stat-lbl">Legs Flown</div></div>
+            <div class="stat-box"><div class="stat-val" id="st-h">0</div><div class="stat-lbl">Total Hours</div></div>
+            <div class="stat-box"><div class="stat-val" id="st-r" style="color:var(--lh-yellow)">-</div><div class="stat-lbl">Rank</div></div>
         </div>
-
         <div style="display:grid; grid-template-columns: 2fr 1fr; gap:20px;" class="dash-layout">
             <div style="display:flex; flex-direction:column; gap:20px;">
                 <div id="af-box" class="card af-card hidden">
                     <div class="af-row">
-                        <div>
-                            <div class="stat-lbl" style="margin-bottom:5px;">ACTIVE SECTOR</div>
-                            <div class="af-route"><span id="af-d"></span> &rarr; <span id="af-a"></span></div>
-                            <div class="af-det"><span id="af-n"></span> • <span id="af-ac"></span></div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div class="af-route timer-display" id="af-t">00:00</div>
-                            <div class="stat-lbl">REMAINING</div>
-                        </div>
+                        <div><div class="stat-lbl" style="margin-bottom:5px;">ACTIVE SECTOR</div><div class="af-route"><span id="af-d"></span> &rarr; <span id="af-a"></span></div><div class="af-det"><span id="af-n"></span> • <span id="af-ac"></span></div></div>
+                        <div style="text-align:right;"><div class="af-route timer-display" id="af-t">00:00</div><div class="stat-lbl">REMAINING</div></div>
                     </div>
                     <div class="prog-track"><div id="af-bar" class="prog-fill"></div></div>
                     <button class="btn-main hidden" id="btn-end" onclick="app.finish()">FILE PIREP</button>
                 </div>
-
                 <div id="mis-box" class="card" style="border-left: 5px solid #05164d;">
-                    <h3>Daily Assignment</h3>
-                    <div id="mis-txt" style="font-size:1.6rem; font-weight:300; margin-bottom:20px;">Loading...</div>
+                    <h3>Daily Assignment</h3><div id="mis-txt" style="font-size:1.6rem; font-weight:300; margin-bottom:20px;">Loading...</div>
                     <button class="btn-sm" style="font-size:0.95rem; padding:12px 20px;" onclick="app.prepMis()">PREPARE FLIGHT</button>
                 </div>
             </div>
-
-            <div class="card">
-                <h3>Operations Center</h3>
-                <div id="news-list"></div>
-            </div>
+            <div class="card"><h3>Operations Center</h3><div id="news-list"></div></div>
         </div>
     </div>
 
@@ -330,11 +308,7 @@
         <div class="filter-row">
             <select id="flt-al" class="inp-sel" onchange="app.renderR()"></select>
             <select id="flt-tm" class="inp-sel" onchange="app.renderR()">
-                <option value="ALL">All Durations</option>
-                <option value="1-2">Short (1-2h)</option>
-                <option value="3-4">Medium (3-4h)</option>
-                <option value="5-6">Long (5-6h)</option>
-                <option value="10+">Ultra (10h+)</option>
+                <option value="ALL">All Durations</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="5-6">Long (5-6h)</option><option value="10+">Ultra (10h+)</option>
             </select>
         </div>
         <div id="list-routes" class="list-grid"></div>
@@ -342,33 +316,16 @@
 
     <div id="tab-fleet" class="tab-content hidden">
         <h2>Fleet Overview</h2>
-        <div class="filter-row">
-            <select id="flt-op" class="inp-sel" onchange="app.renderF()"></select>
-        </div>
+        <div class="filter-row"><select id="flt-op" class="inp-sel" onchange="app.renderF()"></select></div>
         <div id="list-fleet" class="list-grid"></div>
     </div>
 
     <div id="tab-dispatch" class="tab-content hidden">
         <div class="card" style="max-width:600px; margin:0 auto;">
             <h2>Flight Dispatcher</h2>
-            <div style="margin-bottom:20px;">
-                <div class="stat-lbl" style="margin-bottom:5px;">Operator</div>
-                <select id="gen-al" class="inp-sel" onchange="app.updHub()"></select>
-            </div>
-            <div style="margin-bottom:20px;">
-                <div class="stat-lbl" style="margin-bottom:5px;">Hub</div>
-                <select id="gen-hub" class="inp-sel" disabled></select>
-            </div>
-            <div style="margin-bottom:30px;">
-                <div class="stat-lbl" style="margin-bottom:5px;">Duration</div>
-                <select id="gen-tm" class="inp-sel">
-                    <option value="ALL">Random</option>
-                    <option value="1-2">1-2h</option>
-                    <option value="3-4">3-4h</option>
-                    <option value="5-6">5-6h</option>
-                    <option value="10+">10h+</option>
-                </select>
-            </div>
+            <div style="margin-bottom:20px;"><div class="stat-lbl" style="margin-bottom:5px;">Operator</div><select id="gen-al" class="inp-sel" onchange="app.updHub()"></select></div>
+            <div style="margin-bottom:20px;"><div class="stat-lbl" style="margin-bottom:5px;">Hub</div><select id="gen-hub" class="inp-sel" disabled></select></div>
+            <div style="margin-bottom:30px;"><div class="stat-lbl" style="margin-bottom:5px;">Duration</div><select id="gen-tm" class="inp-sel"><option value="ALL">Random</option><option value="1-2">1-2h</option><option value="3-4">3-4h</option><option value="5-6">5-6h</option><option value="10+">10h+</option></select></div>
             <button class="btn-main" onclick="app.gen()">GENERATE OFP</button>
         </div>
     </div>
@@ -377,10 +334,7 @@
 
 <div id="modal" class="modal-wrap hidden">
     <div class="modal-c">
-        <div style="display:flex; justify-content:space-between; border-bottom:2px solid var(--text-main); margin-bottom:20px; padding-bottom:10px;">
-            <h3>OFP BRIEFING</h3>
-            <h3 id="br-num">LH000</h3>
-        </div>
+        <div style="display:flex; justify-content:space-between; border-bottom:2px solid var(--text-main); margin-bottom:20px; padding-bottom:10px;"><h3>OFP BRIEFING</h3><h3 id="br-num">LH000</h3></div>
         <div class="ofp-grid">
             <div><div class="ofp-lbl">DEPARTURE</div><div class="ofp-val" id="br-dep"></div></div>
             <div><div class="ofp-lbl">ARRIVAL</div><div class="ofp-val" id="br-arr"></div></div>
@@ -467,12 +421,16 @@
 
         getAc: function(al, t) {
             let p = DB.FLEET.filter(f=>f.op==al && (t>6 ? f.r>10 : f.r<10));
-            return p.length ? p[Math.floor(Math.random()*p.length)] : DB.FLEET[0];
+            // FALLBACK: If no aircraft found for this operator, give a Generic A320
+            if(!p.length) return { t: "Airbus A320 (Generic)", s: 180, r: 6, ceil: "FL380" };
+            return p[Math.floor(Math.random()*p.length)];
         },
 
         prep: function(al, d, a, t) {
             const p = this.getAc(al, t);
-            this.data.temp = { d, a, t, ac: p.t, n: al.substr(0,2).toUpperCase()+Math.floor(Math.random()*8999+1000), gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil };
+            // LOOKUP CORRECT CALLSIGN PREFIX
+            const prefix = CODES[al] || "LH";
+            this.data.temp = { d, a, t, ac: p.t, n: prefix + Math.floor(Math.random()*8999+1000), gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil };
             ['dep','arr','ac','gate','time','zfw','pax','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.data.temp[{dep:'d',arr:'a',ac:'ac',gate:'gate',time:'t',zfw:'zfw',pax:'pax',fl:'fl'}[k]]);
             document.getElementById('modal').classList.remove('hidden');
             setTimeout(()=>{
@@ -500,7 +458,6 @@
             if(this.tmr) clearInterval(this.tmr);
             this.tmr = setInterval(()=>{
                 const el = Date.now() - this.data.active.start;
-                // REAL TIME DURATION: hours * 3600s * 1000ms
                 const dur = this.data.active.t * 3600 * 1000; 
                 const pct = Math.min(100, (el/dur)*100);
                 document.getElementById('af-bar').style.width=pct+"%";
@@ -512,8 +469,7 @@
                     const remMs = dur - el;
                     const remMins = Math.floor((remMs / (1000 * 60)) % 60);
                     const remHrs = Math.floor((remMs / (1000 * 60 * 60)));
-                    document.getElementById('af-t').innerText = 
-                        `${String(remHrs).padStart(2,'0')}:${String(remMins).padStart(2,'0')}`;
+                    document.getElementById('af-t').innerText = `${String(remHrs).padStart(2,'0')}:${String(remMins).padStart(2,'0')}`;
                 }
             }, 1000);
         },
