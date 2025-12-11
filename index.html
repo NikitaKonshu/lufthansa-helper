@@ -1,9 +1,9 @@
-FV<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v72</title>
+    <title>Lufthansa Crew Portal v73</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
     
@@ -16,6 +16,7 @@ FV<!DOCTYPE html>
             --lh-blue: #05164d;
             --lh-yellow: #ffb600;
             --lh-yellow-hover: #e6a500;
+            --lh-red: #d50000;
             --bg-body: #f4f6f9;
             --bg-card: #ffffff;
             --text-main: #111827;
@@ -135,6 +136,8 @@ FV<!DOCTYPE html>
         #map { height: 250px; background: #eee; border-radius: 8px; margin-bottom: 20px; z-index: 1; border: 1px solid var(--border); }
         .btn-main { width: 100%; padding: 15px; background: var(--lh-yellow); color: #05164d; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
         .btn-main:hover { background: var(--lh-yellow-hover); }
+        .btn-red { width: 100%; padding: 15px; background: var(--lh-red); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1rem; margin-top: 10px; transition: filter 0.2s; }
+        .btn-red:hover { filter: brightness(1.1); }
 
         /* Login */
         #login-wrap { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-body); z-index: 5000; display: flex; flex-direction: column; }
@@ -155,7 +158,7 @@ FV<!DOCTYPE html>
 <body>
 
 <script>
-    // === CALLSIGN MAPPING (ICAO/IATA) ===
+    // === EXACT FLIGHT CODES ===
     const CODES = {
         "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT",
         "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y",
@@ -168,15 +171,13 @@ FV<!DOCTYPE html>
 
     const DB = {
         NEWS: [
-            { t: "Database Update v72", d: "Added all partner airlines and correct callsigns." },
+            { t: "System Update v73", d: "Airline database expanded. Flight codes aligned." },
             { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." }
         ],
-        // EXPANDED FLEET
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, eng: "PW1100G", ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, eng: "GEnx-2B", ceil: "FL430", spd: "M0.85" },
             { id: "A359", t: "Airbus A350-900", op: "Lufthansa", s: 293, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
-            { id: "B77F", t: "Boeing 777F", op: "Lufthansa Cargo", s: 4, r: 10, eng: "GE90", ceil: "FL430", spd: "M0.84" },
             { id: "A333", t: "Airbus A330-300", op: "Swiss", s: 236, r: 10, eng: "Trent 700", ceil: "FL410", spd: "M0.82" },
             { id: "B77W", t: "Boeing 777-300ER", op: "Swiss", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" },
             { id: "A223", t: "Airbus A220-300", op: "Swiss", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
@@ -193,7 +194,6 @@ FV<!DOCTYPE html>
             { id: "B77L", t: "Boeing 777F", op: "AeroLogic", s: 2, r: 10, eng: "GE90", ceil: "FL430", spd: "M0.84" },
             { id: "B738S", t: "Boeing 737-800", op: "SunExpress", s: 189, r: 5, eng: "CFM56", ceil: "FL410", spd: "M0.78" }
         ],
-        // EXPANDED ROUTES
         ROUTES: [
             // Lufthansa
             { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 }, { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 },
@@ -209,24 +209,24 @@ FV<!DOCTYPE html>
             { al: "Eurowings", d: "EDDL", a: "LEPA", t: 2.2 }, { al: "Eurowings", d: "EDDL", a: "EGLL", t: 1.2 },
             // Discover
             { al: "Discover Airlines", d: "EDDF", a: "FIMP", t: 11.0 }, { al: "Discover Airlines", d: "EDDF", a: "MCO", t: 10.0 },
-            // Cargo
+            // Cargo & Others
             { al: "Lufthansa Cargo", d: "EDDF", a: "VHHH", t: 11.5 }, { al: "AeroLogic", d: "EDDP", a: "KCVG", t: 9.0 },
-            // ITA
             { al: "ITA Airways", d: "LIRF", a: "KJFK", t: 9.0 }, { al: "ITA Airways", d: "LIRF", a: "EGLL", t: 2.5 },
-            // Nordic
             { al: "SAS", d: "EKCH", a: "KEWR", t: 8.5 }, { al: "Finnair", d: "EFHK", a: "RJTT", t: 13.0 },
-            { al: "Norwegian", d: "ENGM", a: "LEPA", t: 3.5 },
-            // Others
-            { al: "Condor", d: "EDDF", a: "CUN", t: 11.0 }, { al: "SunExpress", d: "LTAI", a: "EDDL", t: 3.5 },
-            { al: "Air Dolomiti", d: "EDDM", a: "LIPZ", t: 1.0 }, { al: "Brussels Airlines", d: "EBBR", a: "KJFK", t: 8.0 }
+            { al: "Norwegian", d: "ENGM", a: "LEPA", t: 3.5 }, { al: "Condor", d: "EDDF", a: "CUN", t: 11.0 },
+            { al: "SunExpress", d: "LTAI", a: "EDDL", t: 3.5 }, { al: "Air Dolomiti", d: "EDDM", a: "LIPZ", t: 1.0 },
+            { al: "Brussels Airlines", d: "EBBR", a: "KJFK", t: 8.0 }, { al: "Edelweiss Air", d: "LSZH", a: "CPT", t: 11.5 },
+            { al: "Lufthansa CityLine", d: "EDDF", a: "LSZH", t: 0.8 }, { al: "Widerøe", d: "ENGM", a: "BGO", t: 0.9 },
+            { al: "Lufthansa Private Jet", d: "EDDF", a: "NCE", t: 1.5 }, { al: "Lufthansa Technik", d: "EDDH", a: "EDDF", t: 1.0 }
         ],
         COORDS: {
             "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65],
-            "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99],
-            "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76],
-            "LEPA":[39.55,2.73], "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23],
-            "KCVG":[39.04,-84.66], "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10],
-            "CUN":[21.04,-86.87], "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48]
+            "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99], "VTBS":[13.69,100.75], 
+            "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76], "LEPA":[39.55,2.73], 
+            "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23], "KCVG":[39.04,-84.66], 
+            "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10], "CUN":[21.04,-86.87], 
+            "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48], "CPT":[-33.97,18.60], "EDDH":[53.63,9.98], 
+            "NCE":[43.66,7.21], "BGO":[60.29,5.21]
         }
     };
 </script>
@@ -240,9 +240,7 @@ FV<!DOCTYPE html>
 </div>
 
 <div id="login-wrap">
-    <div class="login-nav">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg">
-    </div>
+    <div class="login-nav"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg"></div>
     <div class="login-body">
         <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
@@ -293,6 +291,7 @@ FV<!DOCTYPE html>
                     </div>
                     <div class="prog-track"><div id="af-bar" class="prog-fill"></div></div>
                     <button class="btn-main hidden" id="btn-end" onclick="app.finish()">FILE PIREP</button>
+                    <button class="btn-red" onclick="app.cancel()">CANCEL FLIGHT</button>
                 </div>
                 <div id="mis-box" class="card" style="border-left: 5px solid #05164d;">
                     <h3>Daily Assignment</h3><div id="mis-txt" style="font-size:1.6rem; font-weight:300; margin-bottom:20px;">Loading...</div>
@@ -421,16 +420,21 @@ FV<!DOCTYPE html>
 
         getAc: function(al, t) {
             let p = DB.FLEET.filter(f=>f.op==al && (t>6 ? f.r>10 : f.r<10));
-            // FALLBACK: If no aircraft found for this operator, give a Generic A320
             if(!p.length) return { t: "Airbus A320 (Generic)", s: 180, r: 6, ceil: "FL380" };
             return p[Math.floor(Math.random()*p.length)];
         },
 
         prep: function(al, d, a, t) {
             const p = this.getAc(al, t);
-            // LOOKUP CORRECT CALLSIGN PREFIX
+            // === CORRECT CODE GENERATION ===
             const prefix = CODES[al] || "LH";
-            this.data.temp = { d, a, t, ac: p.t, n: prefix + Math.floor(Math.random()*8999+1000), gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil };
+            const code = prefix + Math.floor(Math.random()*8999+1000);
+            
+            this.data.temp = { d, a, t, ac: p.t, n: code, gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (p.r>10?160:45)+"T", fl: p.ceil };
+            
+            // Explicitly set Header
+            document.getElementById('br-num').innerText = code;
+            
             ['dep','arr','ac','gate','time','zfw','pax','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.data.temp[{dep:'d',arr:'a',ac:'ac',gate:'gate',time:'t',zfw:'zfw',pax:'pax',fl:'fl'}[k]]);
             document.getElementById('modal').classList.remove('hidden');
             setTimeout(()=>{
@@ -461,7 +465,6 @@ FV<!DOCTYPE html>
                 const dur = this.data.active.t * 3600 * 1000; 
                 const pct = Math.min(100, (el/dur)*100);
                 document.getElementById('af-bar').style.width=pct+"%";
-                
                 if(pct>=100) {
                     document.getElementById('af-t').innerText="ARRIVED";
                     document.getElementById('btn-end').classList.remove('hidden');
@@ -479,6 +482,13 @@ FV<!DOCTYPE html>
             localStorage.setItem('stats', JSON.stringify(this.data.stats));
             localStorage.removeItem('active');
             this.chkActive(); this.updStats();
+        },
+        
+        cancel: function() {
+            if(confirm('Are you sure you want to cancel the flight?')) {
+                localStorage.removeItem('active');
+                this.chkActive();
+            }
         },
 
         updHub: function() {
