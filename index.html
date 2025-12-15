@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v86</title>
+    <title>Lufthansa Crew Portal v87</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -22,9 +22,9 @@
             --text-main: #0f172a;
             --text-sub: #64748b;
             --border: #e2e8f0;
-            --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
-            --shadow-lg: 0 15px 40px -10px rgba(0,0,0,0.15);
-            --radius: 16px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 30px -5px rgba(0,0,0,0.1);
+            --radius: 14px;
             --header-h: 64px;
             --nav-h: 56px;
             --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -142,13 +142,13 @@
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
         #dispatch-meme { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; z-index: 10; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
 
-        /* === TICKETS === */
+        /* === TICKET (DESKTOP DEFAULT) === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px 30px;
-            transition: all 0.3s var(--ease); cursor: pointer; position: relative;
+            transition: all 0.2s var(--ease); cursor: pointer; position: relative;
         }
         .ticket:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--lh-yellow); }
         .ticket.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
@@ -162,6 +162,8 @@
         .t-plane { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg); font-size: 1.2rem; } 
         .btn-select { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; }
         .ticket:not(.disabled):hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
+        
+        .t-mobile-arrow { display: none; } /* Hidden on desktop */
 
         /* === FORM CONTROLS === */
         .form-group { margin-bottom: 20px; }
@@ -171,6 +173,9 @@
         .btn-main { width: 100%; padding: 16px; background: var(--lh-yellow); color: #05164d; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
         .btn-main:disabled { background: var(--border); color: var(--text-sub); cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-main:not(:disabled):hover { transform: translateY(-1px); background: var(--lh-yellow-hover); }
+
+        /* Filter Container */
+        .filter-row { display: flex; gap: 10px; margin-bottom: 25px; }
 
         /* === MODAL === */
         .modal-wrap { 
@@ -188,45 +193,53 @@
         .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
         #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
-        /* === MOBILE OPTIMIZATION === */
+        /* === MOBILE OPTIMIZATION (COMPACT & CLEAN) === */
         @media (max-width: 768px) {
             .nav-inner { justify-content: flex-start; }
             .grid-stats { grid-template-columns: 1fr; gap: 15px; }
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
             
-            /* Compact Horizontal Ticket for Mobile */
+            /* Compact Ticket Grid */
             .ticket {
+                padding: 15px;
+                gap: 12px;
                 display: grid;
-                grid-template-columns: 1fr auto 1fr; /* Left - Center - Right */
-                grid-template-areas: 
-                    "loc1 dur loc2"
-                    "sub1 line sub2"
-                    "btn btn btn";
-                padding: 15px 20px;
-                gap: 5px 10px;
-                text-align: center;
+                /* Columns: From | Arrow | To | Button */
+                grid-template-columns: 1fr auto 1fr auto; 
                 align-items: center;
+                text-align: left;
             }
             
-            /* Assign Grid Areas */
-            .ticket > div:nth-child(1) { grid-area: loc1; text-align: left; }
-            .ticket > div:nth-child(3) { grid-area: loc2; text-align: right; }
-            .ticket > div:nth-child(2) { grid-area: dur; display:flex; flex-direction:column; align-items:center; }
+            /* Elements inside Ticket */
+            .t-loc { font-size: 1.2rem; margin-bottom: 2px; }
+            .t-sub { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
+            .t-path { padding: 0; flex: none; width: auto; }
+            .t-dur { display: block; font-size: 0.7rem; padding: 2px 6px; margin: 0; margin-bottom: 2px; }
             
-            /* Adjustments */
-            .t-loc { font-size: 1.6rem; }
-            .t-sub { font-size: 0.8rem; }
-            .t-path { padding: 0; width: auto; }
-            .t-line-wrap { display: flex; width: 40px; margin: 2px 0; }
-            .t-dur { font-size: 0.75rem; padding: 2px 8px; margin: 0; }
-            
-            /* Action Button Full Width at Bottom */
-            .t-action { grid-area: btn; margin-top: 10px; width: 100%; }
-            .btn-select { width: 100%; border-radius: 8px; height: 40px; }
+            /* Hide Complex Graphics, Show Simple Arrow */
+            .t-line-wrap { display: none; }
+            .t-mobile-arrow { display: block; font-size: 1.2rem; color: var(--lh-yellow); }
+
+            /* Right Align Arrival */
+            .ticket > div:nth-child(3) { text-align: right; }
+            /* Button */
+            .t-action { margin-left: 5px; }
+            .btn-select { width: 40px; height: 40px; border-radius: 12px; }
+
+            /* Fix Filters Overflow */
+            .filter-row { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; /* 50% 50% split */
+                gap: 10px; 
+            }
+            .filter-row .inp-sel { width: 100%; margin: 0; }
 
             .ofp-grid { grid-template-columns: 1fr 1fr; }
             .d-map-wrap { height: 250px; min-height: 250px; }
             #intro { padding: 20px; justify-content: flex-end; }
+            
+            /* Fix Login Card margins */
+            .login-card { margin-bottom: 0; }
         }
     </style>
 </head>
@@ -306,12 +319,12 @@
     <div id="tab-routes" class="tab-content hidden">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
             <h2 style="margin:0; border:none;">Flight Schedule</h2>
-            <div style="display:flex; gap:10px;">
-                <select id="flt-al" class="inp-sel" style="width:auto;" onchange="app.renderR()"></select>
-                <select id="flt-tm" class="inp-sel" style="width:auto;" onchange="app.renderR()">
-                    <option value="ALL">All Durations</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="10+">Ultra (10h+)</option>
-                </select>
-            </div>
+        </div>
+        <div class="filter-row">
+            <select id="flt-al" class="inp-sel" onchange="app.renderR()"></select>
+            <select id="flt-tm" class="inp-sel" onchange="app.renderR()">
+                <option value="ALL">All Durations</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="10+">Ultra (10h+)</option>
+            </select>
         </div>
         <div id="list-routes" class="tickets-grid"></div>
     </div>
@@ -375,7 +388,7 @@
     const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [ { t: "System Update v86", d: "Mobile UI simplified. Fleet details expanded." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v87", d: "Mobile layout compacted. Filters fixed." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: "14h 30m", fuel: "195.0t", cat: "Full Service" },
@@ -417,7 +430,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v86.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v87.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -499,7 +512,7 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.85rem; color:var(--text-sub);">
                         <span>Pax: <b style="color:var(--text-main)">${f.s}</b></span> 
                         <span>Endurance: <b style="color:var(--text-main)">${f.r}</b></span>
-                        <span>Fuel: <b style="color:var(--text-main)">${f.fuel}</b></span>
+                        <span>Max Fuel: <b style="color:var(--text-main)">${f.fuel}</b></span>
                         <span>Catering: <b style="color:var(--text-main)">${f.cat}</b></span>
                     </div>
                 </div>`; 
@@ -530,9 +543,9 @@
             r.forEach((x, i)=>{ 
                 l.innerHTML+=`
                 <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.05}s" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t})">
-                    <div style="text-align:left"><div class="t-loc">${x.d}</div><div class="t-sub">${x.al}</div></div>
-                    <div class="t-path"><div class="t-dur">${x.t}h</div><div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div></div>
-                    <div style="text-align:right"><div class="t-loc">${x.a}</div><div class="t-sub">Arrival</div></div>
+                    <div><div class="t-loc">${x.d}</div><div class="t-sub">${x.al}</div></div>
+                    <div class="t-path"><div class="t-dur">${x.t}h</div><div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div><div class="t-mobile-arrow">&rarr;</div></div>
+                    <div><div class="t-loc">${x.a}</div><div class="t-sub">Arrival</div></div>
                     <div class="t-action"><div class="btn-select">${isActive?'🔒':'&rarr;'}</div></div>
                 </div>`; 
             });
