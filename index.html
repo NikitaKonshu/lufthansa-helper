@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v92</title>
+    <title>Lufthansa Crew Portal v93</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -236,7 +236,7 @@
     <div class="login-body">
         <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
-            <p style="color:var(--text-sub); margin-bottom:30px;">Enter your Travel ID (e.g. DLH001)</p>
+            <p style="color:var(--text-sub); margin-bottom:30px;">Please enter your Travel ID.</p>
             <input type="text" id="user" class="inp-sel" placeholder="Travel ID" style="margin-bottom:15px; background:transparent;">
             <input type="password" id="pass" class="inp-sel" placeholder="Password" style="margin-bottom:25px; background:transparent;">
             <button class="btn-main" onclick="app.login()">Next</button>
@@ -292,7 +292,7 @@
             <div class="card">
                 <h3>Operations Center</h3>
                 <div id="news-list" style="margin-bottom:20px;"></div>
-                <h4 style="color:var(--text-sub); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Active Crew (Editable in DB.PILOTS)</h4>
+                <h4 style="color:var(--text-sub); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Active Crew</h4>
                 <div id="pilot-list"></div>
             </div>
         </div>
@@ -367,14 +367,14 @@
 
 <script>
     const DB = {
-        // === EDIT PILOTS HERE ===
+        // === PILOTS ===
         PILOTS: [
             { id: "DLH001", pwd: "1234", name: "Capt. Mueller", rank: "Captain", base: "EDDF" },
             { id: "DLH002", pwd: "1234", name: "F.O. Weber", rank: "First Officer", base: "EDDM" },
             { id: "LX088", pwd: "1234", name: "Capt. Gerber", rank: "Captain", base: "LSZH" }
         ],
 
-        // === EDIT AIRLINES HERE (NAME and ICAO CODE) ===
+        // === AIRLINES ===
         AIRLINES: [
             { n: "Lufthansa", c: "LH" }, { n: "Swiss", c: "LX" }, { n: "Austrian", c: "OS" },
             { n: "AirBaltic", c: "BT" }, { n: "Brussels Airlines", c: "SN" }, { n: "Eurowings", c: "EW" },
@@ -385,7 +385,7 @@
             { n: "SunExpress", c: "XQ" }, { n: "Lufthansa Private Jet", c: "LPJ" }, { n: "Lufthansa Technik", c: "LT" }
         ],
 
-        NEWS: [ { t: "System Update v92", d: "Smart Aircraft Selection: Only matches airline & range." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v93", d: "Flight Dispatch Algorithm Upgrade. Enhanced Fleet Assignment Logic." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -428,7 +428,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v92.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v93.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -596,17 +596,12 @@
         },
 
         getAc: function(al, t) {
-            // ALGORITHM: Filter by Airline and Range Capability
             let suitable = DB.FLEET.filter(f => f.op === al && this.parseTime(f.r) >= t);
-            
-            // If match found, pick random
             if(suitable.length > 0) return suitable[Math.floor(Math.random()*suitable.length)];
 
-            // Fallback 1: Any plane from airline (even if range is short - better than null)
             let anyFromAirline = DB.FLEET.filter(f => f.op === al);
             if(anyFromAirline.length > 0) return anyFromAirline[Math.floor(Math.random()*anyFromAirline.length)];
 
-            // Fallback 2: Generic
             return { t: "Generic Aircraft", s: 180, r: "10h", ceil: "FL380", op: al };
         },
 
