@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v81 (Stable)</title>
+    <title>Lufthansa Crew Portal v84</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -24,8 +24,8 @@
             --text-sub: #64748b;
             --border: #e2e8f0;
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.15);
-            --radius: 16px;
+            --shadow-lg: 0 15px 50px -10px rgba(0,0,0,0.2);
+            --radius: 18px;
             --header-h: 64px;
             --nav-h: 56px;
             --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -63,7 +63,7 @@
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        /* === INTRO (TEXT ONLY - STABLE) === */
+        /* === INTRO (TEXT ONLY) === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999;
@@ -96,11 +96,34 @@
         .takeoff-txt { color: var(--text-main); font-weight: 600; font-size: 1.1rem; text-align: center; font-family: 'Inter', sans-serif; }
         .taking-off #takeoff-screen { opacity: 1; pointer-events: all; }
 
-        /* === LOGIN === */
+        /* === LOGIN (FIXED CENTER) === */
         #login-wrap { 
             position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-body); z-index:5000; 
-            display:flex; flex-direction:column; transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
+            display:flex; flex-direction:column; 
+            transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
         }
+        .login-nav { 
+            flex-shrink: 0; /* Nav stays at top */
+            height: 70px; background:var(--bg-card); border-bottom:1px solid var(--border); 
+            display:flex; align-items:center; padding:0 30px; 
+        }
+        .login-body {
+            flex-grow: 1; /* Takes all available space */
+            display: flex; 
+            align-items: center; /* Vertical Center */
+            justify-content: center; /* Horizontal Center */
+            padding: 20px;
+            width: 100%;
+        }
+        .login-card {
+            width: 100%; max-width: 400px; 
+            background: var(--bg-card); padding: 40px; 
+            border-radius: 24px; border: 1px solid var(--border); 
+            box-shadow: var(--shadow-lg); 
+            /* Offset slightly up for visual balance */
+            margin-bottom: 50px; 
+        }
+
         #login-wrap.login-exit { pointer-events: none; animation: slideUpOut 0.6s var(--ease) forwards; }
 
         /* === HEADER & NAV === */
@@ -167,11 +190,13 @@
         .form-lbl { font-size: 0.8rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; display: block; }
         .d-map-wrap { height: 100%; min-height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
+        
+        /* === THE MEME (HACKERMAN) === */
         #dispatch-meme {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); color: white; z-index: 10;
+            background: rgba(0,0,0,0.85); color: white; z-index: 10;
             display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
         }
 
         /* === TICKETS === */
@@ -245,6 +270,8 @@
             .d-map-wrap { height: 250px; min-height: 250px; }
             #intro { padding: 20px; justify-content: flex-end; }
             .cute-sticker { font-size: 4rem; }
+            /* Mobile Login Fix */
+            .login-card { margin-bottom: 80px; }
         }
     </style>
 </head>
@@ -264,7 +291,7 @@
 <div id="login-wrap">
     <div class="login-nav"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" style="height:28px;"></div>
     <div class="login-body">
-        <div class="card" style="width:100%; max-width:400px; margin:0;">
+        <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
             <p style="color:var(--text-sub); margin-bottom:30px;">Please enter your Travel ID.</p>
             <input type="text" id="user" class="inp-sel" placeholder="Travel ID" style="margin-bottom:15px; background:transparent;">
@@ -354,8 +381,8 @@
                 </div>
                 <div class="d-map-wrap">
                     <div id="dispatch-meme">
-                        <img src="https://i.imgflip.com/1h5z1k.jpg" style="max-width:80%; max-height:70%; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.3);">
-                        <p style="margin-top:15px; font-weight:700; font-family:'JetBrains Mono'; font-size:1.2rem;">"TRUST ME, I'M A PILOT"</p>
+                        <img src="https://i.kym-cdn.com/entries/icons/original/000/021/807/ig9OJyE.jpg" style="max-width:80%; max-height:70%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+                        <p style="margin-top:15px; font-weight:700; font-family:'JetBrains Mono'; font-size:1.2rem; text-shadow:0 2px 10px black;">ME CALCULATING FUEL WITH 2% BRAIN POWER</p>
                     </div>
                     <div id="dispatch-map"></div>
                 </div>
@@ -395,7 +422,7 @@
     const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [ { t: "System Update v81", d: "Rolled back to stable version. Transitions fixed." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v84", d: "Login fixed. New fun visuals installed." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, ceil: "FL430", spd: "M0.85" },
@@ -448,8 +475,8 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            // STABLE SYSTEM BOOT SEQUENCE (No images)
-            const logs = ["Lufthansa Systems BIOS v81.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
+            // SYSTEM BOOT SEQUENCE
+            const logs = ["Lufthansa Systems BIOS v84.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -563,6 +590,7 @@
             document.getElementById('br-num').innerText = code;
             ['dep','arr','ac','gate','time','zfw','pax','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.data.temp[{dep:'d',arr:'a',ac:'ac',gate:'gate',time:'t',zfw:'zfw',pax:'pax',fl:'fl'}[k]]);
             
+            // FIX: Use class for visibility to trigger animation every time
             document.getElementById('modal').classList.add('visible');
             
             setTimeout(()=>{
@@ -585,7 +613,7 @@
                 this.tab('dash', document.querySelector('.nav-btn'));
             }, 3000);
         },
-        
+        // FIX: Remove class instead of adding hidden
         closeM: function() { document.getElementById('modal').classList.remove('visible'); },
 
         chkActive: function() {
@@ -629,7 +657,7 @@
             if(!r.length) { alert("No routes match."); return; }
             const s=r[Math.floor(Math.random()*r.length)]; 
             
-            // MEME VIA URL (Stable)
+            // SHOW MEME OVERLAY (HACKERMAN)
             document.getElementById('dispatch-meme').style.display = 'flex';
 
             const c1=DB.COORDS[s.d], c2=DB.COORDS[s.a];
@@ -639,6 +667,7 @@
                 this.dMap.fitBounds([c1,c2], {padding:[50,50]});
             }
             
+            // Wait 2 seconds for meme, then hide and show modal
             setTimeout(() => {
                 document.getElementById('dispatch-meme').style.display = 'none';
                 this.prep(s.al, s.d, s.a, s.t);
