@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v79</title>
+    <title>Lufthansa Crew Portal v80</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -28,7 +28,7 @@
             --radius: 16px;
             --header-h: 64px;
             --nav-h: 56px;
-            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
         /* DARK MODE */
@@ -56,9 +56,13 @@
         .hidden { display: none !important; }
 
         /* === ANIMATIONS === */
-        @keyframes fadeScaleIn { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulseBar { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        
+        /* Cute Bounce for Sticker */
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
         /* === NEW INTRO (SYSTEM BOOT) === */
         #intro {
@@ -77,18 +81,40 @@
             pointer-events: none;
         }
 
-        /* === TAKEOFF TRANSITION OVERLAY === */
+        /* === CUTE PREPARING OVERLAY === */
         #takeoff-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #05164d; z-index: 7000;
+            background: var(--bg-card); /* Adaptive background */
+            z-index: 7000;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
             opacity: 0; pointer-events: none; transition: opacity 0.5s;
         }
-        .takeoff-icon { font-size: 4rem; color: white; transform: translateY(20px); transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
-        .takeoff-txt { color: white; margin-top: 20px; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; font-size: 0.9rem; }
+        
+        /* The Cute Sticker */
+        .cute-sticker {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite ease-in-out;
+            /* Sticker Effect: White Stroke & Shadow */
+            text-shadow: 
+                0 0 0 #fff, 
+                0 0 0 #fff, 
+                2px 2px 0px rgba(0,0,0,0.1);
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
+        }
+        body.dark-mode .cute-sticker {
+            text-shadow: 
+                0 0 0 #333, 
+                0 0 0 #333, 
+                2px 2px 0px rgba(0,0,0,0.3);
+        }
+
+        .takeoff-txt { 
+            color: var(--text-main); font-weight: 600; font-size: 1.1rem; 
+            text-align: center; font-family: 'Inter', sans-serif;
+        }
         
         .taking-off #takeoff-screen { opacity: 1; pointer-events: all; }
-        .taking-off .takeoff-icon { transform: translateY(-50px) scale(1.2); }
 
         /* === HEADER === */
         header {
@@ -124,7 +150,7 @@
         .card { 
             background: var(--bg-card); border-radius: var(--radius); padding: 25px; 
             border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 25px; 
-            animation: fadeScaleIn 0.5s var(--ease);
+            animation: fadeIn 0.5s var(--ease);
         }
         h2 { font-weight: 600; font-size: 1.5rem; margin-bottom: 25px; color: var(--text-main); letter-spacing: -0.5px; }
         h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; color: var(--text-main); }
@@ -136,13 +162,11 @@
         .stat-lbl { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-top: 8px; letter-spacing: 1px; }
         .dash-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
         
-        /* Active Flight Bar */
         .af-card { border-left: 6px solid var(--lh-yellow); }
         .prog-track { height: 8px; background: var(--border); border-radius: 4px; margin: 25px 0; overflow: hidden; }
         .prog-fill { 
             height: 100%; background: var(--lh-yellow); width: 0%; 
-            transition: width 1s linear; 
-            box-shadow: 0 0 10px rgba(255,182,0,0.5);
+            transition: width 1s linear; box-shadow: 0 0 10px rgba(255,182,0,0.5);
             animation: pulseBar 2s infinite ease-in-out;
         }
         .af-row { display: flex; justify-content: space-between; align-items: flex-end; }
@@ -157,8 +181,9 @@
         .d-map-wrap { height: 100%; min-height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
 
-        /* === TICKETS === */
+        /* === TICKETS (MOBILE OPTIMIZED) === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
+        
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--bg-card); border: 1px solid var(--border);
@@ -170,16 +195,17 @@
         .ticket.disabled:hover { transform: none; box-shadow: none; border-color: var(--border); }
         
         .t-loc { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
+        .t-sub { font-size: 0.85rem; color: var(--text-sub); }
+        
         .t-path { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 40px; }
         .t-dur { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-body); padding: 4px 10px; border-radius: 100px; margin-bottom: 8px; color: var(--text-sub); }
         .t-line-wrap { width: 100%; display: flex; align-items: center; gap: 10px; opacity: 0.4; }
         .t-dot { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
         .t-line { flex: 1; height: 2px; background: currentColor; position: relative; }
-        /* FIXED ROTATION: 90deg makes standard unicode plane point right */
         .t-plane { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg); font-size: 1.2rem; } 
 
         .btn-select { 
-            width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); 
+            width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); 
             background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; transition: 0.2s;
         }
@@ -201,7 +227,7 @@
         .btn-main:disabled { background: var(--border); color: var(--text-sub); cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-main:not(:disabled):hover { transform: translateY(-1px); background: var(--lh-yellow-hover); }
 
-        /* === MODAL === */
+        /* === MODAL (CLASSIC SLIDE UP) === */
         .modal-wrap { 
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); z-index: 6000; 
@@ -210,22 +236,43 @@
         .modal-c { 
             width: 900px; max-width: 100%; max-height: 90vh; overflow-y: auto; 
             background: var(--bg-card); padding: 30px; border-radius: 24px; 
-            box-shadow: var(--shadow-lg); animation: fadeScaleIn 0.3s var(--ease); 
+            box-shadow: var(--shadow-lg); 
+            /* RETURNED OLD ANIMATION */
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .ofp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: var(--bg-body); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--border); }
         .ofp-lbl { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; }
         .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
         #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
-        /* === MOBILE === */
+        /* === MOBILE OPTIMIZATION === */
         @media (max-width: 768px) {
             .nav-inner { justify-content: flex-start; }
             .grid-stats { grid-template-columns: 1fr; gap: 15px; }
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
-            .ticket { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
-            .t-path { width: 100%; padding: 0; margin: 10px 0; }
-            .t-line-wrap { display: none; } /* Simplified ticket for mobile */
-            .t-dur { width: 100%; display: block; margin-bottom: 0; }
+            
+            /* Better Ticket for Mobile */
+            .ticket { 
+                flex-direction: column; 
+                align-items: center; 
+                text-align: center; 
+                gap: 15px; 
+                padding: 25px; 
+            }
+            .t-path { 
+                width: 100%; padding: 0; margin: 0;
+                /* Add dashed separators */
+                border-top: 1px dashed var(--border);
+                border-bottom: 1px dashed var(--border);
+                padding: 10px 0;
+            }
+            .t-line-wrap { display: none; } /* Hide the horizontal line graphic */
+            .t-dur { display: inline-block; width: auto; margin: 0; }
+            .t-loc { font-size: 2rem; }
+            
+            .btn-select { width: 100%; border-radius: 8px; height: 45px; background: var(--bg-body); border: none; }
+            .ticket:not(.disabled) .btn-select { background: var(--lh-yellow); color: #05164d; }
+
             .ofp-grid { grid-template-columns: 1fr 1fr; }
             .d-map-wrap { height: 250px; min-height: 250px; }
             #intro { padding: 20px; justify-content: flex-end; }
@@ -241,8 +288,8 @@
 </div>
 
 <div id="takeoff-screen">
-    <div class="takeoff-icon">✈</div>
-    <div class="takeoff-txt">Initiating Flight Sequence...</div>
+    <div class="cute-sticker">✈️</div>
+    <div class="takeoff-txt">Please wait, preparing your flight...</div>
 </div>
 
 <div id="login-wrap" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-body); z-index:5000; display:flex; flex-direction:column;">
@@ -410,7 +457,7 @@
     const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [ { t: "System Update v79", d: "Security patch: Dual booking disabled. Visuals upgraded." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v80", d: "Cute flight preparation sticker added. Mobile UI optimized." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, ceil: "FL430", spd: "M0.85" },
@@ -465,7 +512,7 @@
             
             // SYSTEM BOOT SEQUENCE
             const logs = [
-                "Lufthansa Systems BIOS v79.0", "Initializing Kernel...", "Loading Navigation Database [AIRAC 2403]...",
+                "Lufthansa Systems BIOS v80.0", "Initializing Kernel...", "Loading Navigation Database [AIRAC 2403]...",
                 "Connecting to Star Alliance Server...", "Authenticating User...", "System READY."
             ];
             let i = 0;
@@ -531,6 +578,7 @@
             return t>=min && t<max;
         },
 
+        // NEW RENDERER FOR "TICKET" STYLE
         renderR: function() {
             const al=document.getElementById('flt-al').value, tm=document.getElementById('flt-tm').value;
             const l=document.getElementById('list-routes'); l.innerHTML="";
@@ -542,7 +590,7 @@
             
             r.forEach((x, i)=>{ 
                 l.innerHTML+=`
-                <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.05}s" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t}')">
+                <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.05}s" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t})">
                     <div style="text-align:left">
                         <div class="t-loc">${x.d}</div>
                         <div class="t-sub">${x.al}</div>
@@ -560,7 +608,7 @@
                         <div class="t-sub">Arrival</div>
                     </div>
                     <div class="t-action">
-                        <div class="btn-select">${isActive?'🔒':'&rarr;'}</div>
+                        <button class="btn-select">${isActive?'🔒':'&rarr;'}</button>
                     </div>
                 </div>`; 
             });
@@ -617,14 +665,14 @@
             localStorage.setItem('active', JSON.stringify(this.data.temp));
             this.closeM(); 
             
-            // TAKEOFF ANIMATION
+            // CUTE TRANSITION ANIMATION
             const ts = document.getElementById('takeoff-screen');
             document.body.classList.add('taking-off');
             setTimeout(()=>{
                 document.body.classList.remove('taking-off');
                 this.chkActive(); 
                 this.tab('dash', document.querySelector('.nav-btn'));
-            }, 2500);
+            }, 3000); // 3 seconds to enjoy the sticker
         },
         closeM: function() { document.getElementById('modal').classList.add('hidden'); },
 
@@ -693,13 +741,11 @@
             // Draw Preview Route on Dispatch Map
             const c1=DB.COORDS[s.d], c2=DB.COORDS[s.a];
             if(c1 && c2) {
-                // Remove old layers on dispatch map (simple clear)
                 this.dMap.eachLayer((layer) => { if(!layer._url) this.dMap.removeLayer(layer); });
                 L.polyline([c1,c2],{color:'#ffb600', weight:3, dashArray:'10,10'}).addTo(this.dMap); 
                 this.dMap.fitBounds([c1,c2], {padding:[50,50]});
             }
             
-            // Delay for effect then show modal
             setTimeout(() => this.prep(s.al, s.d, s.a, s.t), 800);
         },
         dailyMis: function() {
