@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v88</title>
+    <title>Lufthansa Crew Portal v89</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -45,10 +45,7 @@
         
         /* DARK MODE LOGO FIX */
         body.dark-mode .login-nav img, 
-        body.dark-mode .logo-img { 
-            filter: brightness(0) invert(1); 
-            opacity: 0.9; 
-        }
+        body.dark-mode .logo-img { filter: brightness(0) invert(1); opacity: 0.9; }
 
         /* BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -147,7 +144,7 @@
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
         #dispatch-meme { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; z-index: 10; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
 
-        /* === TICKET (DESKTOP) === */
+        /* === LISTS (TICKETS/CREW) === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
@@ -170,6 +167,12 @@
         
         .t-mobile-arrow { display: none; }
 
+        /* CREW LIST STYLE */
+        .crew-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .crew-row:last-child { border: none; }
+        .crew-rank { font-weight: 700; color: var(--lh-blue); }
+        body.dark-mode .crew-rank { color: var(--lh-yellow); }
+
         /* === FORM CONTROLS === */
         .form-group { margin-bottom: 20px; }
         .form-lbl { font-size: 0.85rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; display: block; }
@@ -179,7 +182,6 @@
         .btn-main:disabled { background: var(--border); color: var(--text-sub); cursor: not-allowed; transform: none; box-shadow: none; }
         .btn-main:not(:disabled):hover { transform: translateY(-1px); background: var(--lh-yellow-hover); }
 
-        /* Filter Container */
         .filter-row { display: flex; gap: 10px; margin-bottom: 25px; }
 
         /* === MODAL === */
@@ -198,18 +200,13 @@
         .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
         #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
-        /* === MOBILE OPTIMIZATION === */
+        /* === MOBILE === */
         @media (max-width: 768px) {
             .nav-inner { justify-content: flex-start; }
             .grid-stats { grid-template-columns: 1fr; gap: 15px; }
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
             
-            /* Compact Ticket */
-            .ticket {
-                padding: 15px; gap: 12px; display: grid;
-                grid-template-columns: 1fr auto 1fr auto; 
-                align-items: center; text-align: left;
-            }
+            .ticket { padding: 15px; gap: 12px; display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; text-align: left; }
             .t-loc { font-size: 1.2rem; margin-bottom: 2px; }
             .t-sub { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
             .t-path { padding: 0; flex: none; width: auto; }
@@ -220,7 +217,6 @@
             .t-action { margin-left: 5px; }
             .btn-select { width: 40px; height: 40px; border-radius: 12px; }
 
-            /* Filter Row */
             .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
             .filter-row .inp-sel { width: 100%; margin: 0; }
 
@@ -233,22 +229,15 @@
 </head>
 <body>
 
-<div id="intro">
-    <div id="boot-text" class="boot-log"></div>
-    <div class="boot-log">> <span class="boot-cursor"></span></div>
-</div>
-
-<div id="takeoff-screen">
-    <div class="cute-sticker">✈️</div>
-    <div class="takeoff-txt">Please wait, preparing your flight...</div>
-</div>
+<div id="intro"><div id="boot-text" class="boot-log"></div><div class="boot-log">> <span class="boot-cursor"></span></div></div>
+<div id="takeoff-screen"><div class="cute-sticker">✈️</div><div class="takeoff-txt">Please wait, preparing your flight...</div></div>
 
 <div id="login-wrap">
     <div class="login-nav"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" style="height:28px;"></div>
     <div class="login-body">
         <div class="login-card">
             <h2 style="border:none; margin-bottom:10px;">Login</h2>
-            <p style="color:var(--text-sub); margin-bottom:30px;">Please enter your Travel ID.</p>
+            <p style="color:var(--text-sub); margin-bottom:30px;">Enter your Travel ID (e.g. DLH001)</p>
             <input type="text" id="user" class="inp-sel" placeholder="Travel ID" style="margin-bottom:15px; background:transparent;">
             <input type="password" id="pass" class="inp-sel" placeholder="Password" style="margin-bottom:25px; background:transparent;">
             <button class="btn-main" onclick="app.login()">Next</button>
@@ -260,6 +249,7 @@
 <header>
     <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="logo-img">
     <div class="user-panel">
+        <span id="user-display">Pilot</span>
         <span id="clock">00:00 Z</span>
         <span onclick="app.theme()" style="cursor:pointer; font-size:1.4rem; margin-left:10px;">◑</span>
     </div>
@@ -300,7 +290,12 @@
                     <button class="btn-main" style="width:auto; padding:12px 30px;" onclick="app.prepMis()">PREPARE FLIGHT</button>
                 </div>
             </div>
-            <div class="card"><h3>Operations Center</h3><div id="news-list"></div></div>
+            <div class="card">
+                <h3>Operations Center</h3>
+                <div id="news-list" style="margin-bottom:20px;"></div>
+                <h4 style="color:var(--text-sub); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Active Crew (Editable in DB.PILOTS)</h4>
+                <div id="pilot-list"></div>
+            </div>
         </div>
     </div>
 
@@ -372,10 +367,27 @@
 </div>
 
 <script>
-    const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
-
     const DB = {
-        NEWS: [ { t: "System Update v88", d: "Detailed time filters added. Dark mode visuals patched." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        // === EDIT PILOTS HERE ===
+        PILOTS: [
+            { id: "DLH001", pwd: "1234", name: "Capt. Mueller", rank: "Captain", base: "EDDF" },
+            { id: "DLH002", pwd: "1234", name: "F.O. Weber", rank: "First Officer", base: "EDDM" },
+            { id: "LX088", pwd: "1234", name: "Capt. Gerber", rank: "Captain", base: "LSZH" }
+        ],
+
+        // === EDIT AIRLINES HERE (NAME and ICAO CODE) ===
+        AIRLINES: [
+            { n: "Lufthansa", c: "LH" }, { n: "Swiss", c: "LX" }, { n: "Austrian", c: "OS" },
+            { n: "AirBaltic", c: "BT" }, { n: "Brussels Airlines", c: "SN" }, { n: "Eurowings", c: "EW" },
+            { n: "Discover Airlines", c: "4Y" }, { n: "Edelweiss Air", c: "WK" }, { n: "Lufthansa Cargo", c: "GEC" },
+            { n: "Lufthansa CityLine", c: "CL" }, { n: "Air Dolomiti", c: "EN" }, { n: "ITA Airways", c: "AZ" },
+            { n: "Widerøe", c: "WF" }, { n: "Norwegian", c: "DY" }, { n: "Finnair", c: "AY" },
+            { n: "SAS", c: "SK" }, { n: "Condor", c: "DE" }, { n: "AeroLogic", c: "3S" },
+            { n: "SunExpress", c: "XQ" }, { n: "Lufthansa Private Jet", c: "LPJ" }, { n: "Lufthansa Technik", c: "LT" }
+        ],
+
+        NEWS: [ { t: "System Update v89", d: "Airlines & Pilots now editable in code." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: "14h 30m", fuel: "195.0t", cat: "Full Service" },
@@ -407,7 +419,7 @@
     };
 
     const app = {
-        data: { stats: {l:0, h:0}, active: null, temp: null, mis: null },
+        data: { stats: {l:0, h:0}, active: null, temp: null, mis: null, currentUser: null },
         tmr: null, map: null, dMap: null,
 
         init: function() {
@@ -417,7 +429,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v88.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v89.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -435,6 +447,7 @@
             setTimeout(typeLog, 500);
 
             this.updateDropdowns();
+            this.renderPilots();
             document.getElementById('news-list').innerHTML = DB.NEWS.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:8px;"><b>${n.t}</b><br><span style="color:var(--text-sub); font-size:0.9rem;">${n.d}</span></div>`).join('');
             
             this.dMap = L.map('dispatch-map').setView([48, 10], 3);
@@ -444,15 +457,15 @@
         },
 
         updateDropdowns: function() {
-            const uq = (k) => [...new Set(DB[k].map(x=>x[k=='ROUTES'?'al':'op']))];
-            const ops = uq('ROUTES'), flt = uq('FLEET');
+            // Populate Airlines from DB.AIRLINES
+            const ops = DB.AIRLINES.map(x => x.n);
             const fill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
             
             fill('flt-al', ops, 'All Airlines'); 
             fill('gen-al', ops, 'Select Airline'); 
-            fill('flt-op', flt, 'All Operators');
+            fill('flt-op', ops, 'All Operators');
 
-            // Generate Time Options (1 to 10+)
+            // Generate Detailed Time Options (1 to 10+)
             const tmOpts = document.querySelectorAll('#flt-tm, #gen-tm, #flt-range');
             const optsHTML = `<option value="ALL">All Durations</option>` + 
                              Array.from({length: 10}, (_, i) => `<option value="${i+1}">${i+1} Hour${i>0?'s':''}</option>`).join('') + 
@@ -464,8 +477,22 @@
             });
         },
 
+        renderPilots: function() {
+            const l = document.getElementById('pilot-list'); l.innerHTML = "";
+            DB.PILOTS.forEach(p => {
+                l.innerHTML += `<div class="crew-row"><div><b>${p.name}</b> <span style="color:var(--text-sub)">(${p.id})</span></div><div class="crew-rank">${p.rank}</div></div>`;
+            });
+        },
+
         login: function() {
-            if(document.getElementById('user').value.toUpperCase()==='DLH001' && document.getElementById('pass').value==='1234'){
+            const u = document.getElementById('user').value.toUpperCase();
+            const p = document.getElementById('pass').value;
+            // Check against DB.PILOTS
+            const pilot = DB.PILOTS.find(x => x.id === u && x.pwd === p);
+
+            if(pilot){
+                this.data.currentUser = pilot;
+                document.getElementById('user-display').innerText = pilot.name;
                 const loginWrap = document.getElementById('login-wrap');
                 loginWrap.classList.add('login-exit');
                 setTimeout(() => {
@@ -504,7 +531,6 @@
         parseTime: function(str) {
             if(typeof str === 'number') return str;
             if(!str) return 0;
-            // Handle "6h 30m" format in Fleet or simple numbers
             let h = 0, m = 0;
             const hMatch = str.match(/(\d+)h/);
             const mMatch = str.match(/(\d+)m/);
@@ -578,7 +604,11 @@
         prep: function(al, d, a, t) {
             if(this.data.active) { alert("You already have an active flight! Please complete or cancel it first."); return; }
             const p = this.getAc(al, t);
-            const prefix = CODES[al] || "LH";
+            
+            // Find Code from DB.AIRLINES
+            const airlineObj = DB.AIRLINES.find(x => x.n === al);
+            const prefix = airlineObj ? airlineObj.c : "LH";
+            
             const code = prefix + Math.floor(Math.random()*8999+1000);
             this.data.temp = { d, a, t, ac: p.t, n: code, gate: "A"+Math.floor(Math.random()*40+1), pax: Math.floor(p.s*0.85), zfw: (10 + Math.random()*20).toFixed(1)+"t", fl: "FL3"+Math.floor(Math.random()*9)+"0" };
             document.getElementById('br-num').innerText = code;
