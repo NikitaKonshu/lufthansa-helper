@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v91</title>
+    <title>Lufthansa Crew Portal v92</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -369,9 +369,9 @@
     const DB = {
         // === EDIT PILOTS HERE ===
         PILOTS: [
-            { id: "DLH001", pwd: "1234", name: "Nikita", rank: "Captain", base: "EDDF" },
-            { id: "DLH002", pwd: "1234", name: "Loui", rank: "First Officer", base: "EDDM" },
-            { id: "LX088", pwd: "1234", name: "Artem", rank: "Captain", base: "LSZH" }
+            { id: "DLH001", pwd: "1234", name: "Capt. Mueller", rank: "Captain", base: "EDDF" },
+            { id: "DLH002", pwd: "1234", name: "F.O. Weber", rank: "First Officer", base: "EDDM" },
+            { id: "LX088", pwd: "1234", name: "Capt. Gerber", rank: "Captain", base: "LSZH" }
         ],
 
         // === EDIT AIRLINES HERE (NAME and ICAO CODE) ===
@@ -385,7 +385,7 @@
             { n: "SunExpress", c: "XQ" }, { n: "Lufthansa Private Jet", c: "LPJ" }, { n: "Lufthansa Technik", c: "LT" }
         ],
 
-        NEWS: [ { t: "System Update v91", d: "Time filters upgraded to ranges (1-2h, etc)." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v92", d: "Smart Aircraft Selection: Only matches airline & range." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -428,7 +428,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v91.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v92.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -456,7 +456,6 @@
         },
 
         updateDropdowns: function() {
-            // Populate Airlines from DB.AIRLINES
             const ops = DB.AIRLINES.map(x => x.n);
             const fill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
             
@@ -464,7 +463,6 @@
             fill('gen-al', ops, 'Select Airline'); 
             fill('flt-op', ops, 'All Operators');
 
-            // Generate Range Options (1-2, 2-3, ... 10+)
             let opts = `<option value="ALL">All Durations</option>`;
             for(let i=1; i<10; i++) {
                 opts += `<option value="${i}-${i+1}">${i}-${i+1} Hours</option>`;
@@ -543,12 +541,10 @@
             if(filter === 'ALL') return true;
             const t = this.parseTime(val);
             if(filter === '10+') return t >= 10;
-            // Check for range format "min-max"
             if(filter.includes('-')) {
                 const [min, max] = filter.split('-').map(Number);
                 return t >= min && t < max;
             }
-            // Fallback
             return Math.floor(t) == filter;
         },
 
@@ -600,9 +596,18 @@
         },
 
         getAc: function(al, t) {
-            let p = DB.FLEET.filter(f=>f.op==al);
-            if(!p.length) return { t: "Airbus A320 (Generic)", s: 180, r: "6h 00m", ceil: "FL380" };
-            return p[Math.floor(Math.random()*p.length)];
+            // ALGORITHM: Filter by Airline and Range Capability
+            let suitable = DB.FLEET.filter(f => f.op === al && this.parseTime(f.r) >= t);
+            
+            // If match found, pick random
+            if(suitable.length > 0) return suitable[Math.floor(Math.random()*suitable.length)];
+
+            // Fallback 1: Any plane from airline (even if range is short - better than null)
+            let anyFromAirline = DB.FLEET.filter(f => f.op === al);
+            if(anyFromAirline.length > 0) return anyFromAirline[Math.floor(Math.random()*anyFromAirline.length)];
+
+            // Fallback 2: Generic
+            return { t: "Generic Aircraft", s: 180, r: "10h", ceil: "FL380", op: al };
         },
 
         prep: function(al, d, a, t) {
