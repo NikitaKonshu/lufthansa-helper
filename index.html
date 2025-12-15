@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v78</title>
+    <title>Lufthansa Crew Portal v79</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -14,7 +14,7 @@
         /* === VARIABLES === */
         :root {
             --lh-blue: #05164d;
-            --lh-blue-glass: rgba(5, 22, 77, 0.9);
+            --lh-blue-glass: rgba(5, 22, 77, 0.95);
             --lh-yellow: #ffb600;
             --lh-yellow-hover: #ffc800;
             --lh-red: #d50000;
@@ -23,8 +23,8 @@
             --text-main: #0f172a;
             --text-sub: #64748b;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.1);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-lg: 0 10px 40px -10px rgba(0,0,0,0.15);
             --radius: 16px;
             --header-h: 64px;
             --nav-h: 56px;
@@ -34,13 +34,11 @@
         /* DARK MODE */
         body.dark-mode {
             --lh-blue: #60a5fa; 
-            --lh-blue-glass: rgba(15, 23, 42, 0.9);
-            --bg-body: #0f172a; 
-            --bg-card: #1e293b;
-            --text-main: #f1f5f9; 
-            --text-sub: #94a3b8;
+            --lh-blue-glass: rgba(15, 23, 42, 0.95);
+            --bg-body: #0f172a; --bg-card: #1e293b;
+            --text-main: #f1f5f9; --text-sub: #94a3b8;
             --border: #334155;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.5);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.4);
         }
         body.dark-mode header { background: var(--lh-blue-glass); border-bottom: 1px solid var(--border); }
         body.dark-mode .nav-bar { background: var(--bg-card); border-bottom: 1px solid var(--border); }
@@ -57,41 +55,50 @@
         }
         .hidden { display: none !important; }
 
-        /* === NEW ANIMATIONS === */
-        @keyframes slideUpCurtain { to { transform: translateY(-100%); } }
+        /* === ANIMATIONS === */
         @keyframes fadeScaleIn { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        @keyframes pulseLogo { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.95); opacity: 0.8; } }
-        @keyframes loadBar { 0% { width: 0; } 100% { width: 100%; } }
+        @keyframes pulseBar { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* === INTRO (SYSTEM BOOT STYLE) === */
+        /* === NEW INTRO (SYSTEM BOOT) === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #05164d; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
+            padding: 40px; font-family: 'JetBrains Mono', monospace; color: #0f0;
+            overflow: hidden;
         }
-        .intro-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; }
-        .intro-logo { width: 120px; filter: brightness(0) invert(1); animation: pulseLogo 2s infinite ease-in-out; margin-bottom: 40px; }
-        .intro-bar-bg { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-        .intro-bar-fill { height: 100%; background: #ffb600; width: 0%; animation: loadBar 1.5s var(--ease) forwards; }
-        .intro-txt { 
-            margin-top: 15px; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; 
-            color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; 
+        .boot-log { font-size: 0.8rem; color: #ccc; line-height: 1.6; margin-bottom: 20px; width: 100%; }
+        .boot-highlight { color: #ffb600; }
+        .boot-cursor { display: inline-block; width: 8px; height: 14px; background: #ffb600; animation: blink 0.8s infinite; vertical-align: middle; }
+        .intro-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(5,22,77,0) 0%, rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
         }
-        /* Class to trigger exit animation */
-        .intro-exit { animation: slideUpCurtain 0.8s var(--ease) forwards; }
+
+        /* === TAKEOFF TRANSITION OVERLAY === */
+        #takeoff-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #05164d; z-index: 7000;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            opacity: 0; pointer-events: none; transition: opacity 0.5s;
+        }
+        .takeoff-icon { font-size: 4rem; color: white; transform: translateY(20px); transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .takeoff-txt { color: white; margin-top: 20px; font-family: 'JetBrains Mono', monospace; letter-spacing: 2px; text-transform: uppercase; font-size: 0.9rem; }
+        
+        .taking-off #takeoff-screen { opacity: 1; pointer-events: all; }
+        .taking-off .takeoff-icon { transform: translateY(-50px) scale(1.2); }
 
         /* === HEADER === */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-h);
-            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             z-index: 2000; display: flex; justify-content: space-between; align-items: center; padding: 0 24px;
             box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border);
         }
-        .logo-img { height: 24px; filter: brightness(0) invert(1); }
-        /* Fix logo color in light mode header */
-        header .logo-img { filter: none; } 
+        .logo-img { height: 24px; }
         body.dark-mode header .logo-img { filter: brightness(0) invert(1); }
-
         .user-panel { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 500; display: flex; gap: 15px; align-items: center; }
 
         /* === NAV BAR === */
@@ -100,7 +107,6 @@
             background: var(--bg-card); border-bottom: 1px solid var(--border); z-index: 1900;
             overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none;
         }
-        .nav-bar::-webkit-scrollbar { display: none; }
         .nav-inner { display: flex; height: 100%; margin: 0 auto; max-width: 1200px; padding: 0 10px; width: 100%; justify-content: center; }
         .nav-btn {
             background: none; border: none; height: 100%; padding: 0 24px;
@@ -115,9 +121,8 @@
 
         /* === LAYOUT === */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%; }
-        
         .card { 
-            background: var(--bg-card); border-radius: var(--radius); padding: 30px; 
+            background: var(--bg-card); border-radius: var(--radius); padding: 25px; 
             border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 25px; 
             animation: fadeScaleIn 0.5s var(--ease);
         }
@@ -129,53 +134,56 @@
         .stat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; text-align: center; box-shadow: var(--shadow-sm); }
         .stat-val { font-size: 2.8rem; font-weight: 300; color: var(--text-main); letter-spacing: -1px; }
         .stat-lbl { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-top: 8px; letter-spacing: 1px; }
-
         .dash-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-        .af-card { border-left: 6px solid var(--lh-yellow); }
-
-        /* === DISPATCH (EXPANDED) === */
-        /* New 2-column layout for Dispatch */
-        .dispatch-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .dispatch-col h3 { border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px; }
         
+        /* Active Flight Bar */
+        .af-card { border-left: 6px solid var(--lh-yellow); }
+        .prog-track { height: 8px; background: var(--border); border-radius: 4px; margin: 25px 0; overflow: hidden; }
+        .prog-fill { 
+            height: 100%; background: var(--lh-yellow); width: 0%; 
+            transition: width 1s linear; 
+            box-shadow: 0 0 10px rgba(255,182,0,0.5);
+            animation: pulseBar 2s infinite ease-in-out;
+        }
+        .af-row { display: flex; justify-content: space-between; align-items: flex-end; }
+        .af-route { font-size: 2.2rem; font-weight: 400; line-height: 1; }
+        .af-det { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 8px; }
+        .timer-display { font-size: 1.6rem; font-family: 'JetBrains Mono', monospace; }
+
+        /* === DISPATCH === */
+        .dispatch-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .form-group { margin-bottom: 20px; }
         .form-lbl { font-size: 0.8rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; display: block; }
-        
-        /* === TICKET / ROUTES STYLE === */
+        .d-map-wrap { height: 100%; min-height: 300px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
+
+        /* === TICKETS === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
-        
-        /* The Boarding Pass Look */
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 20px 30px;
             transition: all 0.3s var(--ease); cursor: pointer; position: relative;
-            overflow: hidden;
         }
         .ticket:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--lh-yellow); }
-        .ticket::before {
-            content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%;
-            background: var(--border); transition: background 0.3s;
-        }
-        .ticket:hover::before { background: var(--lh-yellow); }
-
-        .t-loc { font-size: 1.8rem; font-weight: 700; color: var(--text-main); letter-spacing: -1px; }
-        .t-sub { font-size: 0.85rem; color: var(--text-sub); font-weight: 500; margin-top: 4px; }
+        .ticket.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+        .ticket.disabled:hover { transform: none; box-shadow: none; border-color: var(--border); }
         
+        .t-loc { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
         .t-path { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 40px; }
-        .t-dur { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-body); padding: 4px 10px; border-radius: 100px; margin-bottom: 8px; font-weight: 600; color: var(--text-sub); }
+        .t-dur { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: var(--bg-body); padding: 4px 10px; border-radius: 100px; margin-bottom: 8px; color: var(--text-sub); }
         .t-line-wrap { width: 100%; display: flex; align-items: center; gap: 10px; opacity: 0.4; }
         .t-dot { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
         .t-line { flex: 1; height: 2px; background: currentColor; position: relative; }
-        .t-plane { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg); font-size: 1.2rem; }
+        /* FIXED ROTATION: 90deg makes standard unicode plane point right */
+        .t-plane { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(90deg); font-size: 1.2rem; } 
 
-        .t-action { margin-left: 20px; }
         .btn-select { 
             width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--border); 
             background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center;
             font-size: 1.2rem; transition: 0.2s;
         }
-        .ticket:hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
+        .ticket:not(.disabled):hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
 
         /* === CONTROLS === */
         .inp-sel { 
@@ -183,14 +191,15 @@
             background: var(--bg-body); color: var(--text-main); border-radius: 8px; 
             font-size: 0.95rem; outline: none; transition: 0.2s;
         }
-        .inp-sel:focus { border-color: var(--lh-blue); background: var(--bg-card); box-shadow: 0 0 0 3px rgba(5,22,77,0.1); }
+        .inp-sel:focus { border-color: var(--lh-blue); background: var(--bg-card); }
         
         .btn-main { 
             width: 100%; padding: 16px; background: var(--lh-yellow); color: #05164d; 
             border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; 
             transition: all 0.2s;
         }
-        .btn-main:hover { transform: translateY(-1px); background: var(--lh-yellow-hover); box-shadow: 0 4px 12px rgba(255, 182, 0, 0.3); }
+        .btn-main:disabled { background: var(--border); color: var(--text-sub); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-main:not(:disabled):hover { transform: translateY(-1px); background: var(--lh-yellow-hover); }
 
         /* === MODAL === */
         .modal-wrap { 
@@ -200,13 +209,13 @@
         }
         .modal-c { 
             width: 900px; max-width: 100%; max-height: 90vh; overflow-y: auto; 
-            background: var(--bg-card); padding: 40px; border-radius: 24px; 
+            background: var(--bg-card); padding: 30px; border-radius: 24px; 
             box-shadow: var(--shadow-lg); animation: fadeScaleIn 0.3s var(--ease); 
         }
-        .ofp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; background: var(--bg-body); padding: 25px; border-radius: 12px; margin: 25px 0; border: 1px solid var(--border); }
-        .ofp-lbl { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; letter-spacing: 0.5px; }
-        .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; color: var(--text-main); font-size: 1.1rem; }
-        #map { height: 350px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
+        .ofp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; background: var(--bg-body); padding: 20px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--border); }
+        .ofp-lbl { font-size: 0.7rem; font-weight: 700; color: var(--text-sub); margin-bottom: 5px; }
+        .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
+        #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
         /* === MOBILE === */
         @media (max-width: 768px) {
@@ -215,21 +224,25 @@
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
             .ticket { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
             .t-path { width: 100%; padding: 0; margin: 10px 0; }
-            .t-line-wrap { display: none; } /* Hide complex graphic on mobile */
-            .t-dur { width: 100%; display: block; }
+            .t-line-wrap { display: none; } /* Simplified ticket for mobile */
+            .t-dur { width: 100%; display: block; margin-bottom: 0; }
             .ofp-grid { grid-template-columns: 1fr 1fr; }
-            .modal-c { padding: 25px; border-radius: 16px; }
+            .d-map-wrap { height: 250px; min-height: 250px; }
+            #intro { padding: 20px; justify-content: flex-end; }
         }
     </style>
 </head>
 <body>
 
 <div id="intro">
-    <div class="intro-content">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Lufthansa_Logo_2018.svg" class="intro-logo">
-        <div class="intro-bar-bg"><div class="intro-bar-fill"></div></div>
-        <div class="intro-txt">Initializing Systems...</div>
-    </div>
+    <div class="intro-overlay"></div>
+    <div id="boot-text" class="boot-log"></div>
+    <div class="boot-log">> <span class="boot-cursor"></span></div>
+</div>
+
+<div id="takeoff-screen">
+    <div class="takeoff-icon">✈</div>
+    <div class="takeoff-txt">Initiating Flight Sequence...</div>
 </div>
 
 <div id="login-wrap" style="position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-body); z-index:5000; display:flex; flex-direction:column;">
@@ -317,7 +330,6 @@
                     <option value="ALL">All Durations</option>
                     <option value="1-2">Short (1-2h)</option>
                     <option value="3-4">Medium (3-4h)</option>
-                    <option value="5-6">Long (5-6h)</option>
                     <option value="10+">Ultra (10h+)</option>
                 </select>
             </div>
@@ -349,19 +361,16 @@
                         <label class="form-lbl">Estimated Duration</label>
                         <select id="gen-tm" class="inp-sel">
                             <option value="ALL">Random</option>
-                            <option value="1-2">Short Range (1-2h)</option>
-                            <option value="3-4">Medium Range (3-4h)</option>
-                            <option value="5-6">Long Range (5-6h)</option>
-                            <option value="10+">Ultra Long Range (10h+)</option>
+                            <option value="1-2">Short Range</option>
+                            <option value="3-4">Medium Range</option>
+                            <option value="5-6">Long Range</option>
+                            <option value="10+">Ultra Long Range</option>
                         </select>
                     </div>
-                    <button class="btn-main" onclick="app.gen()">GENERATE OFP</button>
+                    <button id="btn-gen" class="btn-main" onclick="app.gen()">GENERATE OFP</button>
                 </div>
-                <div class="dispatch-col" style="background:var(--bg-body); border-radius:12px; padding:20px; display:flex; align-items:center; justify-content:center; text-align:center; color:var(--text-sub);">
-                    <div>
-                        <div style="font-size:3rem; margin-bottom:10px;">✈</div>
-                        <p>Select parameters to generate a random flight plan and briefing package.</p>
-                    </div>
+                <div class="d-map-wrap">
+                    <div id="dispatch-map"></div>
                 </div>
             </div>
         </div>
@@ -398,47 +407,33 @@
 </div>
 
 <script>
-    const CODES = {
-        "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT",
-        "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y",
-        "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL",
-        "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN",
-        "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF",
-        "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE",
-        "AeroLogic": "3S", "SunExpress": "XQ"
-    };
+    const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [
-            { t: "System Update v78", d: "Professional UI overhaul: Ticket view & Dispatch Desk." },
-            { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." }
-        ],
+        NEWS: [ { t: "System Update v79", d: "Security patch: Dual booking disabled. Visuals upgraded." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
-            { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, eng: "PW1100G", ceil: "FL390", spd: "M0.78" },
-            { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, eng: "GEnx-2B", ceil: "FL430", spd: "M0.85" },
-            { id: "A359", t: "Airbus A350-900", op: "Lufthansa", s: 293, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
-            { id: "A333", t: "Airbus A330-300", op: "Swiss", s: 236, r: 10, eng: "Trent 700", ceil: "FL410", spd: "M0.82" },
-            { id: "B77W", t: "Boeing 777-300ER", op: "Swiss", s: 340, r: 15, eng: "GE90", ceil: "FL430", spd: "M0.84" },
-            { id: "A223", t: "Airbus A220-300", op: "Swiss", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
-            { id: "B789", t: "Boeing 787-9", op: "Austrian", s: 294, r: 14, eng: "GEnx", ceil: "FL430", spd: "M0.85" },
-            { id: "E195", t: "Embraer 195", op: "Austrian", s: 120, r: 4, eng: "CF34", ceil: "FL410", spd: "M0.78" },
-            { id: "A220B", t: "Airbus A220-300", op: "AirBaltic", s: 145, r: 6, eng: "PW1500G", ceil: "FL410", spd: "M0.78" },
-            { id: "A320E", t: "Airbus A320", op: "Eurowings", s: 180, r: 5, eng: "CFM56", ceil: "FL390", spd: "M0.78" },
-            { id: "A330D", t: "Airbus A330-300", op: "Discover Airlines", s: 280, r: 10, eng: "Trent 700", ceil: "FL410", spd: "M0.82" },
-            { id: "A350I", t: "Airbus A350-900", op: "ITA Airways", s: 300, r: 16, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
-            { id: "A330N", t: "Airbus A330neo", op: "Condor", s: 310, r: 12, eng: "Trent 7000", ceil: "FL410", spd: "M0.82" },
-            { id: "B738", t: "Boeing 737-800", op: "Norwegian", s: 189, r: 6, eng: "CFM56", ceil: "FL410", spd: "M0.78" },
-            { id: "A359F", t: "Airbus A350-900", op: "Finnair", s: 297, r: 15, eng: "Trent XWB", ceil: "FL410", spd: "M0.85" },
-            { id: "A320S", t: "Airbus A320neo", op: "SAS", s: 180, r: 6, eng: "LEAP-1A", ceil: "FL390", spd: "M0.78" },
-            { id: "B77L", t: "Boeing 777F", op: "AeroLogic", s: 2, r: 10, eng: "GE90", ceil: "FL430", spd: "M0.84" },
-            { id: "B738S", t: "Boeing 737-800", op: "SunExpress", s: 189, r: 5, eng: "CFM56", ceil: "FL410", spd: "M0.78" }
+            { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, ceil: "FL390", spd: "M0.78" },
+            { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, ceil: "FL430", spd: "M0.85" },
+            { id: "A359", t: "Airbus A350-900", op: "Lufthansa", s: 293, r: 16, ceil: "FL410", spd: "M0.85" },
+            { id: "A333", t: "Airbus A330-300", op: "Swiss", s: 236, r: 10, ceil: "FL410", spd: "M0.82" },
+            { id: "B77W", t: "Boeing 777-300ER", op: "Swiss", s: 340, r: 15, ceil: "FL430", spd: "M0.84" },
+            { id: "A223", t: "Airbus A220-300", op: "Swiss", s: 145, r: 6, ceil: "FL410", spd: "M0.78" },
+            { id: "B789", t: "Boeing 787-9", op: "Austrian", s: 294, r: 14, ceil: "FL430", spd: "M0.85" },
+            { id: "E195", t: "Embraer 195", op: "Austrian", s: 120, r: 4, ceil: "FL410", spd: "M0.78" },
+            { id: "A220B", t: "Airbus A220-300", op: "AirBaltic", s: 145, r: 6, ceil: "FL410", spd: "M0.78" },
+            { id: "A320E", t: "Airbus A320", op: "Eurowings", s: 180, r: 5, ceil: "FL390", spd: "M0.78" },
+            { id: "A330D", t: "Airbus A330-300", op: "Discover Airlines", s: 280, r: 10, ceil: "FL410", spd: "M0.82" },
+            { id: "A350I", t: "Airbus A350-900", op: "ITA Airways", s: 300, r: 16, ceil: "FL410", spd: "M0.85" },
+            { id: "A330N", t: "Airbus A330neo", op: "Condor", s: 310, r: 12, ceil: "FL410", spd: "M0.82" },
+            { id: "B738", t: "Boeing 737-800", op: "Norwegian", s: 189, r: 6, ceil: "FL410", spd: "M0.78" },
+            { id: "A359F", t: "Airbus A350-900", op: "Finnair", s: 297, r: 15, ceil: "FL410", spd: "M0.85" },
+            { id: "A320S", t: "Airbus A320neo", op: "SAS", s: 180, r: 6, ceil: "FL390", spd: "M0.78" },
+            { id: "B77L", t: "Boeing 777F", op: "AeroLogic", s: 2, r: 10, ceil: "FL430", spd: "M0.84" },
+            { id: "B738S", t: "Boeing 737-800", op: "SunExpress", s: 189, r: 5, ceil: "FL410", spd: "M0.78" }
         ],
         ROUTES: [
-            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 }, { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 },
-            { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2 }, { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2 },
-            { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5 },
-            { al: "Swiss", d: "LSZH", a: "EGLL", t: 1.8 }, { al: "Swiss", d: "LSZH", a: "WSSS", t: 12.0 },
-            { al: "Swiss", d: "LSZH", a: "KJFK", t: 8.8 },
+            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5 }, { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5 }, { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2 }, { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2 }, { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5 },
+            { al: "Swiss", d: "LSZH", a: "EGLL", t: 1.8 }, { al: "Swiss", d: "LSZH", a: "WSSS", t: 12.0 }, { al: "Swiss", d: "LSZH", a: "KJFK", t: 8.8 },
             { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5 }, { al: "Austrian", d: "LOWW", a: "EGLL", t: 2.2 },
             { al: "AirBaltic", d: "EVRA", a: "EDDL", t: 2.0 }, { al: "AirBaltic", d: "EVRA", a: "EGLL", t: 2.5 },
             { al: "Eurowings", d: "EDDL", a: "LEPA", t: 2.2 }, { al: "Eurowings", d: "EDDL", a: "EGLL", t: 1.2 },
@@ -453,19 +448,13 @@
             { al: "Lufthansa Private Jet", d: "EDDF", a: "NCE", t: 1.5 }, { al: "Lufthansa Technik", d: "EDDH", a: "EDDF", t: 1.0 }
         ],
         COORDS: {
-            "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65],
-            "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99], "VTBS":[13.69,100.75], 
-            "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76], "LEPA":[39.55,2.73], 
-            "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23], "KCVG":[39.04,-84.66], 
-            "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10], "CUN":[21.04,-86.87], 
-            "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48], "CPT":[-33.97,18.60], "EDDH":[53.63,9.98], 
-            "NCE":[43.66,7.21], "BGO":[60.29,5.21], "OMDB":[25.25,55.36]
+            "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65], "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99], "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76], "LEPA":[39.55,2.73], "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23], "KCVG":[39.04,-84.66], "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10], "CUN":[21.04,-86.87], "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48], "CPT":[-33.97,18.60], "EDDH":[53.63,9.98], "NCE":[43.66,7.21], "BGO":[60.29,5.21], "OMDB":[25.25,55.36]
         }
     };
 
     const app = {
         data: { stats: {l:0, h:0}, active: null, temp: null, mis: null },
-        tmr: null, map: null,
+        tmr: null, map: null, dMap: null,
 
         init: function() {
             let s = JSON.parse(localStorage.getItem('stats'));
@@ -474,18 +463,37 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            // NEW INTRO ANIMATION LOGIC
-            setTimeout(()=>{ 
-                const i = document.getElementById('intro');
-                i.classList.add('intro-exit');
-                setTimeout(()=>i.classList.add('hidden'), 800); 
-            }, 2500);
+            // SYSTEM BOOT SEQUENCE
+            const logs = [
+                "Lufthansa Systems BIOS v79.0", "Initializing Kernel...", "Loading Navigation Database [AIRAC 2403]...",
+                "Connecting to Star Alliance Server...", "Authenticating User...", "System READY."
+            ];
+            let i = 0;
+            const typeLog = () => {
+                if(i < logs.length) {
+                    const l = document.createElement('div');
+                    l.innerHTML = `> <span class="boot-highlight">[OK]</span> ${logs[i]}`;
+                    document.getElementById('boot-text').appendChild(l);
+                    i++; setTimeout(typeLog, 300);
+                } else {
+                    setTimeout(()=>{ 
+                        document.getElementById('intro').style.transform="translateY(-100%)";
+                        document.getElementById('intro').style.transition="transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+                    }, 800);
+                }
+            };
+            setTimeout(typeLog, 500);
 
             const uq = (k) => [...new Set(DB[k].map(x=>x[k=='ROUTES'?'al':'op']))];
             const ops = uq('ROUTES'), flt = uq('FLEET');
             const fill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
             fill('flt-al', ops, 'All Airlines'); fill('gen-al', ops, 'Select Airline'); fill('flt-op', flt, 'All Operators');
             document.getElementById('news-list').innerHTML = DB.NEWS.map(n=>`<div style="margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:8px;"><b>${n.t}</b><br><span style="color:var(--text-sub); font-size:0.9rem;">${n.d}</span></div>`).join('');
+            
+            // Init Dispatch Map Early
+            this.dMap = L.map('dispatch-map').setView([48, 10], 3);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.dMap);
+
             this.updStats(); this.renderR(); this.renderF(); this.dailyMis(); this.chkActive();
         },
 
@@ -503,6 +511,9 @@
             document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
             btn.classList.add('active');
             if(id=='routes') this.renderR();
+            if(id=='dispatch') {
+                setTimeout(()=>this.dMap.invalidateSize(), 100);
+            }
         },
 
         updStats: function() {
@@ -520,21 +531,22 @@
             return t>=min && t<max;
         },
 
-        // NEW RENDERER FOR "TICKET" STYLE
         renderR: function() {
             const al=document.getElementById('flt-al').value, tm=document.getElementById('flt-tm').value;
             const l=document.getElementById('list-routes'); l.innerHTML="";
             const r=DB.ROUTES.filter(x=>(al=='ALL'||x.al==al) && this.chkTime(x.t, tm));
             if(!r.length) { l.innerHTML="<div class='card'>No flights found.</div>"; return; }
             
+            // Check active flight for restriction
+            const isActive = !!this.data.active;
+            
             r.forEach((x, i)=>{ 
                 l.innerHTML+=`
-                <div class="ticket list-item" style="animation-delay:${i*0.05}s" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t})">
+                <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.05}s" onclick="app.prep('${x.al}','${x.d}','${x.a}',${x.t}')">
                     <div style="text-align:left">
                         <div class="t-loc">${x.d}</div>
                         <div class="t-sub">${x.al}</div>
                     </div>
-                    
                     <div class="t-path">
                         <div class="t-dur">${x.t}h</div>
                         <div class="t-line-wrap">
@@ -543,14 +555,12 @@
                             <div class="t-dot"></div>
                         </div>
                     </div>
-                    
                     <div style="text-align:right">
                         <div class="t-loc">${x.a}</div>
                         <div class="t-sub">Arrival</div>
                     </div>
-
                     <div class="t-action">
-                        <div class="btn-select">&rarr;</div>
+                        <div class="btn-select">${isActive?'🔒':'&rarr;'}</div>
                     </div>
                 </div>`; 
             });
@@ -568,8 +578,6 @@
                     <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.85rem; color:var(--text-sub);">
                         <span>Pax: <b style="color:var(--text-main)">${f.s}</b></span> 
                         <span>Range: <b style="color:var(--text-main)">${f.r}h</b></span>
-                        <span>Ceil: <b style="color:var(--text-main)">${f.ceil}</b></span> 
-                        <span>Cruise: <b style="color:var(--text-main)">${f.spd}</b></span>
                     </div>
                 </div>`; 
             });
@@ -582,6 +590,9 @@
         },
 
         prep: function(al, d, a, t) {
+            // BLOCK IF ACTIVE
+            if(this.data.active) { alert("You already have an active flight! Please complete or cancel it first."); return; }
+
             const p = this.getAc(al, t);
             const prefix = CODES[al] || "LH";
             const code = prefix + Math.floor(Math.random()*8999+1000);
@@ -591,6 +602,8 @@
             
             ['dep','arr','ac','gate','time','zfw','pax','fl'].forEach(k=>document.getElementById('br-'+k).innerText=this.data.temp[{dep:'d',arr:'a',ac:'ac',gate:'gate',time:'t',zfw:'zfw',pax:'pax',fl:'fl'}[k]]);
             document.getElementById('modal').classList.remove('hidden');
+            
+            // Map Draw logic for Modal
             setTimeout(()=>{
                 if(this.map) this.map.remove(); this.map = L.map('map').setView([50,10], 3);
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(this.map);
@@ -602,15 +615,35 @@
         accept: function() {
             this.data.temp.start = Date.now();
             localStorage.setItem('active', JSON.stringify(this.data.temp));
-            this.closeM(); this.chkActive(); this.tab('dash', document.querySelector('.nav-btn'));
+            this.closeM(); 
+            
+            // TAKEOFF ANIMATION
+            const ts = document.getElementById('takeoff-screen');
+            document.body.classList.add('taking-off');
+            setTimeout(()=>{
+                document.body.classList.remove('taking-off');
+                this.chkActive(); 
+                this.tab('dash', document.querySelector('.nav-btn'));
+            }, 2500);
         },
         closeM: function() { document.getElementById('modal').classList.add('hidden'); },
 
         chkActive: function() {
             const s = localStorage.getItem('active');
-            if(!s) { document.getElementById('af-box').classList.add('hidden'); document.getElementById('mis-box').classList.remove('hidden'); return; }
+            if(!s) { 
+                this.data.active = null;
+                document.getElementById('af-box').classList.add('hidden'); 
+                document.getElementById('mis-box').classList.remove('hidden'); 
+                document.getElementById('btn-gen').disabled = false;
+                return; 
+            }
             this.data.active = JSON.parse(s);
-            document.getElementById('af-box').classList.remove('hidden'); document.getElementById('mis-box').classList.add('hidden');
+            document.getElementById('af-box').classList.remove('hidden'); 
+            document.getElementById('mis-box').classList.add('hidden');
+            
+            // Disable Dispatch Button if active
+            document.getElementById('btn-gen').disabled = true;
+
             ['d','a','n','ac'].forEach(k=>document.getElementById('af-'+k).innerText=this.data.active[k]);
 
             if(this.tmr) clearInterval(this.tmr);
@@ -651,10 +684,23 @@
             [...new Set(DB.ROUTES.filter(r=>r.al==al).map(r=>r.d))].forEach(x=>h.add(new Option(x,x)));
         },
         gen: function() {
+            if(this.data.active) { alert("Flight already in progress."); return; }
             const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub').value, tm=document.getElementById('gen-tm').value;
             const r=DB.ROUTES.filter(x=>x.al==al && x.d==h && this.chkTime(x.t, tm));
             if(!r.length) { alert("No routes match."); return; }
-            const s=r[Math.floor(Math.random()*r.length)]; this.prep(s.al, s.d, s.a, s.t);
+            const s=r[Math.floor(Math.random()*r.length)]; 
+            
+            // Draw Preview Route on Dispatch Map
+            const c1=DB.COORDS[s.d], c2=DB.COORDS[s.a];
+            if(c1 && c2) {
+                // Remove old layers on dispatch map (simple clear)
+                this.dMap.eachLayer((layer) => { if(!layer._url) this.dMap.removeLayer(layer); });
+                L.polyline([c1,c2],{color:'#ffb600', weight:3, dashArray:'10,10'}).addTo(this.dMap); 
+                this.dMap.fitBounds([c1,c2], {padding:[50,50]});
+            }
+            
+            // Delay for effect then show modal
+            setTimeout(() => this.prep(s.al, s.d, s.a, s.t), 800);
         },
         dailyMis: function() {
             const d=new Date().getDate(); this.data.mis = DB.ROUTES[d % DB.ROUTES.length];
