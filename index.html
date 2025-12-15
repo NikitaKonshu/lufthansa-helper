@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v83</title>
+    <title>Lufthansa Crew Portal v81 (Stable)</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -46,7 +46,7 @@
         body.dark-mode .nav-btn.active { color: #ffb600; }
         body.dark-mode .login-nav img { filter: brightness(0) invert(1); opacity: 0.9; }
 
-        /* RESET */
+        /* BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); 
@@ -62,58 +62,16 @@
         @keyframes pulseBar { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
         @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* === NEW INTRO (SYSTEM BOOT WITH LOUIE) === */
+        /* === INTRO (TEXT ONLY - STABLE) === */
         #intro {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #000; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
             padding: 40px; font-family: 'JetBrains Mono', monospace; color: #0f0;
             overflow: hidden;
         }
-        
-        /* Container for Image + Text Overlay */
-        .intro-img-container {
-            flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;
-            margin-bottom: 20px; position: relative; /* Important for absolute positioning of text */
-        }
-
-        /* STYLE FOR THE IMAGE */
-        .intro-meme-img {
-            max-width: 80%; max-height: 50vh; 
-            border: 2px solid #0f0; border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-            animation: zoomIn 1.5s var(--ease) forwards;
-            filter: sepia(0.5) contrast(1.2);
-        }
-
-        /* STYLE FOR THE TEXT OVERLAY */
-        .meme-text-overlay {
-            position: absolute;
-            bottom: 20px; /* Distance from bottom of container */
-            left: 0; width: 100%;
-            text-align: center;
-            color: white;
-            /* Responsive font size: min 1.5rem, preferred 5vw, max 3rem */
-            font-size: clamp(1.5rem, 5vw, 3rem); 
-            font-weight: 900;
-            font-family: sans-serif; /* Classic meme font style */
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            /* Black outline effect for meme text */
-            text-shadow: 
-                3px 3px 0 #000, -3px -3px 0 #000,
-                3px -3px 0 #000, -3px 3px 0 #000,
-                0px 3px 0 #000, 0px -3px 0 #000,
-                3px 0px 0 #000, -3px 0px 0 #000;
-            /* Animate along with the image */
-            animation: zoomIn 1.5s var(--ease) forwards;
-            filter: sepia(0.5) contrast(1.2); /* Apply same filter as image */
-        }
-        
-        .boot-console { width: 100%; text-align: left; max-width: 600px; }
-        .boot-log { font-size: 0.8rem; color: #ccc; line-height: 1.6; }
+        .boot-log { font-size: 0.8rem; color: #ccc; line-height: 1.6; margin-bottom: 20px; width: 100%; }
         .boot-highlight { color: #ffb600; }
         .boot-cursor { display: inline-block; width: 8px; height: 14px; background: #ffb600; animation: blink 0.8s infinite; vertical-align: middle; }
         .intro-overlay {
@@ -122,7 +80,7 @@
             pointer-events: none;
         }
 
-        /* === CUTE PREPARING OVERLAY === */
+        /* === PREPARING OVERLAY === */
         #takeoff-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg-card); z-index: 7000;
@@ -138,7 +96,7 @@
         .takeoff-txt { color: var(--text-main); font-weight: 600; font-size: 1.1rem; text-align: center; font-family: 'Inter', sans-serif; }
         .taking-off #takeoff-screen { opacity: 1; pointer-events: all; }
 
-        /* === LOGIN STYLES === */
+        /* === LOGIN === */
         #login-wrap { 
             position:fixed; top:0; left:0; width:100vw; height:100vh; background:var(--bg-body); z-index:5000; 
             display:flex; flex-direction:column; transition: transform 0.6s var(--ease), opacity 0.6s var(--ease);
@@ -173,7 +131,7 @@
             background: var(--lh-yellow); border-radius: 3px 3px 0 0;
         }
 
-        /* === LAYOUT & DASHBOARD === */
+        /* === CONTENT === */
         .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%; }
         .container.fade-in { animation: fadeIn 0.8s var(--ease) backwards; }
 
@@ -189,8 +147,8 @@
         .stat-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; text-align: center; box-shadow: var(--shadow-sm); }
         .stat-val { font-size: 2.8rem; font-weight: 300; color: var(--text-main); letter-spacing: -1px; }
         .stat-lbl { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-top: 8px; letter-spacing: 1px; }
-        .dash-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
         
+        .dash-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
         .af-card { border-left: 6px solid var(--lh-yellow); }
         .prog-track { height: 8px; background: var(--border); border-radius: 4px; margin: 25px 0; overflow: hidden; }
         .prog-fill { 
@@ -203,7 +161,7 @@
         .af-det { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--text-sub); margin-top: 8px; }
         .timer-display { font-size: 1.6rem; font-family: 'JetBrains Mono', monospace; }
 
-        /* === DISPATCH & MEME === */
+        /* === DISPATCH === */
         .dispatch-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .form-group { margin-bottom: 20px; }
         .form-lbl { font-size: 0.8rem; font-weight: 600; color: var(--text-sub); margin-bottom: 8px; display: block; }
@@ -227,6 +185,7 @@
         .ticket:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--lh-yellow); }
         .ticket.disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
         .ticket.disabled:hover { transform: none; box-shadow: none; border-color: var(--border); }
+        
         .t-loc { font-size: 1.8rem; font-weight: 700; letter-spacing: -1px; }
         .t-sub { font-size: 0.85rem; color: var(--text-sub); }
         .t-path { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 40px; }
@@ -263,6 +222,13 @@
         .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
         #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
+        /* === CONTROLS === */
+        .inp-sel { width: 100%; padding: 14px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        .inp-sel:focus { border-color: var(--lh-blue); background: var(--bg-card); }
+        .btn-main { width: 100%; padding: 16px; background: var(--lh-yellow); color: #05164d; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 1rem; transition: all 0.2s; }
+        .btn-main:disabled { background: var(--border); color: var(--text-sub); cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-main:not(:disabled):hover { transform: translateY(-1px); background: var(--lh-yellow-hover); }
+
         /* === MOBILE === */
         @media (max-width: 768px) {
             .nav-inner { justify-content: flex-start; }
@@ -277,7 +243,7 @@
             .ticket:not(.disabled) .btn-select { background: var(--lh-yellow); color: #05164d; }
             .ofp-grid { grid-template-columns: 1fr 1fr; }
             .d-map-wrap { height: 250px; min-height: 250px; }
-            #intro { padding: 20px; }
+            #intro { padding: 20px; justify-content: flex-end; }
             .cute-sticker { font-size: 4rem; }
         }
     </style>
@@ -286,14 +252,8 @@
 
 <div id="intro">
     <div class="intro-overlay"></div>
-    <div class="intro-img-container">
-        <img src="ВСТАВЬТЕ_СЮДА_ССЫЛКУ_НА_ФОТО" class="intro-meme-img" alt="Sudden Louie">
-        <div class="meme-text-overlay">Внезапный Луи</div>
-    </div>
-    <div class="boot-console">
-        <div id="boot-text" class="boot-log"></div>
-        <div class="boot-log">> <span class="boot-cursor"></span></div>
-    </div>
+    <div id="boot-text" class="boot-log"></div>
+    <div class="boot-log">> <span class="boot-cursor"></span></div>
 </div>
 
 <div id="takeoff-screen">
@@ -435,7 +395,7 @@
     const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [ { t: "System Update v83", d: "Online meme resource integrated into boot sequence." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v81", d: "Rolled back to stable version. Transitions fixed." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: 6, ceil: "FL390", spd: "M0.78" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: 14, ceil: "FL430", spd: "M0.85" },
@@ -488,20 +448,20 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            // SYSTEM BOOT SEQUENCE
-            const logs = ["Lufthansa Systems BIOS v83.0", "Detecting Louie...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
+            // STABLE SYSTEM BOOT SEQUENCE (No images)
+            const logs = ["Lufthansa Systems BIOS v81.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
                     const l = document.createElement('div');
                     l.innerHTML = `> <span class="boot-highlight">[OK]</span> ${logs[i]}`;
                     document.getElementById('boot-text').appendChild(l);
-                    i++; setTimeout(typeLog, 400);
+                    i++; setTimeout(typeLog, 300);
                 } else {
                     setTimeout(()=>{ 
                         document.getElementById('intro').style.transform="translateY(-100%)";
                         document.getElementById('intro').style.transition="transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
-                    }, 1500);
+                    }, 800);
                 }
             };
             setTimeout(typeLog, 500);
@@ -523,6 +483,7 @@
                 // Smooth Login Exit
                 const loginWrap = document.getElementById('login-wrap');
                 loginWrap.classList.add('login-exit');
+                
                 setTimeout(() => {
                      loginWrap.classList.add('hidden');
                      document.getElementById('nav-bar').classList.remove('hidden');
@@ -624,6 +585,7 @@
                 this.tab('dash', document.querySelector('.nav-btn'));
             }, 3000);
         },
+        
         closeM: function() { document.getElementById('modal').classList.remove('visible'); },
 
         chkActive: function() {
@@ -667,6 +629,7 @@
             if(!r.length) { alert("No routes match."); return; }
             const s=r[Math.floor(Math.random()*r.length)]; 
             
+            // MEME VIA URL (Stable)
             document.getElementById('dispatch-meme').style.display = 'flex';
 
             const c1=DB.COORDS[s.d], c2=DB.COORDS[s.a];
