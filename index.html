@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v90</title>
+    <title>Lufthansa Crew Portal v91</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -144,7 +144,7 @@
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
         #dispatch-meme { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; z-index: 10; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
 
-        /* === LISTS (TICKETS/CREW) === */
+        /* === LISTS === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
@@ -167,7 +167,6 @@
         
         .t-mobile-arrow { display: none; }
 
-        /* CREW LIST STYLE */
         .crew-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .crew-row:last-child { border: none; }
         .crew-rank { font-weight: 700; color: var(--lh-blue); }
@@ -386,7 +385,7 @@
             { n: "SunExpress", c: "XQ" }, { n: "Lufthansa Private Jet", c: "LPJ" }, { n: "Lufthansa Technik", c: "LT" }
         ],
 
-        NEWS: [ { t: "System Update v89", d: "Airlines & Pilots now editable in code." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v91", d: "Time filters upgraded to ranges (1-2h, etc)." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -429,7 +428,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v89.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v91.0", "Initializing Kernel...", "Loading Database (DB.AIRLINES)...", "Loading Database (DB.PILOTS)...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -465,15 +464,16 @@
             fill('gen-al', ops, 'Select Airline'); 
             fill('flt-op', ops, 'All Operators');
 
-            // Generate Detailed Time Options (1 to 10+)
-            const tmOpts = document.querySelectorAll('#flt-tm, #gen-tm, #flt-range');
-            const optsHTML = `<option value="ALL">All Durations</option>` + 
-                             Array.from({length: 10}, (_, i) => `<option value="${i+1}">${i+1} Hour${i>0?'s':''}</option>`).join('') + 
-                             `<option value="10+">10+ Hours</option>`;
+            // Generate Range Options (1-2, 2-3, ... 10+)
+            let opts = `<option value="ALL">All Durations</option>`;
+            for(let i=1; i<10; i++) {
+                opts += `<option value="${i}-${i+1}">${i}-${i+1} Hours</option>`;
+            }
+            opts += `<option value="10+">10+ Hours</option>`;
             
-            tmOpts.forEach(el => {
-                if(el.id === 'flt-range') el.innerHTML = optsHTML.replace('All Durations', 'All Ranges');
-                else el.innerHTML = optsHTML;
+            document.querySelectorAll('#flt-tm, #gen-tm, #flt-range').forEach(el => {
+                if(el.id === 'flt-range') el.innerHTML = opts.replace('All Durations', 'All Ranges');
+                else el.innerHTML = opts;
             });
         },
 
@@ -487,7 +487,6 @@
         login: function() {
             const u = document.getElementById('user').value.toUpperCase();
             const p = document.getElementById('pass').value;
-            // Check against DB.PILOTS
             const pilot = DB.PILOTS.find(x => x.id === u && x.pwd === p);
 
             if(pilot){
@@ -544,8 +543,13 @@
             if(filter === 'ALL') return true;
             const t = this.parseTime(val);
             if(filter === '10+') return t >= 10;
-            const f = parseInt(filter);
-            return t >= f && t < (f + 1);
+            // Check for range format "min-max"
+            if(filter.includes('-')) {
+                const [min, max] = filter.split('-').map(Number);
+                return t >= min && t < max;
+            }
+            // Fallback
+            return Math.floor(t) == filter;
         },
 
         renderF: function() {
@@ -605,7 +609,6 @@
             if(this.data.active) { alert("You already have an active flight! Please complete or cancel it first."); return; }
             const p = this.getAc(al, t);
             
-            // Find Code from DB.AIRLINES
             const airlineObj = DB.AIRLINES.find(x => x.n === al);
             const prefix = airlineObj ? airlineObj.c : "LH";
             
