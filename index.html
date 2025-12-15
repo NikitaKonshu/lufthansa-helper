@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v87</title>
+    <title>Lufthansa Crew Portal v88</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -16,7 +16,6 @@
             --lh-blue: #05164d;
             --lh-blue-glass: rgba(5, 22, 77, 0.95);
             --lh-yellow: #ffb600;
-            --lh-yellow-hover: #ffc800;
             --bg-body: #f3f5f9;
             --bg-card: #ffffff;
             --text-main: #0f172a;
@@ -43,6 +42,13 @@
         body.dark-mode .nav-bar { background: var(--bg-card); border-bottom: 1px solid var(--border); }
         body.dark-mode .nav-btn { color: #94a3b8; }
         body.dark-mode .nav-btn.active { color: #ffb600; }
+        
+        /* DARK MODE LOGO FIX */
+        body.dark-mode .login-nav img, 
+        body.dark-mode .logo-img { 
+            filter: brightness(0) invert(1); 
+            opacity: 0.9; 
+        }
 
         /* BASE */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -101,7 +107,6 @@
             box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border);
         }
         .logo-img { height: 24px; }
-        body.dark-mode header .logo-img { filter: brightness(0) invert(1); }
         .user-panel { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 500; display: flex; gap: 15px; align-items: center; }
 
         .nav-bar {
@@ -142,7 +147,7 @@
         #dispatch-map { width: 100%; height: 100%; background: #e2e8f0; z-index: 1; }
         #dispatch-meme { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; z-index: 10; display: none; align-items: center; justify-content: center; flex-direction: column; text-align: center; padding: 20px; backdrop-filter: blur(5px); }
 
-        /* === TICKET (DESKTOP DEFAULT) === */
+        /* === TICKET (DESKTOP) === */
         .tickets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100%, 1fr)); gap: 15px; }
         .ticket {
             display: flex; align-items: center; justify-content: space-between;
@@ -163,7 +168,7 @@
         .btn-select { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; }
         .ticket:not(.disabled):hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
         
-        .t-mobile-arrow { display: none; } /* Hidden on desktop */
+        .t-mobile-arrow { display: none; }
 
         /* === FORM CONTROLS === */
         .form-group { margin-bottom: 20px; }
@@ -193,52 +198,35 @@
         .ofp-val { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 1.1rem; }
         #map { height: 300px; background: #e5e7eb; border-radius: 12px; margin-bottom: 25px; z-index: 1; border: 1px solid var(--border); }
 
-        /* === MOBILE OPTIMIZATION (COMPACT & CLEAN) === */
+        /* === MOBILE OPTIMIZATION === */
         @media (max-width: 768px) {
             .nav-inner { justify-content: flex-start; }
             .grid-stats { grid-template-columns: 1fr; gap: 15px; }
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
             
-            /* Compact Ticket Grid */
+            /* Compact Ticket */
             .ticket {
-                padding: 15px;
-                gap: 12px;
-                display: grid;
-                /* Columns: From | Arrow | To | Button */
+                padding: 15px; gap: 12px; display: grid;
                 grid-template-columns: 1fr auto 1fr auto; 
-                align-items: center;
-                text-align: left;
+                align-items: center; text-align: left;
             }
-            
-            /* Elements inside Ticket */
             .t-loc { font-size: 1.2rem; margin-bottom: 2px; }
             .t-sub { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
             .t-path { padding: 0; flex: none; width: auto; }
             .t-dur { display: block; font-size: 0.7rem; padding: 2px 6px; margin: 0; margin-bottom: 2px; }
-            
-            /* Hide Complex Graphics, Show Simple Arrow */
             .t-line-wrap { display: none; }
             .t-mobile-arrow { display: block; font-size: 1.2rem; color: var(--lh-yellow); }
-
-            /* Right Align Arrival */
             .ticket > div:nth-child(3) { text-align: right; }
-            /* Button */
             .t-action { margin-left: 5px; }
             .btn-select { width: 40px; height: 40px; border-radius: 12px; }
 
-            /* Fix Filters Overflow */
-            .filter-row { 
-                display: grid; 
-                grid-template-columns: 1fr 1fr; /* 50% 50% split */
-                gap: 10px; 
-            }
+            /* Filter Row */
+            .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
             .filter-row .inp-sel { width: 100%; margin: 0; }
 
             .ofp-grid { grid-template-columns: 1fr 1fr; }
             .d-map-wrap { height: 250px; min-height: 250px; }
             #intro { padding: 20px; justify-content: flex-end; }
-            
-            /* Fix Login Card margins */
             .login-card { margin-bottom: 0; }
         }
     </style>
@@ -322,17 +310,16 @@
         </div>
         <div class="filter-row">
             <select id="flt-al" class="inp-sel" onchange="app.renderR()"></select>
-            <select id="flt-tm" class="inp-sel" onchange="app.renderR()">
-                <option value="ALL">All Durations</option><option value="1-2">Short (1-2h)</option><option value="3-4">Medium (3-4h)</option><option value="10+">Ultra (10h+)</option>
-            </select>
+            <select id="flt-tm" class="inp-sel" onchange="app.renderR()"></select>
         </div>
         <div id="list-routes" class="tickets-grid"></div>
     </div>
 
     <div id="tab-fleet" class="tab-content hidden">
         <h2>Fleet Overview</h2>
-        <div style="margin-bottom:20px;">
+        <div class="filter-row">
             <select id="flt-op" class="inp-sel" onchange="app.renderF()"></select>
+            <select id="flt-range" class="inp-sel" onchange="app.renderF()"></select>
         </div>
         <div id="list-fleet" class="tickets-grid"></div>
     </div>
@@ -345,7 +332,7 @@
                     <h3>Flight Parameters</h3>
                     <div class="form-group"><label class="form-lbl">Airline Operator</label><select id="gen-al" class="inp-sel" onchange="app.updHub()"></select></div>
                     <div class="form-group"><label class="form-lbl">Departure Hub</label><select id="gen-hub" class="inp-sel" disabled></select></div>
-                    <div class="form-group"><label class="form-lbl">Estimated Duration</label><select id="gen-tm" class="inp-sel"><option value="ALL">Random</option><option value="1-2">Short Range</option><option value="3-4">Medium Range</option><option value="10+">Ultra Long Range</option></select></div>
+                    <div class="form-group"><label class="form-lbl">Estimated Duration</label><select id="gen-tm" class="inp-sel"></select></div>
                     <button id="btn-gen" class="btn-main" onclick="app.gen()">GENERATE OFP</button>
                 </div>
                 <div class="d-map-wrap">
@@ -388,7 +375,7 @@
     const CODES = { "Lufthansa": "LH", "Swiss": "LX", "Austrian": "OS", "AirBaltic": "BT", "Brussels Airlines": "SN", "Eurowings": "EW", "Discover Airlines": "4Y", "Edelweiss Air": "WK", "Lufthansa Cargo": "GEC", "Lufthansa CityLine": "CL", "Lufthansa City Airlines": "VL", "Lufthansa Technik": "LT", "Air Dolomiti": "EN", "Lufthansa Private Jet": "LPJ", "ITA Airways": "AZ", "Widerøe": "WF", "Norwegian": "DY", "Finnair": "AY", "SAS": "SK", "Condor": "DE", "AeroLogic": "3S", "SunExpress": "XQ" };
 
     const DB = {
-        NEWS: [ { t: "System Update v87", d: "Mobile layout compacted. Filters fixed." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v88", d: "Detailed time filters added. Dark mode visuals patched." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
             { id: "B748", t: "Boeing 747-8", op: "Lufthansa", s: 364, r: "14h 30m", fuel: "195.0t", cat: "Full Service" },
@@ -430,7 +417,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v87.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v88.0", "Initializing Kernel...", "Loading Navigation Database...", "Authenticating User...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -460,7 +447,21 @@
             const uq = (k) => [...new Set(DB[k].map(x=>x[k=='ROUTES'?'al':'op']))];
             const ops = uq('ROUTES'), flt = uq('FLEET');
             const fill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
-            fill('flt-al', ops, 'All Airlines'); fill('gen-al', ops, 'Select Airline'); fill('flt-op', flt, 'All Operators');
+            
+            fill('flt-al', ops, 'All Airlines'); 
+            fill('gen-al', ops, 'Select Airline'); 
+            fill('flt-op', flt, 'All Operators');
+
+            // Generate Time Options (1 to 10+)
+            const tmOpts = document.querySelectorAll('#flt-tm, #gen-tm, #flt-range');
+            const optsHTML = `<option value="ALL">All Durations</option>` + 
+                             Array.from({length: 10}, (_, i) => `<option value="${i+1}">${i+1} Hour${i>0?'s':''}</option>`).join('') + 
+                             `<option value="10+">10+ Hours</option>`;
+            
+            tmOpts.forEach(el => {
+                if(el.id === 'flt-range') el.innerHTML = optsHTML.replace('All Durations', 'All Ranges');
+                else el.innerHTML = optsHTML;
+            });
         },
 
         login: function() {
@@ -500,10 +501,33 @@
             if(id=='dispatch') setTimeout(()=>this.dMap.invalidateSize(), 300);
         },
 
+        parseTime: function(str) {
+            if(typeof str === 'number') return str;
+            if(!str) return 0;
+            // Handle "6h 30m" format in Fleet or simple numbers
+            let h = 0, m = 0;
+            const hMatch = str.match(/(\d+)h/);
+            const mMatch = str.match(/(\d+)m/);
+            if(hMatch) h = parseInt(hMatch[1]);
+            if(mMatch) m = parseInt(mMatch[1]);
+            if(!hMatch && !mMatch && !isNaN(parseFloat(str))) return parseFloat(str);
+            return h + (m/60);
+        },
+
+        chkTime: function(val, filter) {
+            if(filter === 'ALL') return true;
+            const t = this.parseTime(val);
+            if(filter === '10+') return t >= 10;
+            const f = parseInt(filter);
+            return t >= f && t < (f + 1);
+        },
+
         renderF: function() {
-            const op=document.getElementById('flt-op').value;
-            const l=document.getElementById('list-fleet'); l.innerHTML="";
-            DB.FLEET.filter(f=>op=='ALL'||f.op==op).forEach(f=>{ 
+            const op = document.getElementById('flt-op').value;
+            const rng = document.getElementById('flt-range').value;
+            const l = document.getElementById('list-fleet'); l.innerHTML="";
+            
+            DB.FLEET.filter(f => (op=='ALL'||f.op==op) && this.chkTime(f.r, rng)).forEach(f=>{ 
                 l.innerHTML+=`<div class="ticket list-item" style="display:block;">
                     <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                         <span style="font-weight:700; font-size:1.1rem;">${f.t}</span>
@@ -517,6 +541,7 @@
                     </div>
                 </div>`; 
             });
+            if(l.innerHTML === "") l.innerHTML = "<div class='card'>No aircraft found matching filters.</div>";
         },
         
         updStats: function() {
@@ -525,13 +550,6 @@
             const l = this.data.stats.l;
             document.getElementById('st-r').innerText = l>20?"Captain":(l>5?"First Officer":"Second Officer");
             document.getElementById('st-r').style.color = l>20?"#ffb600":(l>5?"#60a5fa":"#9ca3af");
-        },
-
-        chkTime: function(t, f) {
-            if(f=='ALL') return true;
-            if(f.includes('+')) return t>=parseInt(f);
-            const [min,max] = f.split('-').map(Number);
-            return t>=min && t<max;
         },
 
         renderR: function() {
