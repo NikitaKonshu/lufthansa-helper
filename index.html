@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v96</title>
+    <title>Lufthansa Crew Portal v97</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -27,6 +27,11 @@
             --header-h: 64px;
             --nav-h: 56px;
             --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* Status Colors */
+            --st-active: #22c55e;
+            --st-seasonal: #eab308;
+            --st-suspended: #ef4444;
         }
 
         /* DARK MODE */
@@ -170,6 +175,12 @@
         .ticket:not(.disabled):hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
         
         .t-mobile-arrow { display: none; }
+        
+        /* Status Badge */
+        .st-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; margin-left: 8px; display: inline-block; vertical-align: middle; }
+        .st-active { color: var(--st-active); background: rgba(34, 197, 94, 0.1); }
+        .st-seasonal { color: var(--st-seasonal); background: rgba(234, 179, 8, 0.1); }
+        .st-suspended { color: var(--st-suspended); background: rgba(239, 68, 68, 0.1); }
 
         .crew-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .crew-row:last-child { border: none; }
@@ -287,7 +298,7 @@
                     </div>
                     <div class="prog-track"><div id="af-bar" class="prog-fill"></div></div>
                     <button class="btn-main hidden" id="btn-end" onclick="app.finish()">FILE PIREP</button>
-                    <button class="btn-main" style="background:var(--lh-red); color:white; margin-top:10px;" onclick="app.cancel()">CANCEL FLIGHT</button>
+                    <button class="btn-main" style="background:var(--lh-yellow); color:var(--lh-blue); margin-top:10px; border:1px solid rgba(0,0,0,0.1);" onclick="app.cancel()">CANCEL FLIGHT</button>
                 </div>
                 <div id="mis-box" class="card">
                     <h3>Daily Assignment</h3><div id="mis-txt" style="font-size:1.6rem; font-weight:300; margin-bottom:20px;">Loading...</div>
@@ -310,6 +321,7 @@
         <div class="filter-row">
             <select id="flt-al" class="inp-sel" onchange="app.renderR()"></select>
             <select id="flt-tm" class="inp-sel" onchange="app.renderR()"></select>
+            <select id="flt-stat" class="inp-sel" onchange="app.renderR()"></select>
         </div>
         <div id="list-routes" class="tickets-grid"></div>
     </div>
@@ -395,7 +407,7 @@
             "LOWW": ["C31", "C33", "C35", "C37", "C39", "C41", "D21", "D23", "D25", "D27", "D29", "F01", "F03", "F05", "F07", "F09", "F11", "F13", "F15", "F21", "F23", "F27", "F31", "F33", "F35", "G01", "G03", "G11", "G15", "G21"]
         },
 
-        NEWS: [ { t: "System Update v96", d: "Fixed OFP display issues. Routes now strictly tied to fleet and fuel." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v97", d: "Route Status (Active/Seasonal/Suspended) added. Filters updated." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -409,30 +421,30 @@
             { id: "A320E", t: "Airbus A320-200", op: "Eurowings", s: 174, r: "5h 00m", fuel: "18.5t", cat: "Buy on Board" }
         ],
         ROUTES: [
-            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5, ac: "A320L", fuel: "5.8t" },
-            { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5, ac: "B748", fuel: "98.5t" },
-            { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2, ac: "A320L", fuel: "4.9t" },
-            { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2, ac: "A320L", fuel: "16.5t" }, 
-            { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5, ac: "B748", fuel: "135.2t" },
-            { al: "Swiss", d: "LSZH", a: "EGLL", t: 1.8, ac: "A223", fuel: "5.2t" },
-            { al: "Swiss", d: "LSZH", a: "WSSS", t: 12.0, ac: "B77W", fuel: "105.0t" },
-            { al: "Swiss", d: "LSZH", a: "KJFK", t: 8.8, ac: "A333", fuel: "58.0t" },
-            { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5, ac: "B789", fuel: "68.5t" },
-            { al: "Austrian", d: "LOWW", a: "EGLL", t: 2.2, ac: "A320L", fuel: "7.1t" },
-            { al: "AirBaltic", d: "EVRA", a: "EDDL", t: 2.0, ac: "BCS3", fuel: "6.0t" },
-            { al: "AirBaltic", d: "EVRA", a: "EGLL", t: 2.5, ac: "BCS3", fuel: "7.2t" },
-            { al: "Eurowings", d: "EDDL", a: "LEPA", t: 2.2, ac: "A320E", fuel: "7.5t" },
-            { al: "Eurowings", d: "EDDL", a: "EGLL", t: 1.2, ac: "A320E", fuel: "4.5t" },
-            { al: "Discover Airlines", d: "EDDF", a: "FIMP", t: 11.0, ac: "A333", fuel: "72.0t" },
-            { al: "Discover Airlines", d: "EDDF", a: "MCO", t: 10.0, ac: "A333", fuel: "68.0t" },
-            { al: "Lufthansa Cargo", d: "EDDF", a: "VHHH", t: 11.5, ac: "B77W", fuel: "110.0t" },
-            { al: "ITA Airways", d: "LIRF", a: "KJFK", t: 9.0, ac: "A333", fuel: "62.0t" },
-            { al: "ITA Airways", d: "LIRF", a: "EGLL", t: 2.5, ac: "A320L", fuel: "8.0t" },
-            { al: "SAS", d: "EKCH", a: "KEWR", t: 8.5, ac: "A359", fuel: "60.0t" },
-            { al: "Finnair", d: "EFHK", a: "RJTT", t: 13.0, ac: "A359", fuel: "85.0t" },
-            { al: "Condor", d: "EDDF", a: "CUN", t: 11.0, ac: "A333", fuel: "75.0t" },
-            { al: "Brussels Airlines", d: "EBBR", a: "KJFK", t: 8.0, ac: "A333", fuel: "55.0t" },
-            { al: "Edelweiss Air", d: "LSZH", a: "CPT", t: 11.5, ac: "A333", fuel: "78.0t" }
+            { al: "Lufthansa", d: "EDDF", a: "EGLL", t: 1.5, ac: "A320L", fuel: "5.8t", s: "Active" },
+            { al: "Lufthansa", d: "EDDF", a: "KJFK", t: 8.5, ac: "B748", fuel: "98.5t", s: "Active" },
+            { al: "Lufthansa", d: "EDDM", a: "LFPG", t: 1.2, ac: "A320L", fuel: "4.9t", s: "Active" },
+            { al: "Lufthansa", d: "EDDF", a: "OMDB", t: 6.2, ac: "A320L", fuel: "16.5t", s: "Seasonal" }, 
+            { al: "Lufthansa", d: "EDDF", a: "KLAX", t: 11.5, ac: "B748", fuel: "135.2t", s: "Active" },
+            { al: "Swiss", d: "LSZH", a: "EGLL", t: 1.8, ac: "A223", fuel: "5.2t", s: "Active" },
+            { al: "Swiss", d: "LSZH", a: "WSSS", t: 12.0, ac: "B77W", fuel: "105.0t", s: "Suspended" },
+            { al: "Swiss", d: "LSZH", a: "KJFK", t: 8.8, ac: "A333", fuel: "58.0t", s: "Active" },
+            { al: "Austrian", d: "LOWW", a: "VTBS", t: 10.5, ac: "B789", fuel: "68.5t", s: "Seasonal" },
+            { al: "Austrian", d: "LOWW", a: "EGLL", t: 2.2, ac: "A320L", fuel: "7.1t", s: "Active" },
+            { al: "AirBaltic", d: "EVRA", a: "EDDL", t: 2.0, ac: "BCS3", fuel: "6.0t", s: "Active" },
+            { al: "AirBaltic", d: "EVRA", a: "EGLL", t: 2.5, ac: "BCS3", fuel: "7.2t", s: "Active" },
+            { al: "Eurowings", d: "EDDL", a: "LEPA", t: 2.2, ac: "A320E", fuel: "7.5t", s: "Seasonal" },
+            { al: "Eurowings", d: "EDDL", a: "EGLL", t: 1.2, ac: "A320E", fuel: "4.5t", s: "Active" },
+            { al: "Discover Airlines", d: "EDDF", a: "FIMP", t: 11.0, ac: "A333", fuel: "72.0t", s: "Seasonal" },
+            { al: "Discover Airlines", d: "EDDF", a: "MCO", t: 10.0, ac: "A333", fuel: "68.0t", s: "Active" },
+            { al: "Lufthansa Cargo", d: "EDDF", a: "VHHH", t: 11.5, ac: "B77W", fuel: "110.0t", s: "Active" },
+            { al: "ITA Airways", d: "LIRF", a: "KJFK", t: 9.0, ac: "A333", fuel: "62.0t", s: "Active" },
+            { al: "ITA Airways", d: "LIRF", a: "EGLL", t: 2.5, ac: "A320L", fuel: "8.0t", s: "Suspended" },
+            { al: "SAS", d: "EKCH", a: "KEWR", t: 8.5, ac: "A359", fuel: "60.0t", s: "Active" },
+            { al: "Finnair", d: "EFHK", a: "RJTT", t: 13.0, ac: "A359", fuel: "85.0t", s: "Suspended" },
+            { al: "Condor", d: "EDDF", a: "CUN", t: 11.0, ac: "A333", fuel: "75.0t", s: "Seasonal" },
+            { al: "Brussels Airlines", d: "EBBR", a: "KJFK", t: 8.0, ac: "A333", fuel: "55.0t", s: "Active" },
+            { al: "Edelweiss Air", d: "LSZH", a: "CPT", t: 11.5, ac: "A333", fuel: "78.0t", s: "Seasonal" }
         ],
         COORDS: {
             "EDDF":[50.03,8.56], "EDDM":[48.35,11.77], "LSZH":[47.45,8.55], "LOWW":[48.11,16.56], "EKCH":[55.61,12.65], "EGLL":[51.47,-0.45], "KJFK":[40.64,-73.77], "KLAX":[33.94,-118.40], "WSSS":[1.36,103.99], "VTBS":[13.69,100.75], "LFPG":[49.00,2.55], "KEWR":[40.68,-74.17], "EVRA":[56.92,23.97], "EDDL":[51.28,6.76], "LEPA":[39.55,2.73], "FIMP":[-20.43,57.68], "MCO":[28.43,-81.30], "VHHH":[22.30,113.91], "EDDP":[51.42,12.23], "KCVG":[39.04,-84.66], "LIRF":[41.80,12.24], "EFHK":[60.31,24.96], "RJTT":[35.54,139.77], "ENGM":[60.19,11.10], "CUN":[21.04,-86.87], "LTAI":[36.89,30.80], "LIPZ":[45.50,12.35], "EBBR":[50.90,4.48], "CPT":[-33.97,18.60], "EDDH":[53.63,9.98], "NCE":[43.66,7.21], "BGO":[60.29,5.21], "OMDB":[25.25,55.36]
@@ -450,7 +462,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v96.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v97.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -484,6 +496,10 @@
             fill('flt-al', ops, 'All Airlines'); 
             fill('gen-al', ops, 'Select Airline'); 
             fill('flt-op', ops, 'All Operators');
+            
+            // Status Filter
+            const sfill = (id, arr, t) => { const el=document.getElementById(id); el.innerHTML=`<option value="ALL">${t}</option>`; arr.forEach(x=>el.add(new Option(x,x))); };
+            sfill('flt-stat', ['Active', 'Seasonal', 'Suspended'], 'All Statuses');
 
             let opts = `<option value="ALL">All Durations</option>`;
             for(let i=1; i<10; i++) {
@@ -601,18 +617,29 @@
         },
 
         renderR: function() {
-            const al=document.getElementById('flt-al').value, tm=document.getElementById('flt-tm').value;
+            const al=document.getElementById('flt-al').value;
+            const tm=document.getElementById('flt-tm').value;
+            const st=document.getElementById('flt-stat').value;
+            
             const l=document.getElementById('list-routes'); l.innerHTML="";
             const isActive = !!this.data.active;
             
             let found = false;
             DB.ROUTES.forEach((x, i) => {
-                if((al=='ALL'||x.al==al) && this.chkTime(x.t, tm)) {
+                if((al=='ALL'||x.al==al) && this.chkTime(x.t, tm) && (st=='ALL'||x.s==st)) {
                     found = true;
+                    const stClass = x.s === 'Active' ? 'st-active' : (x.s === 'Seasonal' ? 'st-seasonal' : 'st-suspended');
                     l.innerHTML+=`
                     <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.02}s" onclick="app.prep(${i})">
-                        <div><div class="t-loc">${x.d}</div><div class="t-sub">${x.al}</div></div>
-                        <div class="t-path"><div class="t-dur">${x.t}h</div><div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div><div class="t-mobile-arrow">&rarr;</div></div>
+                        <div>
+                            <div class="t-loc">${x.d}</div>
+                            <div class="t-sub">${x.al}</div>
+                        </div>
+                        <div class="t-path">
+                            <div class="t-dur">${x.t}h <span class="st-badge ${stClass}">${x.s[0]}</span></div>
+                            <div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div>
+                            <div class="t-mobile-arrow">&rarr;</div>
+                        </div>
                         <div><div class="t-loc">${x.a}</div><div class="t-sub">Arrival</div></div>
                         <div class="t-action"><div class="btn-select">${isActive?'🔒':'&rarr;'}</div></div>
                     </div>`; 
@@ -632,6 +659,10 @@
             
             const r = DB.ROUTES[idx];
             if(!r) return;
+            
+            // Allow user to click any card to view details, but only fly active if enforcing
+            // For Schedule tab, we let them see all details.
+            // For Generation, we restrict to Active.
 
             const p = DB.FLEET.find(f => f.id === r.ac);
             if(!p) { alert("Aircraft data not found for this route."); return; }
@@ -661,7 +692,6 @@
             document.getElementById('br-pax').innerText = this.data.temp.pax;
             document.getElementById('br-fl').innerText = this.data.temp.fl;
             
-            // Hide ZFW slot, show FUEL slot which is used
             const zfwEl = document.getElementById('br-zfw');
             if(zfwEl && zfwEl.parentElement) zfwEl.parentElement.style.display = 'none';
 
@@ -727,12 +757,12 @@
         gen: function() {
             if(this.data.active) { alert("Flight already in progress."); return; }
             const al=document.getElementById('gen-al').value, h=document.getElementById('gen-hub').value, tm=document.getElementById('gen-tm').value;
-            // Find ALL matching routes
-            const matches = DB.ROUTES.map((r, i) => ({r, i})).filter(x => x.r.al==al && x.r.d==h && this.chkTime(x.r.t, tm));
+            // Filter strictly for ACTIVE routes only
+            const matches = DB.ROUTES.map((r, i) => ({r, i}))
+                                   .filter(x => x.r.al==al && x.r.d==h && this.chkTime(x.r.t, tm) && x.r.s === 'Active');
             
-            if(!matches.length) { alert("No routes match."); return; }
+            if(!matches.length) { alert("No active routes match these criteria."); return; }
             
-            // Pick random match
             const match = matches[Math.floor(Math.random()*matches.length)];
             
             document.getElementById('dispatch-meme').style.display = 'flex';
@@ -751,7 +781,6 @@
         },
         dailyMis: function() {
             const d=new Date().getDate(); 
-            // Find index of daily mission roughly based on date
             const idx = d % DB.ROUTES.length;
             this.data.mis = { ...DB.ROUTES[idx], idx: idx };
             document.getElementById('mis-txt').innerText = `${this.data.mis.d} → ${this.data.mis.a}`;
