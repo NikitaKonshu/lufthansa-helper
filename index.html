@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v97</title>
+    <title>Lufthansa Crew Portal v98</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -174,13 +174,19 @@
         .btn-select { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--border); background: transparent; color: var(--text-sub); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; transition: 0.2s; }
         .ticket:not(.disabled):hover .btn-select { background: var(--lh-yellow); border-color: var(--lh-yellow); color: #05164d; }
         
-        .t-mobile-arrow { display: none; }
+        /* === STATUS BADGE UPDATED === */
+        .st-pill { 
+            display: inline-block; padding: 6px 12px; border-radius: 8px; 
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase; 
+            letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .st-active { color: #166534; background: #dcfce7; border: 1px solid #bbf7d0; }
+        .st-seasonal { color: #854d0e; background: #fef9c3; border: 1px solid #fde047; }
+        .st-suspended { color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; }
         
-        /* Status Badge */
-        .st-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; margin-left: 8px; display: inline-block; vertical-align: middle; }
-        .st-active { color: var(--st-active); background: rgba(34, 197, 94, 0.1); }
-        .st-seasonal { color: var(--st-seasonal); background: rgba(234, 179, 8, 0.1); }
-        .st-suspended { color: var(--st-suspended); background: rgba(239, 68, 68, 0.1); }
+        body.dark-mode .st-active { color: #4ade80; background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.3); }
+        body.dark-mode .st-seasonal { color: #facc15; background: rgba(234, 179, 8, 0.2); border-color: rgba(234, 179, 8, 0.3); }
+        body.dark-mode .st-suspended { color: #f87171; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.3); }
 
         .crew-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
         .crew-row:last-child { border: none; }
@@ -221,19 +227,33 @@
             .grid-stats { grid-template-columns: 1fr; gap: 15px; }
             .dash-layout, .dispatch-layout { grid-template-columns: 1fr; gap: 25px; }
             
-            .ticket { padding: 15px; gap: 12px; display: grid; grid-template-columns: 1fr auto 1fr auto; align-items: center; text-align: left; }
-            .t-loc { font-size: 1.2rem; margin-bottom: 2px; }
-            .t-sub { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80px; }
-            .t-path { padding: 0; flex: none; width: auto; }
-            .t-dur { display: block; font-size: 0.7rem; padding: 2px 6px; margin: 0; margin-bottom: 2px; }
-            .t-line-wrap { display: none; }
-            .t-mobile-arrow { display: block; font-size: 1.2rem; color: var(--lh-yellow); }
-            .ticket > div:nth-child(3) { text-align: right; }
-            .t-action { margin-left: 5px; }
-            .btn-select { width: 40px; height: 40px; border-radius: 12px; }
+            /* TICKET MOBILE UPDATE */
+            .ticket { 
+                padding: 15px; 
+                display: grid; 
+                grid-template-columns: 1fr 1fr auto; 
+                grid-template-rows: auto auto;
+                gap: 15px 10px; 
+                align-items: center; 
+                text-align: left; 
+            }
+            .ticket > div:nth-child(1) { grid-column: 1; grid-row: 1; } /* Dep */
+            .ticket > div:nth-child(3) { grid-column: 2; grid-row: 1; text-align: right; } /* Arr */
+            .ticket > div:nth-child(2) { grid-column: 1 / span 2; grid-row: 2; display:flex; flex-direction:row-reverse; justify-content: space-between; align-items: center; } /* Path info */
+            .ticket > div:nth-child(4) { grid-column: 3; grid-row: 1 / span 2; } /* Button */
+            
+            .t-loc { font-size: 1.4rem; margin-bottom: 2px; }
+            .t-sub { font-size: 0.8rem; }
+            .t-path { padding: 0; width: 100%; border-top: 1px solid var(--border); paddingTop: 12px; marginTop: 5px; }
+            .t-dur { font-size: 0.9rem; font-weight: 600; }
+            .t-line-wrap, .t-mobile-arrow { display: none; }
+            
+            .st-pill { margin: 0; font-size: 0.7rem; padding: 4px 8px; }
 
             .filter-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
             .filter-row .inp-sel { width: 100%; margin: 0; }
+            /* Make status filter full width on mobile */
+            .filter-row select:last-child { grid-column: 1 / -1; }
 
             .ofp-grid { grid-template-columns: 1fr 1fr; }
             .d-map-wrap { height: 250px; min-height: 250px; }
@@ -407,7 +427,7 @@
             "LOWW": ["C31", "C33", "C35", "C37", "C39", "C41", "D21", "D23", "D25", "D27", "D29", "F01", "F03", "F05", "F07", "F09", "F11", "F13", "F15", "F21", "F23", "F27", "F31", "F33", "F35", "G01", "G03", "G11", "G15", "G21"]
         },
 
-        NEWS: [ { t: "System Update v97", d: "Route Status (Active/Seasonal/Suspended) added. Filters updated." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v98", d: "Enhanced UI for Flight Schedule: Status indicators enlarged for better visibility." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -462,7 +482,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v97.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v98.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -629,6 +649,8 @@
                 if((al=='ALL'||x.al==al) && this.chkTime(x.t, tm) && (st=='ALL'||x.s==st)) {
                     found = true;
                     const stClass = x.s === 'Active' ? 'st-active' : (x.s === 'Seasonal' ? 'st-seasonal' : 'st-suspended');
+                    const stText = x.s === 'Active' ? 'ACTIVE FLIGHT' : (x.s === 'Seasonal' ? 'SEASONAL ROUTE' : 'SUSPENDED');
+                    
                     l.innerHTML+=`
                     <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.02}s" onclick="app.prep(${i})">
                         <div>
@@ -636,7 +658,8 @@
                             <div class="t-sub">${x.al}</div>
                         </div>
                         <div class="t-path">
-                            <div class="t-dur">${x.t}h <span class="st-badge ${stClass}">${x.s[0]}</span></div>
+                            <div class="st-pill ${stClass}">${stText}</div>
+                            <div class="t-dur">${x.t}h</div>
                             <div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div>
                             <div class="t-mobile-arrow">&rarr;</div>
                         </div>
@@ -660,10 +683,6 @@
             const r = DB.ROUTES[idx];
             if(!r) return;
             
-            // Allow user to click any card to view details, but only fly active if enforcing
-            // For Schedule tab, we let them see all details.
-            // For Generation, we restrict to Active.
-
             const p = DB.FLEET.find(f => f.id === r.ac);
             if(!p) { alert("Aircraft data not found for this route."); return; }
             
