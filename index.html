@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Lufthansa Crew Portal v95</title>
+    <title>Lufthansa Crew Portal v96</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
@@ -395,7 +395,7 @@
             "LOWW": ["C31", "C33", "C35", "C37", "C39", "C41", "D21", "D23", "D25", "D27", "D29", "F01", "F03", "F05", "F07", "F09", "F11", "F13", "F15", "F21", "F23", "F27", "F31", "F33", "F35", "G01", "G03", "G11", "G15", "G21"]
         },
 
-        NEWS: [ { t: "System Update v95", d: "Exact block fuel calculation and specific gate assignment integrated." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
+        NEWS: [ { t: "System Update v96", d: "Fixed OFP display issues. Routes now strictly tied to fleet and fuel." }, { t: "Winter Operations", d: "De-icing mandatory at stations < 3°C." } ],
         
         FLEET: [
             { id: "A320L", t: "Airbus A320neo", op: "Lufthansa", s: 180, r: "6h 30m", fuel: "19.0t", cat: "Snack" },
@@ -450,7 +450,7 @@
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v95.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v96.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
@@ -603,24 +603,27 @@
         renderR: function() {
             const al=document.getElementById('flt-al').value, tm=document.getElementById('flt-tm').value;
             const l=document.getElementById('list-routes'); l.innerHTML="";
-            const r=DB.ROUTES.filter(x=>(al=='ALL'||x.al==al) && this.chkTime(x.t, tm));
-            if(!r.length) { l.innerHTML="<div class='card'>No flights found.</div>"; return; }
             const isActive = !!this.data.active;
-            r.forEach((x, i)=>{ 
-                l.innerHTML+=`
-                <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.05}s" onclick="app.prep(${i})">
-                    <div><div class="t-loc">${x.d}</div><div class="t-sub">${x.al}</div></div>
-                    <div class="t-path"><div class="t-dur">${x.t}h</div><div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div><div class="t-mobile-arrow">&rarr;</div></div>
-                    <div><div class="t-loc">${x.a}</div><div class="t-sub">Arrival</div></div>
-                    <div class="t-action"><div class="btn-select">${isActive?'🔒':'&rarr;'}</div></div>
-                </div>`; 
+            
+            let found = false;
+            DB.ROUTES.forEach((x, i) => {
+                if((al=='ALL'||x.al==al) && this.chkTime(x.t, tm)) {
+                    found = true;
+                    l.innerHTML+=`
+                    <div class="ticket list-item ${isActive?'disabled':''}" style="animation-delay:${i*0.02}s" onclick="app.prep(${i})">
+                        <div><div class="t-loc">${x.d}</div><div class="t-sub">${x.al}</div></div>
+                        <div class="t-path"><div class="t-dur">${x.t}h</div><div class="t-line-wrap"><div class="t-dot"></div><div class="t-line"><div class="t-plane">✈</div></div><div class="t-dot"></div></div><div class="t-mobile-arrow">&rarr;</div></div>
+                        <div><div class="t-loc">${x.a}</div><div class="t-sub">Arrival</div></div>
+                        <div class="t-action"><div class="btn-select">${isActive?'🔒':'&rarr;'}</div></div>
+                    </div>`; 
+                }
             });
+            if(!found) l.innerHTML="<div class='card'>No flights found.</div>";
         },
 
         getGate: function(airport) {
             const g = DB.GATES[airport];
             if(g) return g[Math.floor(Math.random() * g.length)];
-            // Fallback for non-hub airports
             return "G" + Math.floor(Math.random() * 20 + 1);
         },
 
@@ -630,7 +633,6 @@
             const r = DB.ROUTES[idx];
             if(!r) return;
 
-            // Find specific aircraft details from FLEET using the ID assigned in ROUTES
             const p = DB.FLEET.find(f => f.id === r.ac);
             if(!p) { alert("Aircraft data not found for this route."); return; }
             
@@ -644,8 +646,8 @@
                 d: r.d, a: r.a, t: r.t, 
                 ac: p.t, n: code, 
                 gate: gate, 
-                pax: Math.floor(p.s * (0.7 + Math.random() * 0.3)), // 70-100% load
-                fuel: r.fuel, // Exact fuel from DB
+                pax: Math.floor(p.s * (0.7 + Math.random() * 0.3)), 
+                fuel: r.fuel, 
                 fl: "FL3"+Math.floor(Math.random()*9)+"0" 
             };
             
@@ -655,11 +657,13 @@
             document.getElementById('br-ac').innerText = this.data.temp.ac;
             document.getElementById('br-gate').innerText = this.data.temp.gate;
             document.getElementById('br-time').innerText = this.data.temp.t + "h";
-            document.getElementById('br-fuel').innerText = this.data.temp.fuel; // Using BLOCK FUEL field
+            document.getElementById('br-fuel').innerText = this.data.temp.fuel;
             document.getElementById('br-pax').innerText = this.data.temp.pax;
             document.getElementById('br-fl').innerText = this.data.temp.fl;
-            document.getElementById('br-zfw').style.display = 'none'; // Replaced by Fuel or just hide ZFW for now as user asked for fuel focus
-            document.querySelector('#br-zfw').parentElement.style.display = 'none';
+            
+            // Hide ZFW slot, show FUEL slot which is used
+            const zfwEl = document.getElementById('br-zfw');
+            if(zfwEl && zfwEl.parentElement) zfwEl.parentElement.style.display = 'none';
 
             document.getElementById('modal').classList.add('visible');
             
