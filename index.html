@@ -744,7 +744,7 @@ const DB = {
             if(localStorage.getItem('dark')=='1') document.body.classList.add('dark-mode');
             setInterval(()=>{ const d=new Date(); document.getElementById('clock').innerText=`${String(d.getUTCHours()).padStart(2,0)}:${String(d.getUTCMinutes()).padStart(2,0)} Z`; }, 1000);
             
-            const logs = ["Lufthansa Systems BIOS v99.0", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
+            const logs = ["Lufthansa Systems BIOS v1 Alpha", "Initializing Kernel...", "Loading Airline Database...", "Loading Crew Database...", "System READY."];
             let i = 0;
             const typeLog = () => {
                 if(i < logs.length) {
